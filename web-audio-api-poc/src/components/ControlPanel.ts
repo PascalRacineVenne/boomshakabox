@@ -40,4 +40,13 @@ export const controlPanelStyles = {
     flex-direction: column;
     align-items: center;
   `,
+
+  /**
+   * Combined with `panel` via `classnames` when this instrument is the one
+   * currently selected for step-pattern editing — see StepSequencer.tsx.
+   */
+  selected: css`
+    border-color: var(--accent);
+    border-width: 2px;
+  `,
 };

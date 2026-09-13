@@ -33,6 +33,7 @@ const TempoKnob = () => {
   return (
     <div className={styles.container}>
       <Knob
+        variant="plainCap"
         min={min}
         max={max}
         value={bpm}

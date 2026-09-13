@@ -14,6 +14,7 @@ const MetronomeClick = () => {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
       <Knob
+        variant="plainCap"
         min={minTone}
         max={maxTone}
         value={tone}
