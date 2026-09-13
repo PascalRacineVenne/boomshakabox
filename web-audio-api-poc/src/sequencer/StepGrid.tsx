@@ -54,9 +54,12 @@ const StepGrid = ({ active, currentStep, onStepChange }: StepGridProps) => {
                 key={stepIndex}
                 latch
                 size="small"
+                label={`${stepIndex + 1}`}
                 value={active[stepIndex]}
                 onChange={(e) => onStepChange(stepIndex, e.value)}
-                className={classNames(currentStep === stepIndex && styles.playhead)}
+                className={classNames(
+                  currentStep === stepIndex && styles.playhead,
+                )}
               />
             );
           })}
