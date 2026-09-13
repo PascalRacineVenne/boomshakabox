@@ -37,6 +37,7 @@ function ToneKickButton() {
   const [tone, setTone] = useState(50); // resting fundamental frequency the pitch glide settles on, in Hz
   const [decay, setDecay] = useState(0.35); // amp envelope decay length, in seconds
   const [volume, setVolume] = useState(75); // 0-100%, overall output level
+  const [pressed, setPressed] = useState(false); // drives the pad's lit state — real mousedown/up, not hover
 
   const triggerKick = async () => {
     // Unlocks/resumes Tone's shared AudioContext after the click gesture,
@@ -121,7 +122,14 @@ function ToneKickButton() {
           />
         </KnobColumn>
       </ControlsRow>
-      <Button label="Kick" value={false} onClick={triggerKick} />
+      <Button
+        label="Kick"
+        value={pressed}
+        onChange={(e) => {
+          setPressed(e.value);
+          if (e.value) triggerKick(); // fires on the real press, not on the release toggling back to false
+        }}
+      />
     </ControlPanel>
   );
 }

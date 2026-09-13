@@ -27,6 +27,7 @@ function ToneSnareButton() {
   const [tone, setTone] = useState(180); // base frequency of the tone voice's VCOs, in Hz
   const [snappy, setSnappy] = useState(1); // 0-1 mix level of the noise/snap voice
   const [volume, setVolume] = useState(75); // 0-100%, overall output level for both voices
+  const [pressed, setPressed] = useState(false); // drives the pad's lit state — real mousedown/up, not hover
 
   const triggerSnare = async () => {
     // Tone.js shares one AudioContext under the hood (Tone.getContext()).
@@ -117,7 +118,14 @@ function ToneSnareButton() {
           />
         </KnobColumn>
       </ControlsRow>
-      <Button label="Snare" value={false} onClick={triggerSnare} />
+      <Button
+        label="Snare"
+        value={pressed}
+        onChange={(e) => {
+          setPressed(e.value);
+          if (e.value) triggerSnare(); // fires on the real press, not on the release toggling back to false
+        }}
+      />
     </ControlPanel>
   );
 }
