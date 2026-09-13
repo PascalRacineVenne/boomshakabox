@@ -2,10 +2,21 @@ import { css } from "@linaria/core";
 import TempoTransportPanel from "./TempoTransportPanel";
 import KickPad from "../components/kick/KickPad";
 import SnarePad from "../components/snare/SnarePad";
+import HiHatPad from "../components/hihat/HiHatPad";
+import HiHatOpenPad from "../components/hihatOpen/HiHatOpenPad";
 import { useKickVoice } from "../components/kick/useKickVoice";
 import { useSnareVoice } from "../components/snare/useSnareVoice";
+import { useHiHatVoice } from "../components/hihat/useHiHatVoice";
+import { useHiHatOpenVoice } from "../components/hihatOpen/useHiHatOpenVoice";
 import StepGrid from "./StepGrid";
-import { useStepSequencer } from "./useStepSequencer";
+import { useStepSequencer, type TrackId } from "./useStepSequencer";
+
+const TRACK_LABELS: Record<TrackId, string> = {
+  kick: "Kick",
+  snare: "Snare",
+  hihat: "HH Closed",
+  hihatOpen: "HH Open",
+};
 
 const styles = {
   container: css`
@@ -36,15 +47,16 @@ const styles = {
 /**
  * The full step drum sequencer.
  *
- * `useKickVoice`/`useSnareVoice` are called *here*, not inside the pad
- * components — this is what lets the sequencer's scheduler
- * (`useStepSequencer`) reach each voice's live `trigger` closure directly,
- * using the exact same sound-generation code driven by the exact same
- * knobs shown on the pads below. Adding an instrument later (Tom1, HH
- * Closed, etc. — see ARCHITECTURE-SPEC.MD) means: add its id to
- * `useStepSequencer.ts`'s `TRACK_IDS`, give it a `use<X>Voice`/`<X>Pad`
- * pair under `components/`, and render + pass it in here the same way
- * kick/snare are below.
+ * `useKickVoice`/`useSnareVoice`/`useHiHatVoice`/`useHiHatOpenVoice` are
+ * called *here*, not inside the pad components — this is what lets the
+ * sequencer's scheduler (`useStepSequencer`) reach each voice's live
+ * `trigger` closure directly, using the exact same sound-generation code
+ * driven by the exact same knobs shown on the pads below. Adding an
+ * instrument later (Tom1, etc. — see ARCHITECTURE-SPEC.MD) means: add its
+ * id to `useStepSequencer.ts`'s `TRACK_IDS`, give it a
+ * `use<X>Voice`/`<X>Pad` pair under `components/`, a label in
+ * `TRACK_LABELS` above, and render + pass it in here the same way
+ * kick/snare/hihat/hihatOpen are below.
  *
  * There's a single 16-step grid, not one per track: pressing a pad both
  * fires that instrument's preview hit and selects it as the pattern the
@@ -55,9 +67,15 @@ const styles = {
 const StepSequencer = () => {
   const kickVoice = useKickVoice();
   const snareVoice = useSnareVoice();
+  const hiHatVoice = useHiHatVoice();
+  const hiHatOpenVoice = useHiHatOpenVoice();
 
-  const { activePattern, selectedTrack, selectTrack, currentStep, setStep } =
-    useStepSequencer({ kick: kickVoice, snare: snareVoice });
+  const { activePattern, selectedTrack, selectTrack, currentStep, setStep } = useStepSequencer({
+    kick: kickVoice,
+    snare: snareVoice,
+    hihat: hiHatVoice,
+    hihatOpen: hiHatOpenVoice,
+  });
 
   return (
     <div className={styles.container}>
@@ -73,11 +91,19 @@ const StepSequencer = () => {
           selected={selectedTrack === "snare"}
           onSelect={() => selectTrack("snare")}
         />
+        <HiHatPad
+          {...hiHatVoice}
+          selected={selectedTrack === "hihat"}
+          onSelect={() => selectTrack("hihat")}
+        />
+        <HiHatOpenPad
+          {...hiHatOpenVoice}
+          selected={selectedTrack === "hihatOpen"}
+          onSelect={() => selectTrack("hihatOpen")}
+        />
       </div>
       <div className={styles.gridRow}>
-        <span className={styles.gridLabel}>
-          {selectedTrack === "kick" ? "Kick" : "Snare"}
-        </span>
+        <span className={styles.gridLabel}>{TRACK_LABELS[selectedTrack]}</span>
         <StepGrid active={activePattern} currentStep={currentStep} onStepChange={setStep} />
       </div>
     </div>
