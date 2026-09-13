@@ -1,5 +1,7 @@
-import { Button } from "antd";
+import { useState } from "react";
+import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
 import * as Tone from "tone";
+import { ControlPanel, ControlsRow, KnobColumn } from "./ControlPanel";
 
 // Tone.Distortion's curve (from its source: (3+k)x*20deg / (PI+k|x|), where
 // k = amount*100) isn't a soft-clipper like the raw version's tanh — it's a
@@ -14,6 +16,8 @@ function distortionMakeupGain(amount: number): number {
   return 1 / peakOutput;
 }
 
+const PITCH_DROP_START = 180; // starting "click" pitch the VCO glides down from, in Hz
+
 // Same TR-808 kick recipe as WebAudioKickButton (a sine VCO with a fast
 // downward pitch glide for the attack/punch, a short VCA decay, and a
 // saturation stage for fatness), rebuilt with Tone.js. The one swap worth
@@ -21,7 +25,19 @@ function distortionMakeupGain(amount: number): number {
 // WaveShaperNode curve — a different waveshaping algorithm under the hood,
 // so its level-compensated with a makeup gain stage below (see
 // distortionMakeupGain) instead of a Float32Array you compute yourself.
+//
+// Per ui-stack.md's per-track strip mapping, Volume is the shared-base
+// Slider and "Tone"/"Decay" are the kick's instrument-specific Knobs. This
+// is a one-shot preview button, not a persistent scheduled voice, so
+// there's no live Tone node to write control changes into mid-sound (see
+// drum-machine-architecture.md's one-shot vs. sustained classification) —
+// plain useState is enough, read fresh at the top of triggerKick on every
+// click.
 function ToneKickButton() {
+  const [tone, setTone] = useState(50); // resting fundamental frequency the pitch glide settles on, in Hz
+  const [decay, setDecay] = useState(0.35); // amp envelope decay length, in seconds
+  const [volume, setVolume] = useState(75); // 0-100%, overall output level
+
   const triggerKick = async () => {
     // Unlocks/resumes Tone's shared AudioContext after the click gesture,
     // same role as audioCtx.resume() in the raw Web Audio version.
@@ -29,12 +45,12 @@ function ToneKickButton() {
 
     const now = Tone.now();
     const pitchDropTime = 0.05; // ~50ms glide — fast enough to read as a "click," not a siren
-    const duration = 0.35; // short, punchy decay — fat but not a long boomy tail
+    const duration = decay; // "Decay" knob: short, punchy decay — fat but not a long boomy tail
+    const level = volume / 100; // Volume slider as a 0-1 multiplier applied to the VCA peak
 
     // VCO with a pitch envelope: starts bright, glides down to the sub fundamental
-    const osc = new Tone.Oscillator(180, "sine");
-    osc.frequency.setValueAtTime(180, now);
-    osc.frequency.exponentialRampToValueAtTime(50, now + pitchDropTime);
+    const osc = new Tone.Oscillator(PITCH_DROP_START, "sine");
+    osc.frequency.exponentialRampToValueAtTime(tone, now + pitchDropTime); // "Tone" knob: the pitch it settles on
 
     // Saturation stage (Drive knob): Tone.Distortion is a prebuilt
     // WaveShaper wrapper — the "0.4" is the same kind of drive amount as
@@ -51,7 +67,7 @@ function ToneKickButton() {
 
     // VCA: instant attack, no ramp-up, exponential decay curve
     const ampGain = new Tone.Gain(1).toDestination();
-    ampGain.gain.setValueAtTime(1, now);
+    ampGain.gain.setValueAtTime(level, now); // "Volume" slider sets the peak level
     ampGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
     osc.connect(saturation); // VCO -> Drive
@@ -74,7 +90,40 @@ function ToneKickButton() {
     );
   };
 
-  return <Button onClick={triggerKick}>Trigger 808 Kick (Tone.js)</Button>;
+  return (
+    <ControlPanel>
+      <ControlsRow>
+        <Slider
+          min={0}
+          max={100}
+          step={1}
+          value={volume}
+          onChange={(e) => setVolume(e.value)}
+          label="Volume"
+          orientation="vertical"
+          unit="%"
+          valueAsLabel="interactive"
+        />
+        <KnobColumn>
+          <Knob
+            min={30}
+            max={120}
+            value={tone}
+            onChange={(e) => setTone(e.value)}
+            label="Tone"
+          />
+          <Knob
+            min={0.1}
+            max={1}
+            value={decay}
+            onChange={(e) => setDecay(e.value)}
+            label="Decay"
+          />
+        </KnobColumn>
+      </ControlsRow>
+      <Button label="Kick" value={false} onClick={triggerKick} />
+    </ControlPanel>
+  );
 }
 
 export default ToneKickButton;

@@ -1,9 +1,9 @@
 import { Space } from "antd";
 import "./App.css";
-import WebAudioSnareButton from "./components/WebAudioSnareButton";
-import ToneSnareButton from "./components/ToneSnareButton";
-import WebAudioKickButton from "./components/WebAudioKickButton";
 import ToneKickButton from "./components/ToneKickButton";
+import ToneSnareButton from "./components/ToneSnareButton";
+// import WebAudioKickButton from "./components/WebAudioKickButton";
+// import WebAudioSnareButton from "./components/WebAudioSnareButton";
 
 function App() {
   return (
@@ -13,12 +13,14 @@ function App() {
           <h1>Be creative!</h1>
 
           <Space>
-            <WebAudioSnareButton />
-            <ToneSnareButton />
-            <WebAudioKickButton />
             <ToneKickButton />
+            <ToneSnareButton />
           </Space>
         </div>
+        <Space>
+          {/* <WebAudioKickButton /> */}
+          {/* <WebAudioSnareButton /> */}
+        </Space>
       </section>
 
       <div className="ticks"></div>
