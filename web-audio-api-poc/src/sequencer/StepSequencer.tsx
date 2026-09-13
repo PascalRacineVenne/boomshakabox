@@ -1,0 +1,87 @@
+import { css } from "@linaria/core";
+import TempoTransportPanel from "./TempoTransportPanel";
+import KickPad from "../components/kick/KickPad";
+import SnarePad from "../components/snare/SnarePad";
+import { useKickVoice } from "../components/kick/useKickVoice";
+import { useSnareVoice } from "../components/snare/useSnareVoice";
+import StepGrid from "./StepGrid";
+import { useStepSequencer } from "./useStepSequencer";
+
+const styles = {
+  container: css`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(var(--audioui-unit) / 2);
+  `,
+  pads: css`
+    display: flex;
+    gap: calc(var(--audioui-unit) / 2);
+  `,
+  gridRow: css`
+    display: flex;
+    align-items: center;
+    gap: calc(var(--audioui-unit) / 2);
+    border: 1px solid var(--accent-border);
+    border-radius: 8px;
+    padding: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
+  `,
+  gridLabel: css`
+    font-size: 12px;
+    color: var(--text);
+    width: 48px;
+  `,
+};
+
+/**
+ * The full step drum sequencer.
+ *
+ * `useKickVoice`/`useSnareVoice` are called *here*, not inside the pad
+ * components — this is what lets the sequencer's scheduler
+ * (`useStepSequencer`) reach each voice's live `trigger` closure directly,
+ * using the exact same sound-generation code driven by the exact same
+ * knobs shown on the pads below. Adding an instrument later (Tom1, HH
+ * Closed, etc. — see ARCHITECTURE-SPEC.MD) means: add its id to
+ * `useStepSequencer.ts`'s `TRACK_IDS`, give it a `use<X>Voice`/`<X>Pad`
+ * pair under `components/`, and render + pass it in here the same way
+ * kick/snare are below.
+ *
+ * There's a single 16-step grid, not one per track: pressing a pad both
+ * fires that instrument's preview hit and selects it as the pattern the
+ * grid is currently showing/editing. Every instrument's pattern stays
+ * live and plays together regardless of which one is selected — see
+ * `useStepSequencer.ts`.
+ */
+const StepSequencer = () => {
+  const kickVoice = useKickVoice();
+  const snareVoice = useSnareVoice();
+
+  const { activePattern, selectedTrack, selectTrack, currentStep, setStep } =
+    useStepSequencer({ kick: kickVoice, snare: snareVoice });
+
+  return (
+    <div className={styles.container}>
+      <TempoTransportPanel />
+      <div className={styles.pads}>
+        <KickPad
+          {...kickVoice}
+          selected={selectedTrack === "kick"}
+          onSelect={() => selectTrack("kick")}
+        />
+        <SnarePad
+          {...snareVoice}
+          selected={selectedTrack === "snare"}
+          onSelect={() => selectTrack("snare")}
+        />
+      </div>
+      <div className={styles.gridRow}>
+        <span className={styles.gridLabel}>
+          {selectedTrack === "kick" ? "Kick" : "Snare"}
+        </span>
+        <StepGrid active={activePattern} currentStep={currentStep} onStepChange={setStep} />
+      </div>
+    </div>
+  );
+};
+
+export default StepSequencer;

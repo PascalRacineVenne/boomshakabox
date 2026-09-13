@@ -5,7 +5,7 @@ import { clamp } from "../lib/clamp";
 const DEFAULT_TONE = 1000; // Hz — a bright, classic metronome "tick" pitch
 const MIN_TONE = 200;
 const MAX_TONE = 2000;
-const DEFAULT_VOLUME = 75; // 0-100%, matches the Volume slider convention used elsewhere in this project
+const DEFAULT_VOLUME = 50; // 0-100%, matches the Volume slider convention used elsewhere in this project
 
 /**
  * Drives an audible metronome click on every beat, on its own `Tone.Loop`
