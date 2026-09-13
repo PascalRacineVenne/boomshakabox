@@ -1,6 +1,7 @@
 import { useState } from "react";
 import * as Tone from "tone";
 import { HI_HAT_OSCILLATOR_FREQUENCIES } from "../../lib/hiHatOscillatorFrequencies";
+import { masterBusInput } from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
 
 // Closed hat: short, tight amp envelope with no sustain — this is what
@@ -48,7 +49,7 @@ export const useHiHatVoice = () => {
     const filter = new Tone.Filter(tone, "highpass");
 
     // VCA: instant attack, no ramp-up, exponential decay curve
-    const ampGain = new Tone.Gain(1).toDestination();
+    const ampGain = new Tone.Gain(1).connect(masterBusInput);
     ampGain.gain.setValueAtTime(level, now);
     ampGain.gain.exponentialRampToValueAtTime(0.001, now + DECAY);
     filter.connect(ampGain);

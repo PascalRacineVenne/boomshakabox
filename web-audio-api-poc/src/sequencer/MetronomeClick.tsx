@@ -5,9 +5,7 @@ import { css } from "@linaria/core";
 const style = {
   container: css`
     display: flex;
-    flex-direction: column;
     alignitems: center;
-    // gap: calc(var(--audioui-unit) / 8);
   `,
 };
 

@@ -10,7 +10,7 @@ const styles = {
     grid-template-columns: auto auto;
     align-items: center;
     justify-items: center;
-    gap: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) * 1.5);
+    // gap: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) * 1.5);
     padding: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
     border: 1px solid var(--accent-border);
     border-radius: 8px;
@@ -32,8 +32,8 @@ const TempoTransportPanel = () => {
   return (
     <div className={styles.grid}>
       <TempoKnob />
-      <BeatIndicator />
       <TransportControls />
+      <BeatIndicator />
       <MetronomeClick />
     </div>
   );

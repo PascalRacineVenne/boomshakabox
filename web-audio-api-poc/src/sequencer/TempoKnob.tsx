@@ -20,7 +20,7 @@ const styles = {
   // !important is needed here regardless of stylesheet insertion order.
   input: css`
     text-align: center !important;
-    font-size: 56px !important;
+    font-size: var(--audioui-unit) !important;
     font-weight: 700 !important;
     line-height: 1 !important;
     color: var(--accent) !important;

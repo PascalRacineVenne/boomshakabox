@@ -1,6 +1,7 @@
 import { useState } from "react";
 import * as Tone from "tone";
 import { distortionMakeupGain } from "../../lib/distortionMakeupGain";
+import { masterBusInput } from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
 
 const PITCH_DROP_START = 180; // starting "click" pitch the VCO glides down from, in Hz
@@ -61,7 +62,7 @@ export const useKickVoice = () => {
     const makeupGain = new Tone.Gain(distortionMakeupGain(distortionAmount));
 
     // VCA: instant attack, no ramp-up, exponential decay curve
-    const ampGain = new Tone.Gain(1).toDestination();
+    const ampGain = new Tone.Gain(1).connect(masterBusInput);
     ampGain.gain.setValueAtTime(level, now); // "Volume" slider sets the peak level
     ampGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 

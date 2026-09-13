@@ -1,5 +1,6 @@
 import { useState } from "react";
 import * as Tone from "tone";
+import { masterBusInput } from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
 
 // Ratio between the two tone-voice VCOs in the original fixed-frequency
@@ -41,7 +42,7 @@ export const useSnareVoice = () => {
     const level = volume / 100; // Volume slider as a 0-1 multiplier applied to both voices' peaks
 
     // --- Tone voice: two VCOs summed into one VCA ---
-    const toneGain = new Tone.Gain(1).toDestination();
+    const toneGain = new Tone.Gain(1).connect(masterBusInput);
     toneGain.gain.setValueAtTime(0.7 * level, now);
     toneGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
@@ -54,7 +55,7 @@ export const useSnareVoice = () => {
 
     // --- Snap voice: noise source -> filter (VCF) -> its own VCA/EG ---
     const noiseFilter = new Tone.Filter(1000, "highpass");
-    const noiseGain = new Tone.Gain(1).toDestination();
+    const noiseGain = new Tone.Gain(1).connect(masterBusInput);
     noiseGain.gain.setValueAtTime(snappy * level, now); // "Snappy" knob mix, scaled by the Volume slider
     noiseGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
