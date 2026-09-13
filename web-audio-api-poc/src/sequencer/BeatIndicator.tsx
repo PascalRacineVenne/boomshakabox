@@ -1,27 +1,22 @@
 import { css } from "@linaria/core";
-import { useBeatPulse } from "./useBeatPulse";
 import classNames from "classnames";
+import { useBeatPulse } from "./useBeatPulse";
 
 const styles = {
   row: css`
     display: flex;
-    gap: calc(var(--audioui-unit) / 4);
+    gap: calc(var(--audioui-unit) / 8);
     align-items: center;
     justify-content: center;
   `,
 
   dot: css`
-    width: 12px;
-    height: 12px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     border: 1px solid var(--accent-border);
     background: transparent;
     transition: background 0.05s ease-out;
-  `,
-
-  dotDownbeat: css`
-    width: 16px;
-    height: 16px;
   `,
 
   dotActive: css`
@@ -30,23 +25,23 @@ const styles = {
 };
 
 /**
- * Visual metronome: flashes each quarter note, one dot per beat of the bar
- * (4/4 assumed, matching `Tone.Transport`'s default time signature). The
- * downbeat (beat 1) renders slightly larger so the bar boundary reads at a
- * glance, the way a hardware drum machine's beat LEDs do.
+ * Minimal visual metronome: two dots, one per alternating beat (see
+ * `useBeatPulse.ts`). Whichever dot the current beat lands on flashes
+ * `--accent` briefly; the other stays a transparent outline. A tempo pulse
+ * to glance at, not a bar-position readout — deliberately doesn't track
+ * all 4 beats of the bar.
  */
 const BeatIndicator = () => {
-  const { beat, flash } = useBeatPulse();
+  const { pulse, flash } = useBeatPulse();
 
   return (
     <div className={styles.row}>
-      {[0, 1, 2, 3].map((i) => (
+      {[1, 2].map((i) => (
         <div
           key={i}
           className={classNames(
             styles.dot,
-            i === 0 && styles.dotDownbeat,
-            flash && beat === i && styles.dotActive,
+            flash && pulse === i && styles.dotActive,
           )}
         />
       ))}

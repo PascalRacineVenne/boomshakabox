@@ -1,28 +1,40 @@
-import { controlPanelStyles } from "../components/ControlPanel";
+import { css } from "@linaria/core";
 import TempoKnob from "./TempoKnob";
 import TransportControls from "./TransportControls";
 import BeatIndicator from "./BeatIndicator";
 import MetronomeClick from "./MetronomeClick";
 
+const styles = {
+  grid: css`
+    display: inline-grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    justify-items: center;
+    gap: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) * 1.5);
+    padding: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
+    border: 1px solid var(--accent-border);
+    border-radius: 8px;
+  `,
+};
+
 /**
- * Groups the sequencer's tempo dial, transport buttons, beat indicator,
- * and metronome click controls into one panel, styled consistently with
- * the drum voice panels (ControlPanel.ts) even though this isn't a drum
- * voice — reuses the same visual language rather than introducing a
- * separate one.
+ * Groups the sequencer's tempo input, beat pulse, transport buttons, and
+ * metronome click into a 2x2 grid:
  *
- * This is a staging point for the future SequencerPage.tsx (step 8 of the
- * suggested file breakdown) once the step grid and per-track sequences
- * exist; for now it only composes what's been built so far (steps 1, 2, 3
- * and 4).
+ *   TempoKnob          BeatIndicator
+ *   TransportControls  MetronomeClick
+ *
+ * so the tempo readout and its at-a-glance beat pulse sit on top, with the
+ * play/stop and click controls that act on that tempo lined up right
+ * underneath.
  */
 const TempoTransportPanel = () => {
   return (
-    <div className={controlPanelStyles.panel}>
+    <div className={styles.grid}>
       <TempoKnob />
       <BeatIndicator />
-      <MetronomeClick />
       <TransportControls />
+      <MetronomeClick />
     </div>
   );
 };
