@@ -1,10 +1,18 @@
 import { useRef } from "react";
 import { Button } from "antd";
 
-// Builds a soft-clip transfer curve for a WaveShaperNode — the "Drive"/
-// "Saturation" knob. tanh-shaping pushes the waveform's peaks toward +-1,
-// adding harmonics (fattening the sound) without hard-clipping it.
-function makeSaturationCurve(amount: number): Float32Array<ArrayBuffer> {
+/**
+ * Builds a soft-clip transfer curve for a `WaveShaperNode` — the
+ * "Drive"/"Saturation" knob. tanh-shaping pushes the waveform's peaks
+ * toward ±1, adding harmonics (fattening the sound) without
+ * hard-clipping it.
+ *
+ * @param amount - Drive amount; higher values push more of the waveform
+ * into the saturated region of the curve.
+ * @returns A 44.1kHz-resolution transfer curve suitable for
+ * `WaveShaperNode.curve`.
+ */
+const makeSaturationCurve = (amount: number): Float32Array<ArrayBuffer> => {
   const samples = 44100;
   const curve = new Float32Array(samples);
   for (let i = 0; i < samples; i++) {
@@ -12,14 +20,16 @@ function makeSaturationCurve(amount: number): Float32Array<ArrayBuffer> {
     curve[i] = Math.tanh(amount * x);
   }
   return curve;
-}
+};
 
-// The real TR-808 kick is a single VCO (sine core) whose pitch glides
-// quickly downward right after the trigger — that fast pitch drop *is*
-// the kick's "attack"/punch, there's no separate click/noise layer like
-// the snare uses. A VCA then shapes a short, punchy decay, and a touch of
-// saturation fattens the low end so it still reads on small speakers.
-function WebAudioKickButton() {
+/**
+ * The real TR-808 kick is a single VCO (sine core) whose pitch glides
+ * quickly downward right after the trigger — that fast pitch drop *is*
+ * the kick's "attack"/punch, there's no separate click/noise layer like
+ * the snare uses. A VCA then shapes a short, punchy decay, and a touch of
+ * saturation fattens the low end so it still reads on small speakers.
+ */
+const WebAudioKickButton = () => {
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   const triggerKick = () => {
@@ -62,6 +72,6 @@ function WebAudioKickButton() {
   return (
     <Button onClick={triggerKick}>Trigger 808 Kick (Web Audio API)</Button>
   );
-}
+};
 
 export default WebAudioKickButton;

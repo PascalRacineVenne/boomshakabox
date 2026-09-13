@@ -1,29 +1,27 @@
 import { useState } from "react";
 import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
 import * as Tone from "tone";
-import { ControlPanel, ControlsRow, KnobColumn } from "./ControlPanel";
+import { controlPanelStyles } from "./ControlPanel";
 
 // Ratio between the two tone-voice VCOs in the original fixed-frequency
 // recipe (330/180) — preserved when the "Tone" knob shifts the base
 // frequency, so the interval between them stays the same as you tune it.
 const TONE_VOICE_RATIO = 330 / 180;
 
-// Same TR-808 snare recipe as WebAudioSnareButton (two triangle VCOs for the
-// "Tone" voice, highpass-filtered noise for the "Snap" voice), rebuilt with
-// Tone.js's higher-level nodes instead of raw Web Audio nodes. Compare the
-// two components node-by-node — Tone.Gain/.Oscillator/.Filter/.Noise are
-// thin wrappers over the exact same native GainNode/OscillatorNode/
-// BiquadFilterNode, plus a couple of Tone.js-specific conveniences noted
-// below.
-//
-// Per ui-stack.md's per-track strip mapping, Volume is the shared-base
-// Slider and "Tone"/"Snappy" are the snare's instrument-specific Knobs.
-// This is a one-shot preview button, not a persistent scheduled voice, so
-// there's no live Tone node to write control changes into mid-sound (see
-// drum-machine-architecture.md's one-shot vs. sustained classification) —
-// plain useState is enough, read fresh at the top of triggerSnare on every
-// click.
-function ToneSnareButton() {
+/**
+ * TR-808 snare recipe (two triangle VCOs for
+ * the "Tone" voice, highpass-filtered noise for the "Snap" voice), built
+ * with Tone.js's higher-level nodes instead of raw Web Audio nodes.
+ *
+ * Per ui-stack.md's per-track strip mapping, Volume is the shared-base
+ * Slider and "Tone"/"Snappy" are the snare's instrument-specific Knobs.
+ * This is a one-shot preview button, not a persistent scheduled voice, so
+ * there's no live Tone node to write control changes into mid-sound (see
+ * drum-machine-architecture.md's one-shot vs. sustained classification) —
+ * plain `useState` is enough, read fresh at the top of `triggerSnare` on
+ * every click.
+ */
+const ToneSnareButton = () => {
   const [tone, setTone] = useState(180); // base frequency of the tone voice's VCOs, in Hz
   const [snappy, setSnappy] = useState(1); // 0-1 mix level of the noise/snap voice
   const [volume, setVolume] = useState(75); // 0-100%, overall output level for both voices
@@ -88,8 +86,8 @@ function ToneSnareButton() {
   };
 
   return (
-    <ControlPanel>
-      <ControlsRow>
+    <div className={controlPanelStyles.panel}>
+      <div className={controlPanelStyles.controlsRow}>
         <Slider
           min={0}
           max={100}
@@ -101,7 +99,7 @@ function ToneSnareButton() {
           unit="%"
           valueAsLabel="interactive"
         />
-        <KnobColumn>
+        <div className={controlPanelStyles.knobColumn}>
           <Knob
             min={100}
             max={300}
@@ -116,8 +114,8 @@ function ToneSnareButton() {
             onChange={(e) => setSnappy(e.value)}
             label="Snappy"
           />
-        </KnobColumn>
-      </ControlsRow>
+        </div>
+      </div>
       <Button
         label="Snare"
         value={pressed}
@@ -126,8 +124,8 @@ function ToneSnareButton() {
           if (e.value) triggerSnare(); // fires on the real press, not on the release toggling back to false
         }}
       />
-    </ControlPanel>
+    </div>
   );
-}
+};
 
 export default ToneSnareButton;

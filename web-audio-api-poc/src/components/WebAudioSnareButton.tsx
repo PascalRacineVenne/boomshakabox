@@ -1,11 +1,13 @@
 import { useRef } from "react";
 import { Button } from "antd";
 
-// The real TR-808 snare is two analog voices summed on the mix bus:
-// a "Tone" voice (two VCOs -> VCA -> fast decay EG) and a "Snap" voice
-// (noise diode -> VCF -> VCA -> slightly longer decay EG). We rebuild
-// both voices with raw Web Audio API nodes and mix them the same way.
-function WebAudioSnareButton() {
+/**
+ * The real TR-808 snare is two analog voices summed on the mix bus: a
+ * "Tone" voice (two VCOs -> VCA -> fast decay EG) and a "Snap" voice
+ * (noise diode -> VCF -> VCA -> slightly longer decay EG). We rebuild
+ * both voices with raw Web Audio API nodes and mix them the same way.
+ */
+const WebAudioSnareButton = () => {
   const audioCtxRef = useRef<AudioContext | null>(null);
 
   const triggerSnare = () => {
@@ -79,6 +81,6 @@ function WebAudioSnareButton() {
   return (
     <Button onClick={triggerSnare}>Trigger 808 Snare (Web Audio API)</Button>
   );
-}
+};
 
 export default WebAudioSnareButton;
