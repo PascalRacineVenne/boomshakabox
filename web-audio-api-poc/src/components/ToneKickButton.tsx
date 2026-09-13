@@ -1,39 +1,49 @@
 import { useState } from "react";
 import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
 import * as Tone from "tone";
-import { ControlPanel, ControlsRow, KnobColumn } from "./ControlPanel";
+import { controlPanelStyles } from "./ControlPanel";
 
-// Tone.Distortion's curve (from its source: (3+k)x*20deg / (PI+k|x|), where
-// k = amount*100) isn't a soft-clipper like the raw version's tanh — it's a
-// compressive curve that squashes full-scale input down hard (at x=1 it
-// only outputs ~0.35 with amount=0.4). That's the "eaten low end": the
-// fundamental's peak amplitude gets crushed by ~2.9x, not filtered.
-// This computes exactly how much makeup gain restores that peak to unity.
-function distortionMakeupGain(amount: number): number {
+/**
+ * `Tone.Distortion`'s curve (from its source: `(3+k)x*20deg / (PI+k|x|)`,
+ * where `k = amount*100`) isn't a soft-clipper like the raw version's
+ * tanh — it's a compressive curve that squashes full-scale input down
+ * hard (at x=1 it only outputs ~0.35 with amount=0.4). That's the "eaten
+ * low end": the fundamental's peak amplitude gets crushed by ~2.9x, not
+ * filtered.
+ *
+ * @param amount - The `Tone.Distortion` `distortion` amount (0-1) this
+ * makeup gain is compensating for.
+ * @returns The linear gain multiplier that restores the curve's peak
+ * output back to unity.
+ */
+const distortionMakeupGain = (amount: number): number => {
   const k = amount * 100;
   const deg = Math.PI / 180;
   const peakOutput = ((3 + k) * 20 * deg) / (Math.PI + k); // curve value at x=1
   return 1 / peakOutput;
-}
+};
 
 const PITCH_DROP_START = 180; // starting "click" pitch the VCO glides down from, in Hz
 
-// Same TR-808 kick recipe as WebAudioKickButton (a sine VCO with a fast
-// downward pitch glide for the attack/punch, a short VCA decay, and a
-// saturation stage for fatness), rebuilt with Tone.js. The one swap worth
-// noting: Tone.Distortion replaces the raw version's hand-built
-// WaveShaperNode curve — a different waveshaping algorithm under the hood,
-// so its level-compensated with a makeup gain stage below (see
-// distortionMakeupGain) instead of a Float32Array you compute yourself.
-//
-// Per ui-stack.md's per-track strip mapping, Volume is the shared-base
-// Slider and "Tone"/"Decay" are the kick's instrument-specific Knobs. This
-// is a one-shot preview button, not a persistent scheduled voice, so
-// there's no live Tone node to write control changes into mid-sound (see
-// drum-machine-architecture.md's one-shot vs. sustained classification) —
-// plain useState is enough, read fresh at the top of triggerKick on every
-// click.
-function ToneKickButton() {
+/**
+ * TR-808 kick recipe (a sine VCO with a fast
+ * downward pitch glide for the attack/punch, a short VCA decay, and a
+ * saturation stage for fatness), built with Tone.js. The one swap worth
+ * noting: `Tone.Distortion` replaces the raw version's hand-built
+ * `WaveShaperNode` curve — a different waveshaping algorithm under the
+ * hood, so it's level-compensated with a makeup gain stage below (see
+ * {@link distortionMakeupGain}) instead of a `Float32Array` you compute
+ * yourself.
+ *
+ * Per ui-stack.md's per-track strip mapping, Volume is the shared-base
+ * Slider and "Tone"/"Decay" are the kick's instrument-specific Knobs. This
+ * is a one-shot preview button, not a persistent scheduled voice, so
+ * there's no live Tone node to write control changes into mid-sound (see
+ * drum-machine-architecture.md's one-shot vs. sustained classification) —
+ * plain `useState` is enough, read fresh at the top of `triggerKick` on
+ * every click.
+ */
+const ToneKickButton = () => {
   const [tone, setTone] = useState(50); // resting fundamental frequency the pitch glide settles on, in Hz
   const [decay, setDecay] = useState(0.35); // amp envelope decay length, in seconds
   const [volume, setVolume] = useState(75); // 0-100%, overall output level
@@ -92,8 +102,8 @@ function ToneKickButton() {
   };
 
   return (
-    <ControlPanel>
-      <ControlsRow>
+    <div className={controlPanelStyles.panel}>
+      <div className={controlPanelStyles.controlsRow}>
         <Slider
           min={0}
           max={100}
@@ -105,7 +115,7 @@ function ToneKickButton() {
           unit="%"
           valueAsLabel="interactive"
         />
-        <KnobColumn>
+        <div className={controlPanelStyles.knobColumn}>
           <Knob
             min={30}
             max={120}
@@ -120,8 +130,8 @@ function ToneKickButton() {
             onChange={(e) => setDecay(e.value)}
             label="Decay"
           />
-        </KnobColumn>
-      </ControlsRow>
+        </div>
+      </div>
       <Button
         label="Kick"
         value={pressed}
@@ -130,8 +140,8 @@ function ToneKickButton() {
           if (e.value) triggerKick(); // fires on the real press, not on the release toggling back to false
         }}
       />
-    </ControlPanel>
+    </div>
   );
-}
+};
 
 export default ToneKickButton;

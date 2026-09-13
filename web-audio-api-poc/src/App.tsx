@@ -2,16 +2,19 @@ import { Space } from "antd";
 import "./App.css";
 import ToneKickButton from "./components/ToneKickButton";
 import ToneSnareButton from "./components/ToneSnareButton";
+import TempoTransportPanel from "./sequencer/TempoTransportPanel";
 // import WebAudioKickButton from "./components/WebAudioKickButton";
 // import WebAudioSnareButton from "./components/WebAudioSnareButton";
 
-function App() {
+const App = () => {
   return (
     <>
       <section id="center">
+        <Space>
+          <TempoTransportPanel />
+        </Space>
         <div>
           <h1>Be creative!</h1>
-
           <Space>
             <ToneKickButton />
             <ToneSnareButton />
@@ -29,6 +32,6 @@ function App() {
       <section id="spacer"></section>
     </>
   );
-}
+};
 
 export default App;
