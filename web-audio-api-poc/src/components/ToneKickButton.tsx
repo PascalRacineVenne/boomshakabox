@@ -108,6 +108,7 @@ const ToneKickButton = () => {
           min={0}
           max={100}
           step={1}
+          size="small"
           value={volume}
           onChange={(e) => setVolume(e.value)}
           label="Volume"
@@ -119,6 +120,7 @@ const ToneKickButton = () => {
           <Knob
             min={30}
             max={120}
+            size="small"
             value={tone}
             onChange={(e) => setTone(e.value)}
             label="Tone"
@@ -126,6 +128,7 @@ const ToneKickButton = () => {
           <Knob
             min={0.1}
             max={1}
+            size="small"
             value={decay}
             onChange={(e) => setDecay(e.value)}
             label="Decay"
@@ -135,6 +138,7 @@ const ToneKickButton = () => {
       <Button
         label="Kick"
         value={pressed}
+        size="large"
         onChange={(e) => {
           setPressed(e.value);
           if (e.value) triggerKick(); // fires on the real press, not on the release toggling back to false

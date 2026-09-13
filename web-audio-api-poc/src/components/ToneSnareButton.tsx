@@ -92,6 +92,7 @@ const ToneSnareButton = () => {
           min={0}
           max={100}
           step={1}
+          size="small"
           value={volume}
           onChange={(e) => setVolume(e.value)}
           label="Volume"
@@ -103,6 +104,7 @@ const ToneSnareButton = () => {
           <Knob
             min={100}
             max={300}
+            size="small"
             value={tone}
             onChange={(e) => setTone(e.value)}
             label="Tone"
@@ -110,6 +112,7 @@ const ToneSnareButton = () => {
           <Knob
             min={0}
             max={1}
+            size="small"
             value={snappy}
             onChange={(e) => setSnappy(e.value)}
             label="Snappy"
@@ -119,6 +122,7 @@ const ToneSnareButton = () => {
       <Button
         label="Snare"
         value={pressed}
+        size="large"
         onChange={(e) => {
           setPressed(e.value);
           if (e.value) triggerSnare(); // fires on the real press, not on the release toggling back to false

@@ -19,8 +19,8 @@ export const controlPanelStyles = {
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    gap: calc(var(--audioui-unit) / 2);
-    padding: calc(var(--audioui-unit) / 2);
+    gap: calc(var(--audioui-unit) / 4);
+    padding: calc(var(--audioui-unit) / 4);
     border: 1px solid var(--accent-border);
     border-radius: 8px;
   `,
@@ -29,7 +29,6 @@ export const controlPanelStyles = {
   controlsRow: css`
     display: flex;
     align-items: center;
-    gap: calc(var(--audioui-unit) / 2);
   `,
 
   /**
@@ -40,6 +39,5 @@ export const controlPanelStyles = {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: calc(var(--audioui-unit) / 4);
   `,
 };

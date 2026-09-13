@@ -15,7 +15,13 @@ const App = () => {
         </Space>
         <div>
           <h1>Be creative!</h1>
-          <Space>
+          <Space size={"small"}>
+            <ToneKickButton />
+            <ToneSnareButton />
+            <ToneKickButton />
+            <ToneSnareButton />
+            <ToneKickButton />
+            <ToneSnareButton />
             <ToneKickButton />
             <ToneSnareButton />
           </Space>
