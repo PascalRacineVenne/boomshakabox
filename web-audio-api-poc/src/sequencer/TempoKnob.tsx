@@ -1,5 +1,4 @@
 import { css } from "@linaria/core";
-import { Knob } from "@cutoff/audio-ui-react";
 import { InputNumber } from "antd";
 import { useTempo } from "./useTempo";
 
@@ -8,50 +7,67 @@ const styles = {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 2px;
+  `,
+
+  root: css`
+    width: 140px;
+  `,
+
+  // AntD's own rule for this element is a two-class compound selector
+  // (".ant-input-number .ant-input-number-input") wrapped in :where() only
+  // around its own hash — that still outranks our single custom class, so
+  // !important is needed here regardless of stylesheet insertion order.
+  input: css`
+    text-align: center !important;
+    font-size: 56px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    color: var(--accent) !important;
+    height: auto !important;
+  `,
+
+  unit: css`
+    font-size: 11px;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   `,
 };
 
 /**
- * Primary tempo dial: a continuous rotary Knob, per the sequencer plan's
- * recommendation to use audio-ui-react for the main tempo control and
- * reserve AntD for secondary/utility controls (like TransportControls'
- * Start/Stop) — so the two knob-style widgets don't compete for the same
- * parameter's "feel." The AntD InputNumber below it is exactly that kind
- * of secondary/utility control: a numbers-only text entry for typing an
- * exact BPM directly, rather than dragging.
+ * Primary tempo control: one big number input in `--accent`, the panel's
+ * headline control now that there's no dial to drag — type an exact BPM
+ * directly. Reads/writes the same `useTempo()` state that
+ * `Tone.getTransport().bpm` is the source of truth for, so this stays in
+ * sync with anything else that touches tempo.
  *
- * Both controls read/write the same `useTempo()` instance called once
- * here, so there's a single `bpm` value and a single `setBpm` — turning
- * the knob updates the number, typing a number updates the knob, always
- * in sync because they're two views over the same state rather than two
- * independently-tracked copies of it.
+ * AntD's `InputNumber` per the sequencer plan's convention of reserving
+ * AntD for secondary/utility controls — `variant="borderless"` and
+ * `controls={false}` strip its default box and stepper arrows so it reads
+ * as a bare number rather than a form field, and the semantic
+ * `classNames.input` prop styles the actual `<input>` directly instead of
+ * fighting internal AntD class names.
  */
 const TempoKnob = () => {
   const { bpm, setBpm, min, max } = useTempo();
 
   return (
     <div className={styles.container}>
-      <Knob
-        variant="plainCap"
-        min={min}
-        max={max}
-        value={bpm}
-        onChange={(e) => setBpm(e.value)}
-        label={bpm.toFixed(0) + " bpm"}
-        valueAsLabel="interactive"
-      />
       <InputNumber
+        className={styles.root}
+        classNames={{ input: styles.input }}
+        variant="borderless"
+        controls={false}
         min={min}
         max={max}
-        value={bpm}
         precision={0}
+        value={bpm}
         onChange={(value) => {
-          if (value !== null) setBpm(value);
+          if (value !== null) setBpm(Number(value));
         }}
-        size="small"
-        style={{ width: 64 }}
       />
+      <span className={styles.unit}>BPM</span>
     </div>
   );
 };

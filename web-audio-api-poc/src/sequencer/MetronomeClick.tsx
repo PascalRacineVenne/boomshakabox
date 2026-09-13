@@ -1,37 +1,45 @@
-import { Knob, Slider } from "@cutoff/audio-ui-react";
+import { Button, Knob } from "@cutoff/audio-ui-react";
 import { useMetronomeClick } from "./useMetronomeClick";
+import { css } from "@linaria/core";
+
+const style = {
+  container: css`
+    display: flex;
+    flex-direction: column;
+    alignitems: center;
+    // gap: calc(var(--audioui-unit) / 8);
+  `,
+};
 
 /**
  * Controls for the audible metronome click that ticks on every beat (see
- * `useMetronomeClick.ts`) — a "Tone" knob for the click's pitch, and a
- * small vertical "Volume" slider for its level, independent of the drum
- * voices' own volume sliders.
+ * `useMetronomeClick.ts`): a small vertical "Volume" slider for its level,
+ * and a latch "Mute" button, independent of the drum voices' own volume
+ * sliders. Pitch is fixed — no Tone knob — the click is meant to be heard,
+ * not tuned.
  */
 const MetronomeClick = () => {
-  const { tone, setTone, minTone, maxTone, volume, setVolume } =
-    useMetronomeClick();
+  const { volume, setVolume, muted, setMuted } = useMetronomeClick();
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+    <div className={style.container}>
       <Knob
-        variant="plainCap"
-        min={minTone}
-        max={maxTone}
-        value={tone}
-        onChange={(e) => setTone(e.value)}
-        label="Tone"
-      />
-      <Slider
         min={0}
         max={100}
         step={1}
         value={volume}
         onChange={(e) => setVolume(e.value)}
         label="Click"
-        orientation="vertical"
         size="small"
         unit="%"
         valueAsLabel="interactive"
+      />
+      <Button
+        latch
+        size="small"
+        label="Mute"
+        value={muted}
+        onChange={(e) => setMuted(e.value)}
       />
     </div>
   );

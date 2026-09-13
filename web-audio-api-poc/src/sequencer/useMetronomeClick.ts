@@ -2,9 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import * as Tone from "tone";
 import { clamp } from "../lib/clamp";
 
-const DEFAULT_TONE = 1000; // Hz — a bright, classic metronome "tick" pitch
-const MIN_TONE = 200;
-const MAX_TONE = 2000;
+const CLICK_TONE = 1000; // Hz — a bright, classic metronome "tick" pitch; fixed, not user-adjustable
 const DEFAULT_VOLUME = 50; // 0-100%, matches the Volume slider convention used elsewhere in this project
 
 /**
@@ -18,24 +16,29 @@ const DEFAULT_VOLUME = 50; // 0-100%, matches the Volume slider convention used 
  * The synth + gain chain is created once and kept alive for the hook's
  * lifetime (this project's node-lifecycle rule, ARCHITECTURE-SPEC.MD) —
  * every beat only calls `.triggerAttackRelease()` on the pre-existing
- * synth, never creates a new node.
+ * synth, never creates a new node. The click's pitch is fixed
+ * (`CLICK_TONE`) rather than a knob — only level (`volume`) and on/off
+ * (`muted`) are user-adjustable.
  *
- * @returns The click's `tone`/`volume` state and their setters, plus the
- * allowed tone range.
+ * @returns The click's `volume`/`muted` state and their setters.
  */
 export const useMetronomeClick = () => {
-  const [tone, setToneState] = useState(DEFAULT_TONE);
   const [volume, setVolumeState] = useState(DEFAULT_VOLUME);
+  const [muted, setMutedState] = useState(false);
 
-  // The Loop callback below is created once in a mount-only effect, so it
-  // closes over whatever "tone" was at mount time unless it reads through a
-  // ref instead — the same "live params ref" pattern used for scheduler
-  // callbacks in ARCHITECTURE-SPEC.MD. Kept in sync via its own effect
-  // rather than written during render (react-hooks/refs disallows that).
-  const toneRef = useRef(tone);
+  // Read by setVolume/setMuted so either setter can recompute the
+  // effective gain (volume x mute) without needing the other state's own
+  // setter to also fire — the same "live params ref" pattern
+  // ARCHITECTURE-SPEC.MD uses for values read outside React's render cycle.
+  const volumeRef = useRef(volume);
   useEffect(() => {
-    toneRef.current = tone;
-  }, [tone]);
+    volumeRef.current = volume;
+  }, [volume]);
+
+  const mutedRef = useRef(muted);
+  useEffect(() => {
+    mutedRef.current = muted;
+  }, [muted]);
 
   const gainRef = useRef<Tone.Gain | null>(null);
 
@@ -49,7 +52,7 @@ export const useMetronomeClick = () => {
     gainRef.current = gain;
 
     const loop = new Tone.Loop((time) => {
-      synth.triggerAttackRelease(toneRef.current, "32n", time);
+      synth.triggerAttackRelease(CLICK_TONE, "32n", time);
     }, "4n").start(0);
 
     return () => {
@@ -58,11 +61,7 @@ export const useMetronomeClick = () => {
       gain.dispose();
       gainRef.current = null;
     };
-  }, []); // created once for the hook's lifetime — never recreated on tone/volume changes
-
-  const setTone = useCallback((value: number) => {
-    setToneState(clamp(value, MIN_TONE, MAX_TONE));
-  }, []);
+  }, []); // created once for the hook's lifetime — never recreated on volume/mute changes
 
   const setVolume = useCallback((value: number) => {
     const clamped = clamp(value, 0, 100);
@@ -70,15 +69,18 @@ export const useMetronomeClick = () => {
     // volume is a live AudioParam (Tone.Gain.gain) — ramp rather than jump,
     // same "no zipper noise" rule as useTempo's bpm.rampTo, in case it's
     // dragged while the click is actively playing.
-    gainRef.current?.gain.rampTo(clamped / 100, 0.02);
+    gainRef.current?.gain.rampTo(mutedRef.current ? 0 : clamped / 100, 0.02);
+  }, []);
+
+  const setMuted = useCallback((value: boolean) => {
+    setMutedState(value);
+    gainRef.current?.gain.rampTo(value ? 0 : volumeRef.current / 100, 0.02);
   }, []);
 
   return {
-    tone,
-    setTone,
-    minTone: MIN_TONE,
-    maxTone: MAX_TONE,
     volume,
     setVolume,
+    muted,
+    setMuted,
   };
 }
