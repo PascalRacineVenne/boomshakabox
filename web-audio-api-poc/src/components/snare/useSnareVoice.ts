@@ -1,5 +1,6 @@
 import { useState } from "react";
 import * as Tone from "tone";
+import { startAudioContext } from "../../lib/startAudioContext";
 
 // Ratio between the two tone-voice VCOs in the original fixed-frequency
 // recipe (330/180) — preserved when the "Tone" knob shifts the base
@@ -15,8 +16,9 @@ const TONE_VOICE_RATIO = 330 / 180;
  * `sequencer/useStepSequencer.ts`).
  *
  * `trigger` accepts an optional `scheduledTime` — see `useKickVoice` for
- * why: manual presses fire at `Tone.now()` after unlocking audio,
- * scheduled calls fire at the precise Transport time instead.
+ * why: manual presses fire at `Tone.now()` after unlocking audio via
+ * {@link startAudioContext}, scheduled calls fire at the precise
+ * Transport time instead.
  *
  * @returns The snare's `tone`/`snappy`/`volume`/`pressed` state, their
  * setters, and `trigger`.
@@ -28,8 +30,10 @@ export const useSnareVoice = () => {
   const [pressed, setPressed] = useState(false); // drives the pad's lit state — real mousedown/up, not hover
 
   const trigger = async (scheduledTime?: number) => {
+    // Skipped for scheduled calls: the Transport is only ever running
+    // after Start already passed this gate once.
     if (scheduledTime === undefined) {
-      await Tone.start();
+      await startAudioContext();
     }
 
     const now = scheduledTime ?? Tone.now();

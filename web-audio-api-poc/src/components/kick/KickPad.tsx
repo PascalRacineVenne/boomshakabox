@@ -14,7 +14,13 @@ interface KickPadProps {
   trigger: (scheduledTime?: number) => void;
   /** Highlights this pad — true when it's the instrument the step grid is currently editing. */
   selected?: boolean;
-  /** Called on a real press, alongside triggering the sound — lets a parent make this the selected instrument. */
+  /**
+   * Called on any real interaction with the panel — pressing the trigger,
+   * turning a knob, dragging the slider — so this pad can be selected
+   * without necessarily hearing it. See the `onMouseDown` on the outer
+   * panel div below: selection is a property of the whole panel, not tied
+   * to the trigger button's own onChange.
+   */
   onSelect?: () => void;
 }
 
@@ -38,7 +44,10 @@ const KickPad = ({
   onSelect,
 }: KickPadProps) => {
   return (
-    <div className={classNames(controlPanelStyles.panel, selected && controlPanelStyles.selected)}>
+    <div
+      className={classNames(controlPanelStyles.panel, selected && controlPanelStyles.selected)}
+      onMouseDown={onSelect}
+    >
       <div className={controlPanelStyles.controlsRow}>
         <Slider
           min={0}
@@ -79,10 +88,7 @@ const KickPad = ({
         size="large"
         onChange={(e) => {
           setPressed(e.value);
-          if (e.value) {
-            trigger(); // fires on the real press, not on the release toggling back to false
-            onSelect?.();
-          }
+          if (e.value) trigger(); // fires on the real press, not on the release toggling back to false
         }}
       />
     </div>

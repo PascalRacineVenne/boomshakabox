@@ -1,6 +1,7 @@
 import { useState } from "react";
 import * as Tone from "tone";
 import { distortionMakeupGain } from "../../lib/distortionMakeupGain";
+import { startAudioContext } from "../../lib/startAudioContext";
 
 const PITCH_DROP_START = 180; // starting "click" pitch the VCO glides down from, in Hz
 
@@ -12,13 +13,14 @@ const PITCH_DROP_START = 180; // starting "click" pitch the VCO glides down from
  * directly (see `sequencer/useStepSequencer.ts`).
  *
  * `trigger` accepts an optional `scheduledTime`: called with none (a
- * manual pad press), it unlocks the audio context via `Tone.start()` and
- * fires immediately at `Tone.now()`. Called with a time (from the
- * sequencer's `Tone.Transport.scheduleRepeat` callback), it skips the
- * `Tone.start()` gate — the Transport can only be running after that gate
- * already passed once via the transport's own Start button — and
- * schedules everything at the precise time the look-ahead scheduler asked
- * for, rather than at "now."
+ * manual pad press), it unlocks the audio context via
+ * {@link startAudioContext} (which also absorbs the first-ever-sound
+ * warm-up glitch on a throwaway tone, see that function) and fires at
+ * `Tone.now()`. Called with a time (from the sequencer's
+ * `Tone.Transport.scheduleRepeat` callback), it skips that gate entirely —
+ * the Transport can only be running after Start already passed it once —
+ * and schedules everything at the precise time the look-ahead scheduler
+ * asked for, rather than at "now."
  *
  * @returns The kick's `tone`/`decay`/`volume`/`pressed` state, their
  * setters, and `trigger`.
@@ -30,12 +32,10 @@ export const useKickVoice = () => {
   const [pressed, setPressed] = useState(false); // drives the pad's lit state — real mousedown/up, not hover
 
   const trigger = async (scheduledTime?: number) => {
+    // Skipped for scheduled calls: the Transport is only ever running
+    // after Start already passed this gate once.
     if (scheduledTime === undefined) {
-      // Required by browser autoplay policy — must run in direct response
-      // to a user gesture, same as every other manual trigger in this
-      // project. Skipped for scheduled calls: the Transport is only ever
-      // running after Start already passed this gate once.
-      await Tone.start();
+      await startAudioContext();
     }
 
     const now = scheduledTime ?? Tone.now();
