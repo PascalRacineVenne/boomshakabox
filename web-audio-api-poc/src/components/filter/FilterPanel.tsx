@@ -18,7 +18,7 @@ const styles = {
 
   grid: css`
     display: grid;
-    grid-template-columns: repeat(3, auto);
+    grid-template-columns: repeat(2, auto);
     align-items: center;
     justify-items: center;
     gap: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
@@ -36,11 +36,15 @@ const styles = {
 };
 
 /**
- * Master filter panel: Cutoff, Resonance, and Mode (HP/LP/BP) on top,
- * Env Amount and Keyboard Tracking underneath — a 2x3 grid, the third
- * cell of the bottom row deliberately left empty. Sits on the mix as a
- * whole (see `lib/masterBus.ts` for the shared `Tone.Filter` every voice's
- * output runs through), between the Master bus and Transport panels.
+ * Master filter panel: Cutoff, Resonance, Env Amount, and Mode (HP/LP/BP)
+ * in a 2x2 grid. Sits on the mix as a whole (see `lib/masterBus.ts` for
+ * the shared `Tone.Filter` every voice's output runs through), between
+ * the Transport and Master panels.
+ *
+ * No Keyboard Tracking control: this is a drum machine with no per-step
+ * pitch or velocity, so a "tracking" knob could only ever apply the same
+ * fixed offset on every hit — indistinguishable from just setting a
+ * different Cutoff. See `masterBus.ts` for the fuller reasoning.
  */
 const FilterPanel = () => {
   const {
@@ -56,8 +60,6 @@ const FilterPanel = () => {
     setMode,
     envAmount,
     setEnvAmount,
-    keyboardTracking,
-    setKeyboardTracking,
   } = useFilterBus();
 
   return (
@@ -81,31 +83,22 @@ const FilterPanel = () => {
           onChange={(e) => setResonance(e.value)}
           label="Res"
         />
-        <CycleButton
-          size="small"
-          label={MODE_OPTIONS.find((o) => o.value === mode)?.label ?? "Mode"}
-          options={MODE_OPTIONS}
-          value={mode}
-          onChange={(e) => setMode(e.value as FilterMode)}
-        />
-
         <Knob
           variant="plainCap"
           size="small"
           min={-1}
           max={1}
           value={envAmount}
+          bipolar={true}
           onChange={(e) => setEnvAmount(e.value)}
           label="Env Amt"
         />
-        <Knob
-          variant="plainCap"
+        <CycleButton
           size="small"
-          min={0}
-          max={1}
-          value={keyboardTracking}
-          onChange={(e) => setKeyboardTracking(e.value)}
-          label="Kbd Trk"
+          label={MODE_OPTIONS.find((o) => o.value === mode)?.label ?? "Mode"}
+          options={MODE_OPTIONS}
+          value={mode}
+          onChange={(e) => setMode(e.value as FilterMode)}
         />
       </div>
       <span className={styles.title}>Filter</span>

@@ -4,6 +4,7 @@ import { clamp } from "../lib/clamp";
 
 const CLICK_TONE = 1000; // Hz — a bright, classic metronome "tick" pitch; fixed, not user-adjustable
 const DEFAULT_VOLUME = 50; // 0-100%, matches the Volume slider convention used elsewhere in this project
+const DEFAULT_MUTED = true; // the click is silent by default — an opt-in reference tone, not a surprise on first Start
 
 /**
  * Drives an audible metronome click on every beat, on its own `Tone.Loop`
@@ -24,7 +25,7 @@ const DEFAULT_VOLUME = 50; // 0-100%, matches the Volume slider convention used 
  */
 export const useMetronomeClick = () => {
   const [volume, setVolumeState] = useState(DEFAULT_VOLUME);
-  const [muted, setMutedState] = useState(false);
+  const [muted, setMutedState] = useState(DEFAULT_MUTED);
 
   // Read by setVolume/setMuted so either setter can recompute the
   // effective gain (volume x mute) without needing the other state's own
@@ -47,7 +48,7 @@ export const useMetronomeClick = () => {
       oscillator: { type: "sine" },
       envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 },
     });
-    const gain = new Tone.Gain(DEFAULT_VOLUME / 100).toDestination();
+    const gain = new Tone.Gain(DEFAULT_MUTED ? 0 : DEFAULT_VOLUME / 100).toDestination();
     synth.connect(gain);
     gainRef.current = gain;
 
