@@ -1,12 +1,17 @@
 import { useState } from "react";
 import * as Tone from "tone";
 import { HI_HAT_OSCILLATOR_FREQUENCIES } from "../../lib/hiHatOscillatorFrequencies";
-import { masterBusInput } from "../../lib/masterBus";
+import { masterBusInput, triggerMasterFilterEnvelope } from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
 
 // Closed hat: short, tight amp envelope with no sustain — this is what
 // makes it read as "closed" rather than the open hat's longer ring.
 const DECAY = 0.05;
+
+// Must match HiHatPad's Tone knob min/max — normalizes `tone` to 0-1 for
+// the master filter's Keyboard Tracking (see `triggerMasterFilterEnvelope`).
+const TONE_MIN = 3000;
+const TONE_MAX = 10000;
 
 /**
  * The closed hi-hat's live knob state and its `trigger` function — the
@@ -42,6 +47,9 @@ export const useHiHatVoice = () => {
 
     const now = scheduledTime ?? Tone.now();
     const level = volume / 100; // Volume slider as a 0-1 multiplier applied to the VCA peak
+
+    // Sweeps the master filter on every hit — see `triggerMasterFilterEnvelope`.
+    triggerMasterFilterEnvelope(now, (tone - TONE_MIN) / (TONE_MAX - TONE_MIN));
 
     // VCF: highpass filters out the fundamentals of the six VCOs below,
     // leaving the upper harmonics that read as "metallic." "Tone" knob

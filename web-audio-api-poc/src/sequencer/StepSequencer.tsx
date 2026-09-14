@@ -1,6 +1,7 @@
 import { css } from "@linaria/core";
 import TempoTransportPanel from "./TempoTransportPanel";
 import MasterPanel from "../components/master/MasterPanel";
+import FilterPanel from "../components/filter/FilterPanel";
 import KickPad from "../components/kick/KickPad";
 import SnarePad from "../components/snare/SnarePad";
 import HiHatPad from "../components/hihat/HiHatPad";
@@ -88,6 +89,7 @@ const StepSequencer = () => {
     <div className={styles.container}>
       <div className={styles.topRow}>
         <TempoTransportPanel />
+        <FilterPanel />
         <MasterPanel />
       </div>
       <div className={styles.pads}>
