@@ -4,11 +4,6 @@ import { HI_HAT_OSCILLATOR_FREQUENCIES } from "../../lib/hiHatOscillatorFrequenc
 import { masterBusInput, triggerMasterFilterEnvelope } from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
 
-// Must match HiHatOpenPad's Tone knob min/max — normalizes `tone` to 0-1
-// for the master filter's Keyboard Tracking (see `triggerMasterFilterEnvelope`).
-const TONE_MIN = 3000;
-const TONE_MAX = 10000;
-
 /**
  * The open hi-hat's live knob state and its `trigger` function — the same
  * TR-808 hex-oscillator bank as {@link useHiHatVoice} (six square VCOs
@@ -48,7 +43,7 @@ export const useHiHatOpenVoice = () => {
     const level = volume / 100; // Volume slider as a 0-1 multiplier applied to the VCA peak
 
     // Sweeps the master filter on every hit — see `triggerMasterFilterEnvelope`.
-    triggerMasterFilterEnvelope(now, (tone - TONE_MIN) / (TONE_MAX - TONE_MIN));
+    triggerMasterFilterEnvelope(now);
 
     // VCF: highpass filters out the fundamentals of the six VCOs below,
     // leaving the upper harmonics that read as "metallic." "Tone" knob

@@ -1,10 +1,6 @@
 import { useCallback, useState } from "react";
 import { clamp } from "../../lib/clamp";
-import {
-  masterFilter,
-  setMasterFilterEnvAmount,
-  setMasterFilterKeyboardTracking,
-} from "../../lib/masterBus";
+import { masterFilter, setMasterFilterEnvAmount } from "../../lib/masterBus";
 
 export type FilterMode = "lowpass" | "highpass" | "bandpass";
 
@@ -16,7 +12,6 @@ const MIN_RESONANCE = 0.1;
 const MAX_RESONANCE = 20;
 const DEFAULT_MODE: FilterMode = "lowpass";
 const DEFAULT_ENV_AMOUNT = 0; // -1 to 1, bipolar
-const DEFAULT_KEYBOARD_TRACKING = 0; // 0 to 1
 
 /**
  * UI state for the master filter (`lib/masterBus.ts`) — Cutoff, Resonance,
@@ -25,20 +20,23 @@ const DEFAULT_KEYBOARD_TRACKING = 0; // 0 to 1
  * "sustained" per-track classification, ARCHITECTURE-SPEC.MD): Cutoff/
  * Resonance are AudioParam-backed and ramped to avoid zipper noise, Mode
  * is a plain property assigned directly, same as an envelope's
- * attack/decay. Env Amount and Keyboard Tracking instead only matter at
- * the moment of the next hit (they scale a per-hit envelope, see
- * `triggerMasterFilterEnvelope`), so those setters just update the
- * module-level fields `masterBus.ts` reads at trigger time.
+ * attack/decay. Env Amount instead only matters at the moment of the next
+ * hit (it scales a per-hit envelope, see `triggerMasterFilterEnvelope`),
+ * so that setter just updates the module-level field `masterBus.ts` reads
+ * at trigger time.
  *
- * @returns The filter's `cutoff`/`resonance`/`mode`/`envAmount`/
- * `keyboardTracking` state and their setters.
+ * (No "Keyboard Tracking" control here — see `masterBus.ts` for why it was
+ * removed: with no per-step pitch or velocity, it couldn't do anything a
+ * different Cutoff setting doesn't already do.)
+ *
+ * @returns The filter's `cutoff`/`resonance`/`mode`/`envAmount` state and
+ * their setters.
  */
 export const useFilterBus = () => {
   const [cutoff, setCutoffState] = useState(DEFAULT_CUTOFF);
   const [resonance, setResonanceState] = useState(DEFAULT_RESONANCE);
   const [mode, setModeState] = useState<FilterMode>(DEFAULT_MODE);
   const [envAmount, setEnvAmountState] = useState(DEFAULT_ENV_AMOUNT);
-  const [keyboardTracking, setKeyboardTrackingState] = useState(DEFAULT_KEYBOARD_TRACKING);
 
   const setCutoff = useCallback((value: number) => {
     const clamped = clamp(value, MIN_CUTOFF, MAX_CUTOFF);
@@ -63,12 +61,6 @@ export const useFilterBus = () => {
     setMasterFilterEnvAmount(clamped);
   }, []);
 
-  const setKeyboardTracking = useCallback((value: number) => {
-    const clamped = clamp(value, 0, 1);
-    setKeyboardTrackingState(clamped);
-    setMasterFilterKeyboardTracking(clamped);
-  }, []);
-
   return {
     cutoff,
     setCutoff,
@@ -82,7 +74,5 @@ export const useFilterBus = () => {
     setMode,
     envAmount,
     setEnvAmount,
-    keyboardTracking,
-    setKeyboardTracking,
   };
 };

@@ -6,11 +6,6 @@ import { startAudioContext } from "../../lib/startAudioContext";
 
 const PITCH_DROP_START = 180; // starting "click" pitch the VCO glides down from, in Hz
 
-// Must match KickPad's Tone knob min/max — normalizes `tone` to 0-1 for
-// the master filter's Keyboard Tracking (see `triggerMasterFilterEnvelope`).
-const TONE_MIN = 30;
-const TONE_MAX = 120;
-
 /**
  * The kick's live knob state and its `trigger` function — the TR-808
  * recipe behind {@link KickPad} (sine VCO + pitch glide + `Tone.Distortion`
@@ -50,7 +45,7 @@ export const useKickVoice = () => {
     const level = volume / 100; // Volume slider as a 0-1 multiplier applied to the VCA peak
 
     // Sweeps the master filter on every hit — see `triggerMasterFilterEnvelope`.
-    triggerMasterFilterEnvelope(now, (tone - TONE_MIN) / (TONE_MAX - TONE_MIN));
+    triggerMasterFilterEnvelope(now);
 
     // VCO with a pitch envelope: starts bright, glides down to the sub fundamental
     const osc = new Tone.Oscillator(PITCH_DROP_START, "sine");

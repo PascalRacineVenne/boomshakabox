@@ -8,11 +8,6 @@ import { startAudioContext } from "../../lib/startAudioContext";
 // makes it read as "closed" rather than the open hat's longer ring.
 const DECAY = 0.05;
 
-// Must match HiHatPad's Tone knob min/max — normalizes `tone` to 0-1 for
-// the master filter's Keyboard Tracking (see `triggerMasterFilterEnvelope`).
-const TONE_MIN = 3000;
-const TONE_MAX = 10000;
-
 /**
  * The closed hi-hat's live knob state and its `trigger` function — the
  * TR-808 recipe behind {@link HiHatPad} (six square VCOs summed, then a
@@ -49,7 +44,7 @@ export const useHiHatVoice = () => {
     const level = volume / 100; // Volume slider as a 0-1 multiplier applied to the VCA peak
 
     // Sweeps the master filter on every hit — see `triggerMasterFilterEnvelope`.
-    triggerMasterFilterEnvelope(now, (tone - TONE_MIN) / (TONE_MAX - TONE_MIN));
+    triggerMasterFilterEnvelope(now);
 
     // VCF: highpass filters out the fundamentals of the six VCOs below,
     // leaving the upper harmonics that read as "metallic." "Tone" knob

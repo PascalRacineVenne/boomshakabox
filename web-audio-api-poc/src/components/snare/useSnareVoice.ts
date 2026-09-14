@@ -8,11 +8,6 @@ import { startAudioContext } from "../../lib/startAudioContext";
 // frequency, so the interval between them stays the same as you tune it.
 const TONE_VOICE_RATIO = 330 / 180;
 
-// Must match SnarePad's Tone knob min/max — normalizes `tone` to 0-1 for
-// the master filter's Keyboard Tracking (see `triggerMasterFilterEnvelope`).
-const TONE_MIN = 100;
-const TONE_MAX = 300;
-
 /**
  * The snare's live knob state and its `trigger` function — the TR-808
  * recipe behind {@link SnarePad} (two triangle VCOs for the tone voice,
@@ -47,7 +42,7 @@ export const useSnareVoice = () => {
     const level = volume / 100; // Volume slider as a 0-1 multiplier applied to both voices' peaks
 
     // Sweeps the master filter on every hit — see `triggerMasterFilterEnvelope`.
-    triggerMasterFilterEnvelope(now, (tone - TONE_MIN) / (TONE_MAX - TONE_MIN));
+    triggerMasterFilterEnvelope(now);
 
     // --- Tone voice: two VCOs summed into one VCA ---
     const toneGain = new Tone.Gain(1).connect(masterBusInput);

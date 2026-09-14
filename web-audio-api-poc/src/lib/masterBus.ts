@@ -26,7 +26,7 @@ import * as Tone from "tone";
 const masterDistortion = new Tone.Distortion(0.4);
 masterDistortion.wet.value = 0; // off by default
 
-const masterFilter = new Tone.Filter(2000, "lowpass");
+const masterFilter = new Tone.Filter(12000, "lowpass");
 masterDistortion.connect(masterFilter);
 
 const masterGain = new Tone.Gain(0.75).toDestination();
@@ -37,23 +37,27 @@ export const masterBusInput = masterDistortion;
 
 export { masterDistortion, masterFilter, masterGain };
 
-// ---- Master filter envelope + keyboard tracking ----
+// ---- Master filter envelope ----
 //
-// "Env Amount" and "Keyboard Tracking" both modulate `masterFilter.frequency`
-// on every drum hit, on top of whatever the Cutoff knob itself holds. Rather
-// than compute a combined target Hz value and repeatedly overwrite
-// `frequency` (which would fight the Cutoff knob's own `.rampTo` scheduling
-// whenever both are live at once), both paths are separate `Tone.Gain`
-// "depth" scalers fed by one shared `Tone.Envelope` shape and connected
-// directly into `masterFilter.frequency` — an AudioParam sums every
-// audio-rate connection into it with its own held/scheduled value for free,
-// which is the idiomatic Web Audio way to layer modulation onto a live
-// knob-controlled parameter without the two ever competing over the same
-// scheduled value.
+// "Env Amount" modulates `masterFilter.frequency` on every drum hit, on top
+// of whatever the Cutoff knob itself holds. Rather than compute a combined
+// target Hz value and repeatedly overwrite `frequency` (which would fight
+// the Cutoff knob's own `.rampTo` scheduling whenever both are live at
+// once), it's a `Tone.Gain` "depth" scaler fed by a `Tone.Envelope` and
+// connected directly into `masterFilter.frequency` — an AudioParam sums
+// every audio-rate connection into it with its own held/scheduled value for
+// free, which is the idiomatic Web Audio way to layer modulation onto a
+// live knob-controlled parameter without the two ever competing over the
+// same scheduled value.
+//
+// (There was also a "Keyboard Tracking" knob here, scaling a second per-hit
+// offset by each voice's own Tone-knob position. Removed: with no per-step
+// pitch or velocity input, it could only ever apply the same fixed offset
+// on every hit — mathematically identical to just setting a different base
+// Cutoff. Not a distinct behavior, so not a real control.)
 
 const FILTER_ENV_DECAY = 0.15; // seconds — how long each hit's sweep takes to settle back
 const ENV_DEPTH_HZ = 4000; // how far a full +/-1 "Env Amount" sweeps the cutoff, in Hz
-const TRACKING_DEPTH_HZ = 3000; // how far full "Keyboard Tracking" shifts cutoff at the extremes of a voice's own Tone knob, in Hz
 
 const filterEnvelope = new Tone.Envelope({
   attack: 0.001,
@@ -62,36 +66,32 @@ const filterEnvelope = new Tone.Envelope({
   release: 0.01,
 });
 
-// Fixed depth: re-set only when the Env Amount knob turns. Signed, so a
-// negative amount sweeps the cutoff down instead of up.
+// Signed, so a negative amount sweeps the cutoff down instead of up.
 const envDepthGain = new Tone.Gain(0);
 filterEnvelope.connect(envDepthGain);
 envDepthGain.connect(masterFilter.frequency);
-
-// Per-hit depth: re-set right before each trigger, scaled by that voice's
-// own normalized Tone-knob position — this app's stand-in for "note pitch"
-// since it's a drum machine, not a keyboard instrument.
-const trackingDepthGain = new Tone.Gain(0);
-filterEnvelope.connect(trackingDepthGain);
-trackingDepthGain.connect(masterFilter.frequency);
-
-let keyboardTrackingAmount = 0; // 0-1, read at trigger time to scale trackingDepthGain per hit
 
 export const setMasterFilterEnvAmount = (amount: number) => {
   envDepthGain.gain.value = amount * ENV_DEPTH_HZ;
 };
 
-export const setMasterFilterKeyboardTracking = (amount: number) => {
-  keyboardTrackingAmount = amount;
-};
+// The step sequencer calls `trigger()` on every track scheduled for the
+// current step from one `Tone.Transport.scheduleRepeat` callback, all with
+// the exact same `time` (see `useStepSequencer.ts`) — so a busy step with
+// several tracks hitting at once would otherwise retrigger this SAME
+// envelope several times at that identical instant, each restarting the
+// ramp mid-sweep and clicking. Deduping by exact `time` match collapses
+// that back down to one sweep per step, matching what's audible anyway
+// (one shared master filter, not one per voice).
+let lastEnvelopeTriggerTime = -1;
 
 /**
  * Fires the master filter's shared envelope shape — called by every drum
  * voice's own `trigger()` alongside its own amp envelope, so any hit
- * sweeps the master filter. `normalizedPitch` (0-1) is that voice's own
- * Tone knob position within its own range.
+ * sweeps the master filter.
  */
-export const triggerMasterFilterEnvelope = (time: number, normalizedPitch: number) => {
-  trackingDepthGain.gain.setValueAtTime(keyboardTrackingAmount * TRACKING_DEPTH_HZ * normalizedPitch, time);
+export const triggerMasterFilterEnvelope = (time: number) => {
+  if (time === lastEnvelopeTriggerTime) return;
+  lastEnvelopeTriggerTime = time;
   filterEnvelope.triggerAttack(time);
 };
