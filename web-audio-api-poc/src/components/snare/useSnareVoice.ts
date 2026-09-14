@@ -1,11 +1,17 @@
 import { useState } from "react";
 import * as Tone from "tone";
+import { masterBusInput, triggerMasterFilterEnvelope } from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
 
 // Ratio between the two tone-voice VCOs in the original fixed-frequency
 // recipe (330/180) — preserved when the "Tone" knob shifts the base
 // frequency, so the interval between them stays the same as you tune it.
 const TONE_VOICE_RATIO = 330 / 180;
+
+// Must match SnarePad's Tone knob min/max — normalizes `tone` to 0-1 for
+// the master filter's Keyboard Tracking (see `triggerMasterFilterEnvelope`).
+const TONE_MIN = 100;
+const TONE_MAX = 300;
 
 /**
  * The snare's live knob state and its `trigger` function — the TR-808
@@ -40,8 +46,11 @@ export const useSnareVoice = () => {
     const duration = 0.2; // ~200ms, matching the 808's fixed snare decay
     const level = volume / 100; // Volume slider as a 0-1 multiplier applied to both voices' peaks
 
+    // Sweeps the master filter on every hit — see `triggerMasterFilterEnvelope`.
+    triggerMasterFilterEnvelope(now, (tone - TONE_MIN) / (TONE_MAX - TONE_MIN));
+
     // --- Tone voice: two VCOs summed into one VCA ---
-    const toneGain = new Tone.Gain(1).toDestination();
+    const toneGain = new Tone.Gain(1).connect(masterBusInput);
     toneGain.gain.setValueAtTime(0.7 * level, now);
     toneGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
@@ -54,7 +63,7 @@ export const useSnareVoice = () => {
 
     // --- Snap voice: noise source -> filter (VCF) -> its own VCA/EG ---
     const noiseFilter = new Tone.Filter(1000, "highpass");
-    const noiseGain = new Tone.Gain(1).toDestination();
+    const noiseGain = new Tone.Gain(1).connect(masterBusInput);
     noiseGain.gain.setValueAtTime(snappy * level, now); // "Snappy" knob mix, scaled by the Volume slider
     noiseGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 

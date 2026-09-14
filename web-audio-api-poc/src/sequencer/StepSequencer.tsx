@@ -1,5 +1,7 @@
 import { css } from "@linaria/core";
 import TempoTransportPanel from "./TempoTransportPanel";
+import MasterPanel from "../components/master/MasterPanel";
+import FilterPanel from "../components/filter/FilterPanel";
 import KickPad from "../components/kick/KickPad";
 import SnarePad from "../components/snare/SnarePad";
 import HiHatPad from "../components/hihat/HiHatPad";
@@ -22,6 +24,11 @@ const styles = {
   container: css`
     display: flex;
     flex-direction: column;
+    align-items: center;
+    gap: calc(var(--audioui-unit) / 2);
+  `,
+  topRow: css`
+    display: flex;
     align-items: center;
     gap: calc(var(--audioui-unit) / 2);
   `,
@@ -70,16 +77,21 @@ const StepSequencer = () => {
   const hiHatVoice = useHiHatVoice();
   const hiHatOpenVoice = useHiHatOpenVoice();
 
-  const { activePattern, selectedTrack, selectTrack, currentStep, setStep } = useStepSequencer({
-    kick: kickVoice,
-    snare: snareVoice,
-    hihat: hiHatVoice,
-    hihatOpen: hiHatOpenVoice,
-  });
+  const { activePattern, selectedTrack, selectTrack, currentStep, setStep } =
+    useStepSequencer({
+      kick: kickVoice,
+      snare: snareVoice,
+      hihat: hiHatVoice,
+      hihatOpen: hiHatOpenVoice,
+    });
 
   return (
     <div className={styles.container}>
-      <TempoTransportPanel />
+      <div className={styles.topRow}>
+        <TempoTransportPanel />
+        <FilterPanel />
+        <MasterPanel />
+      </div>
       <div className={styles.pads}>
         <KickPad
           {...kickVoice}
@@ -104,7 +116,11 @@ const StepSequencer = () => {
       </div>
       <div className={styles.gridRow}>
         <span className={styles.gridLabel}>{TRACK_LABELS[selectedTrack]}</span>
-        <StepGrid active={activePattern} currentStep={currentStep} onStepChange={setStep} />
+        <StepGrid
+          active={activePattern}
+          currentStep={currentStep}
+          onStepChange={setStep}
+        />
       </div>
     </div>
   );

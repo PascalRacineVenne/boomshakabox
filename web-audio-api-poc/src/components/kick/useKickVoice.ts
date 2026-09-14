@@ -1,9 +1,15 @@
 import { useState } from "react";
 import * as Tone from "tone";
 import { distortionMakeupGain } from "../../lib/distortionMakeupGain";
+import { masterBusInput, triggerMasterFilterEnvelope } from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
 
 const PITCH_DROP_START = 180; // starting "click" pitch the VCO glides down from, in Hz
+
+// Must match KickPad's Tone knob min/max — normalizes `tone` to 0-1 for
+// the master filter's Keyboard Tracking (see `triggerMasterFilterEnvelope`).
+const TONE_MIN = 30;
+const TONE_MAX = 120;
 
 /**
  * The kick's live knob state and its `trigger` function — the TR-808
@@ -43,6 +49,9 @@ export const useKickVoice = () => {
     const duration = decay; // "Decay" knob: short, punchy decay — fat but not a long boomy tail
     const level = volume / 100; // Volume slider as a 0-1 multiplier applied to the VCA peak
 
+    // Sweeps the master filter on every hit — see `triggerMasterFilterEnvelope`.
+    triggerMasterFilterEnvelope(now, (tone - TONE_MIN) / (TONE_MAX - TONE_MIN));
+
     // VCO with a pitch envelope: starts bright, glides down to the sub fundamental
     const osc = new Tone.Oscillator(PITCH_DROP_START, "sine");
     osc.frequency.exponentialRampToValueAtTime(tone, now + pitchDropTime); // "Tone" knob: the pitch it settles on
@@ -61,7 +70,7 @@ export const useKickVoice = () => {
     const makeupGain = new Tone.Gain(distortionMakeupGain(distortionAmount));
 
     // VCA: instant attack, no ramp-up, exponential decay curve
-    const ampGain = new Tone.Gain(1).toDestination();
+    const ampGain = new Tone.Gain(1).connect(masterBusInput);
     ampGain.gain.setValueAtTime(level, now); // "Volume" slider sets the peak level
     ampGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
