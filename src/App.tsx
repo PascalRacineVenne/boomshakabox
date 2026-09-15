@@ -12,7 +12,6 @@ const App = () => {
             <StepSequencer />
           </Space>
         </div>
-        <div className="ticks">
       </section>
 
       <div className="ticks"></div>
