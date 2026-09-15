@@ -12,7 +12,4 @@ describe("clamp", () => {
   test("clamps to the maximum when the value is above range", () => {
     expect(clamp(15, 0, 10)).toBe(10);
   });
-  test("Create a failing test", () => {
-    expect(clamp(15, 0, 10)).toBe(15); // This test is expected to fail
-  });
 });
