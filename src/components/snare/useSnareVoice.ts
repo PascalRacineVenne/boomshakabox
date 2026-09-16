@@ -21,13 +21,14 @@ const TONE_VOICE_RATIO = 330 / 180;
  * {@link startAudioContext}, scheduled calls fire at the precise
  * Transport time instead.
  *
- * @returns The snare's `tone`/`snappy`/`volume`/`pressed` state, their
- * setters, and `trigger`.
+ * @returns The snare's `tone`/`snappy`/`volume`/`pan`/`pressed` state,
+ * their setters, and `trigger`.
  */
 export const useSnareVoice = () => {
   const [tone, setTone] = useState(180); // base frequency of the tone voice's VCOs, in Hz
   const [snappy, setSnappy] = useState(1); // 0-1 mix level of the noise/snap voice
   const [volume, setVolume] = useState(75); // 0-100%, overall output level for both voices
+  const [pan, setPan] = useState(0); // -100 (hard left) to 100 (hard right)
   const [pressed, setPressed] = useState(false); // drives the pad's lit state — real mousedown/up, not hover
 
   const trigger = async (scheduledTime?: number) => {
@@ -44,8 +45,13 @@ export const useSnareVoice = () => {
     // Sweeps the master filter on every hit — see `triggerMasterFilterEnvelope`.
     triggerMasterFilterEnvelope(now);
 
+    // Stereo placement (Pan knob): both voices below share this one panner
+    // so the tone and snap stay correlated at the same position in the
+    // stereo field, rather than each drifting independently.
+    const panner = new Tone.Panner(pan / 100).connect(masterBusInput);
+
     // --- Tone voice: two VCOs summed into one VCA ---
-    const toneGain = new Tone.Gain(1).connect(masterBusInput);
+    const toneGain = new Tone.Gain(1).connect(panner);
     toneGain.gain.setValueAtTime(0.7 * level, now);
     toneGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
@@ -58,7 +64,7 @@ export const useSnareVoice = () => {
 
     // --- Snap voice: noise source -> filter (VCF) -> its own VCA/EG ---
     const noiseFilter = new Tone.Filter(1000, "highpass");
-    const noiseGain = new Tone.Gain(1).connect(masterBusInput);
+    const noiseGain = new Tone.Gain(1).connect(panner);
     noiseGain.gain.setValueAtTime(snappy * level, now); // "Snappy" knob mix, scaled by the Volume slider
     noiseGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
@@ -74,10 +80,23 @@ export const useSnareVoice = () => {
         noise.dispose();
         noiseFilter.dispose();
         noiseGain.dispose();
+        panner.dispose();
       },
       (duration + 0.1) * 1000,
     );
   };
 
-  return { tone, setTone, snappy, setSnappy, volume, setVolume, pressed, setPressed, trigger };
+  return {
+    tone,
+    setTone,
+    snappy,
+    setSnappy,
+    volume,
+    setVolume,
+    pan,
+    setPan,
+    pressed,
+    setPressed,
+    trigger,
+  };
 };

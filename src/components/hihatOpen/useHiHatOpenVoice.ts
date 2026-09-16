@@ -22,13 +22,14 @@ import { startAudioContext } from "../../lib/startAudioContext";
  * changes only need to reach the next triggered voice, so no direct node
  * write is wired up for live playback.
  *
- * @returns The open hi-hat's `tone`/`decay`/`volume`/`pressed` state,
+ * @returns The open hi-hat's `tone`/`decay`/`volume`/`pan`/`pressed` state,
  * their setters, and `trigger`.
  */
 export const useHiHatOpenVoice = () => {
   const [tone, setTone] = useState(7000); // highpass VCF cutoff, in Hz — brightness/metallic content
   const [decay, setDecay] = useState(0.4); // amp envelope decay length, in seconds — the open hat's "ring"
   const [volume, setVolume] = useState(75); // 0-100%, overall output level
+  const [pan, setPan] = useState(0); // -100 (hard left) to 100 (hard right)
   const [pressed, setPressed] = useState(false); // drives the pad's lit state — real mousedown/up, not hover
 
   const trigger = async (scheduledTime?: number) => {
@@ -51,10 +52,14 @@ export const useHiHatOpenVoice = () => {
     const filter = new Tone.Filter(tone, "highpass");
 
     // VCA: instant attack, no ramp-up, exponential decay curve
-    const ampGain = new Tone.Gain(1).connect(masterBusInput);
+    const ampGain = new Tone.Gain(1);
     ampGain.gain.setValueAtTime(level, now);
     ampGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
     filter.connect(ampGain);
+
+    // Stereo placement (Pan knob), after the VCA, before the shared bus.
+    const panner = new Tone.Panner(pan / 100).connect(masterBusInput);
+    ampGain.connect(panner);
 
     const oscillators = HI_HAT_OSCILLATOR_FREQUENCIES.map((freq) => {
       const osc = new Tone.Oscillator(freq, "square").connect(filter);
@@ -68,10 +73,23 @@ export const useHiHatOpenVoice = () => {
         oscillators.forEach((osc) => osc.dispose());
         filter.dispose();
         ampGain.dispose();
+        panner.dispose();
       },
       (duration + 0.1) * 1000,
     );
   };
 
-  return { tone, setTone, decay, setDecay, volume, setVolume, pressed, setPressed, trigger };
+  return {
+    tone,
+    setTone,
+    decay,
+    setDecay,
+    volume,
+    setVolume,
+    pan,
+    setPan,
+    pressed,
+    setPressed,
+    trigger,
+  };
 };
