@@ -1,6 +1,7 @@
 import { Flex, Space, Typography } from "antd";
 import { css } from "@linaria/core";
 import StepSequencer from "./sequencer/StepSequencer";
+import ADSRPanel from "./components/adsr/ADSRPanel";
 
 const styles = {
   center: css`
@@ -37,6 +38,16 @@ const App = () => {
       <Space size={"large"}>
         <StepSequencer />
       </Space>
+      <Space size={"large"}>
+        <ADSRPanel />
+      </Space>
+      <Typography.Paragraph style={{ color: "var(--text)" }}>
+        potentially useful ADSR envelope for synth or filter modulation (not yet
+        wired to any drum voice)
+      </Typography.Paragraph>
+      <Typography.Title level={2} className={styles.title}>
+        Gimme a beat
+      </Typography.Title>
     </Flex>
   );
 };
