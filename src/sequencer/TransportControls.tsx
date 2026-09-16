@@ -1,8 +1,9 @@
 import { css } from "@linaria/core";
 import { useState } from "react";
 import { Button, Space } from "antd";
-import { CaretRightOutlined, StopOutlined } from "@ant-design/icons";
+import { StopOutlined } from "@ant-design/icons";
 import * as Tone from "tone";
+import { PlayCircleIcon } from "../icons/transport/PlayCircleIcon";
 
 const styles = {
   button: css`
@@ -40,7 +41,7 @@ const TransportControls = () => {
         className={styles.button}
         type={isPlaying ? "default" : "primary"}
         icon={
-          <CaretRightOutlined
+          <PlayCircleIcon
             style={{
               color: "var(--accent)",
             }}
