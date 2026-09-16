@@ -36,7 +36,7 @@ const MetronomeClick = () => {
         variant="plainCap"
         step={1}
         value={volume}
-        onChange={(e) => setVolume(e.value)}
+        onChange={(rotation) => setVolume(rotation.value)}
         label="Click"
         size="small"
         valueAsLabel="interactive"
