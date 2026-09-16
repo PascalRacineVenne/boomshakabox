@@ -41,6 +41,10 @@ const App = () => {
       <Space size={"large"}>
         <ADSRPanel />
       </Space>
+      <Typography.Paragraph style={{ color: "var(--text)" }}>
+        potentially useful ADSR envelope for synth or filter modulation (not yet
+        wired to any drum voice)
+      </Typography.Paragraph>
       <Typography.Title level={2} className={styles.title}>
         Gimme a beat
       </Typography.Title>
