@@ -1,14 +1,11 @@
 import { CycleButton, Knob } from "@cutoff/audio-ui-react";
 import { css } from "@linaria/core";
-import { type FilterMode, useFilterBus } from "./useFilterBus";
+import { useFilterBus } from "./useFilterBus";
+import { FILTER_MODE_OPTIONS, type FilterMode } from "../../lib/masterBus";
 import { Space } from "antd";
 import { LABELED_SMALL_KNOB_HEIGHT_UNITS } from "../ControlPanel";
 
-const MODE_OPTIONS = [
-  { value: "lowpass", label: "LP" },
-  { value: "bandpass", label: "BP" },
-  { value: "highpass", label: "HP" },
-];
+const FILTER_MODE_OPTIONS_LIST = Object.values(FILTER_MODE_OPTIONS);
 
 const styles = {
   wrapper: css`
@@ -42,11 +39,6 @@ const styles = {
  * in a 2x2 grid. Sits on the mix as a whole (see `lib/masterBus.ts` for
  * the shared `Tone.Filter` every voice's output runs through), between
  * the Transport and Master panels.
- *
- * No Keyboard Tracking control: this is a drum machine with no per-step
- * pitch or velocity, so a "tracking" knob could only ever apply the same
- * fixed offset on every hit — indistinguishable from just setting a
- * different Cutoff. See `masterBus.ts` for the fuller reasoning.
  */
 const FilterPanel = () => {
   const {
@@ -74,7 +66,7 @@ const FilterPanel = () => {
             min={minCutoff}
             max={maxCutoff}
             value={cutoff}
-            onChange={(e) => setCutoff(e.value)}
+            onChange={(rotation) => setCutoff(rotation.value)}
             label="Cutoff"
           />
           <Space vertical>
@@ -84,7 +76,7 @@ const FilterPanel = () => {
               min={minResonance}
               max={maxResonance}
               value={resonance}
-              onChange={(e) => setResonance(e.value)}
+              onChange={(rotation) => setResonance(rotation.value)}
               label="Res"
               labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
             />
@@ -95,7 +87,7 @@ const FilterPanel = () => {
               max={1}
               value={envAmount}
               bipolar={true}
-              onChange={(e) => setEnvAmount(e.value)}
+              onChange={(rotation) => setEnvAmount(rotation.value)}
               label="Env"
               labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
             />
@@ -103,10 +95,13 @@ const FilterPanel = () => {
         </Space>
         <CycleButton
           size="small"
-          label={MODE_OPTIONS.find((o) => o.value === mode)?.label ?? "Mode"}
-          options={MODE_OPTIONS}
+          label={
+            FILTER_MODE_OPTIONS_LIST.find((option) => option.value === mode)
+              ?.label ?? "Mode"
+          }
+          options={FILTER_MODE_OPTIONS_LIST}
           value={mode}
-          onChange={(e) => setMode(e.value as FilterMode)}
+          onChange={(rotation) => setMode(rotation.value as FilterMode)}
           labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
         />
       </div>

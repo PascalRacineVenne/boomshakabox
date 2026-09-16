@@ -1,6 +1,22 @@
 import * as Tone from "tone";
 
 /**
+ * The master filter's selectable modes, keyed by name so call sites read as
+ * `MODE_OPTIONS.LOWPASS` instead of a bare `"lowpass"` string repeated
+ * across the audio engine (`masterFilter.type`) and the UI (`FilterPanel`'s
+ * cycle button + `useFilterBus`'s default) — one place to add a mode (e.g.
+ * "notch") instead of three.
+ */
+export const FILTER_MODE_OPTIONS = {
+  LOWPASS: { value: "lowpass", label: "LP" },
+  BANDPASS: { value: "bandpass", label: "BP" },
+  HIGHPASS: { value: "highpass", label: "HP" },
+} as const;
+
+export type FilterMode =
+  (typeof FILTER_MODE_OPTIONS)[keyof typeof FILTER_MODE_OPTIONS]["value"];
+
+/**
  * The single master output chain every drum voice's final VCA connects
  * into (`.connect(masterBusInput)`) instead of calling `.toDestination()`
  * directly: Drive -> Filter -> Volume -> Destination, the way a drum
@@ -26,7 +42,7 @@ import * as Tone from "tone";
 const masterDistortion = new Tone.Distortion(0.4);
 masterDistortion.wet.value = 0; // off by default
 
-const masterFilter = new Tone.Filter(12000, "lowpass");
+const masterFilter = new Tone.Filter(12000, FILTER_MODE_OPTIONS.LOWPASS.value);
 masterDistortion.connect(masterFilter);
 
 const masterGain = new Tone.Gain(0.75).toDestination();
