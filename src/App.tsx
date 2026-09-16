@@ -1,7 +1,7 @@
 import { Flex, Space, Typography } from "antd";
 import { css } from "@linaria/core";
 import StepSequencer from "./sequencer/StepSequencer";
-import ADSRGraph from "./components/adsr/ADSRGraph";
+import ADSRPanel from "./components/adsr/ADSRPanel";
 
 const styles = {
   center: css`
@@ -39,7 +39,7 @@ const App = () => {
         <StepSequencer />
       </Space>
       <Space size={"large"}>
-        <ADSRGraph attack={0.005} decay={0.3} sustain={0.5} release={0.6} />
+        <ADSRPanel />
       </Space>
       <Typography.Title level={2} className={styles.title}>
         Gimme a beat
