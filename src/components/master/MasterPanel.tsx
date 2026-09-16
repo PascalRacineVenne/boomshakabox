@@ -1,6 +1,9 @@
 import { Button, Knob } from "@cutoff/audio-ui-react";
 import { css } from "@linaria/core";
-import { controlPanelStyles } from "../ControlPanel";
+import {
+  controlPanelStyles,
+  LABELED_SMALL_KNOB_HEIGHT_UNITS,
+} from "../ControlPanel";
 import { useMasterBus } from "./useMasterBus";
 
 const styles = {
@@ -50,13 +53,15 @@ const MasterPanel = () => {
               value={distortion}
               onChange={(e) => setDistortion(e.value)}
               label="Drive"
+              labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
             />
             <Button
               latch
-              label="Drive"
+              label="ON/OFF"
               size="xsmall"
               value={distortionOn}
               onChange={(e) => setDistortionOn(e.value)}
+              labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS / 2}
             />
           </div>
           <Knob

@@ -1,13 +1,7 @@
 import { Button, Knob } from "@cutoff/audio-ui-react";
 import { useMetronomeClick } from "./useMetronomeClick";
-import { css } from "@linaria/core";
-
-const style = {
-  container: css`
-    display: flex;
-    alignitems: center;
-  `,
-};
+import { LABELED_SMALL_KNOB_HEIGHT_UNITS } from "../components/ControlPanel";
+import { Space } from "antd";
 
 /**
  * Controls for the audible metronome click that ticks on every beat (see
@@ -35,7 +29,7 @@ const MetronomeClick = () => {
   const { volume, setVolume, muted, setMuted } = useMetronomeClick();
 
   return (
-    <div className={style.container}>
+    <Space vertical>
       <Knob
         min={0}
         max={100}
@@ -46,14 +40,16 @@ const MetronomeClick = () => {
         label="Click"
         size="small"
         valueAsLabel="interactive"
+        labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
       />
       <Button
         size="small"
         label={muted ? "Off" : "On"}
         value={!muted}
         onClick={() => setMuted(!muted)}
+        labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS / 2}
       />
-    </div>
+    </Space>
   );
 };
 

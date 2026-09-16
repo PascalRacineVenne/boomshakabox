@@ -1,5 +1,7 @@
 import { css } from "@linaria/core";
 
+export const LABELED_SMALL_KNOB_HEIGHT_UNITS = 40; // 2x the default 40-unit height of a single knob, to fit the label above
+
 /**
  * Shared layout classNames for a Tone.js voice's slider + knobs + trigger,
  * so every "device" reads as one grouped unit rather than loose controls
@@ -12,6 +14,7 @@ import { css } from "@linaria/core";
  * import: Linaria's build-time evaluator needs to trace the whole import
  * graph of any file containing a styled/css tag, and chokes on that
  * package's ESM-only exports when both live in the same file.
+ * 
  */
 export const controlPanelStyles = {
   /** Outer frame: slider+knobs row on top, trigger button centered underneath. */
