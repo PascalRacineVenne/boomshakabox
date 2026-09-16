@@ -1,14 +1,16 @@
 import { css } from "@linaria/core";
 import { useState } from "react";
 import { Button, Space } from "antd";
-import { StopOutlined } from "@ant-design/icons";
 import * as Tone from "tone";
-import { PlayCircleIcon } from "../icons/transport/PlayCircleIcon";
+import { PlayBevIcon } from "../icons/transport/PlayBevIcon";
+import { StopBevIcon } from "../icons/transport/StopBevIcon";
+
+const TRANSPORT_ICON_SIZE = 32;
 
 const styles = {
   button: css`
-    background: calc(var(--accent) / 2);
-    border: 1px solid var(--accent-border);
+    background: calc(var(--accent) / 2) !important;
+    border: none !important;
   `,
 };
 
@@ -41,9 +43,9 @@ const TransportControls = () => {
         className={styles.button}
         type={isPlaying ? "default" : "primary"}
         icon={
-          <PlayCircleIcon
+          <PlayBevIcon
             style={{
-              color: "var(--accent)",
+              fontSize: TRANSPORT_ICON_SIZE,
             }}
           />
         }
@@ -53,16 +55,15 @@ const TransportControls = () => {
       />
       <Button
         className={styles.button}
-        danger={isPlaying}
+        type={!isPlaying ? "default" : "primary"}
         icon={
-          <StopOutlined
+          <StopBevIcon
             style={{
-              color: "var(--accent)",
+              fontSize: TRANSPORT_ICON_SIZE,
             }}
           />
         }
         onClick={handleStop}
-        disabled={!isPlaying}
         aria-label="Stop"
       />
     </Space>

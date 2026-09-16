@@ -10,17 +10,13 @@ const styles = {
     gap: 2px;
   `,
 
-  root: css`
-    width: 140px;
-  `,
-
   // AntD's own rule for this element is a two-class compound selector
   // (".ant-input-number .ant-input-number-input") wrapped in :where() only
   // around its own hash — that still outranks our single custom class, so
   // !important is needed here regardless of stylesheet insertion order.
   input: css`
     text-align: center !important;
-    font-size: var(--audioui-unit) !important;
+    font-size: 24px !important;
     font-weight: 700 !important;
     line-height: 1 !important;
     color: var(--accent) !important;
@@ -55,7 +51,6 @@ const TempoKnob = () => {
   return (
     <div className={styles.container}>
       <InputNumber
-        className={styles.root}
         classNames={{ input: styles.input }}
         variant="borderless"
         controls={false}
