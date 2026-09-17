@@ -2,7 +2,7 @@ import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
 import classNames from "classnames";
 import { controlPanelStyles, formatPan } from "../ControlPanel";
 
-interface KickPadProps {
+interface HiTomPadProps {
   tone: number;
   setTone: (value: number) => void;
   decay: number;
@@ -25,14 +25,7 @@ interface KickPadProps {
    */
   onSelect?: () => void;
 }
-
-/**
- * Kick pad UI: Volume slider + Tone/Decay knobs + trigger button. Pure
- * presentation over whatever state it's given — {@link useKickVoice}
- * supplies it, currently only used by `StepSequencer`, which also
- * schedules that same instance's `trigger` for step playback.
- */
-const KickPad = ({
+const HiTomPad = ({
   tone,
   setTone,
   decay,
@@ -46,7 +39,7 @@ const KickPad = ({
   trigger,
   selected,
   onSelect,
-}: KickPadProps) => {
+}: HiTomPadProps) => {
   return (
     <div
       className={classNames(
@@ -59,16 +52,15 @@ const KickPad = ({
         min={-100}
         max={100}
         step={1}
-        size="small"
         value={pan}
         onChange={(drag) => setPan(drag.value)}
         label="Pan"
-        bipolar
-        orientation="horizontal"
         valueAsLabel="interactive"
         valueFormatter={formatPan}
         variant="trackless"
         cursorSize="Strip"
+        bipolar
+        orientation="horizontal"
       />
       <div className={controlPanelStyles.controlsRow}>
         <Slider
@@ -105,16 +97,16 @@ const KickPad = ({
         </div>
       </div>
       <Button
-        label="Kick"
+        label="Hi Tom"
         value={pressed}
         size="large"
         onChange={(press) => {
           setPressed(press.value);
-          if (press.value) trigger(); // fires on the real press, not on the release toggling back to false
+          if (press.value) trigger();
         }}
       />
     </div>
   );
 };
 
-export default KickPad;
+export default HiTomPad;

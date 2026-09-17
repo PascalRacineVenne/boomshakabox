@@ -49,7 +49,10 @@ const SnarePad = ({
 }: SnarePadProps) => {
   return (
     <div
-      className={classNames(controlPanelStyles.panel, selected && controlPanelStyles.selected)}
+      className={classNames(
+        controlPanelStyles.panel,
+        selected && controlPanelStyles.selected,
+      )}
       onMouseDown={onSelect}
     >
       <Slider
@@ -58,7 +61,7 @@ const SnarePad = ({
         step={1}
         size="small"
         value={pan}
-        onChange={(e) => setPan(e.value)}
+        onChange={(drag) => setPan(drag.value)}
         label="Pan"
         bipolar
         orientation="horizontal"
@@ -74,7 +77,7 @@ const SnarePad = ({
           step={1}
           size="small"
           value={volume}
-          onChange={(e) => setVolume(e.value)}
+          onChange={(drag) => setVolume(drag.value)}
           label="Volume"
           orientation="vertical"
           unit="%"
@@ -87,7 +90,7 @@ const SnarePad = ({
             max={300}
             size="small"
             value={tone}
-            onChange={(e) => setTone(e.value)}
+            onChange={(rotation) => setTone(rotation.value)}
             label="Tone"
           />
           <Knob
@@ -96,7 +99,7 @@ const SnarePad = ({
             max={1}
             size="small"
             value={snappy}
-            onChange={(e) => setSnappy(e.value)}
+            onChange={(rotation) => setSnappy(rotation.value)}
             label="Snappy"
           />
         </div>
@@ -105,9 +108,9 @@ const SnarePad = ({
         label="Snare"
         value={pressed}
         size="large"
-        onChange={(e) => {
-          setPressed(e.value);
-          if (e.value) trigger();
+        onChange={(press) => {
+          setPressed(press.value);
+          if (press.value) trigger();
         }}
       />
     </div>

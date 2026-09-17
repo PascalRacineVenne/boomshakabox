@@ -45,7 +45,10 @@ const HiHatPad = ({
 }: HiHatPadProps) => {
   return (
     <div
-      className={classNames(controlPanelStyles.panel, selected && controlPanelStyles.selected)}
+      className={classNames(
+        controlPanelStyles.panel,
+        selected && controlPanelStyles.selected,
+      )}
       onMouseDown={onSelect}
     >
       <Slider
@@ -54,7 +57,7 @@ const HiHatPad = ({
         step={1}
         size="small"
         value={pan}
-        onChange={(e) => setPan(e.value)}
+        onChange={(drag) => setPan(drag.value)}
         label="Pan"
         bipolar
         orientation="horizontal"
@@ -70,7 +73,7 @@ const HiHatPad = ({
           step={1}
           size="small"
           value={volume}
-          onChange={(e) => setVolume(e.value)}
+          onChange={(drag) => setVolume(drag.value)}
           label="Volume"
           orientation="vertical"
           unit="%"
@@ -83,7 +86,7 @@ const HiHatPad = ({
             max={10000}
             size="small"
             value={tone}
-            onChange={(e) => setTone(e.value)}
+            onChange={(rotation) => setTone(rotation.value)}
             label="Tone"
           />
         </div>
@@ -92,9 +95,9 @@ const HiHatPad = ({
         label="HH"
         value={pressed}
         size="large"
-        onChange={(e) => {
-          setPressed(e.value);
-          if (e.value) trigger(); // fires on the real press, not on the release toggling back to false
+        onChange={(press) => {
+          setPressed(press.value);
+          if (press.value) trigger(); // fires on the real press, not on the release toggling back to false
         }}
       />
     </div>
