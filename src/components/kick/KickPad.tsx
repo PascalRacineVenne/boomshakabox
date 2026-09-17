@@ -1,6 +1,6 @@
 import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
 import classNames from "classnames";
-import { controlPanelStyles } from "../ControlPanel";
+import { controlPanelStyles, formatPan } from "../ControlPanel";
 
 interface KickPadProps {
   tone: number;
@@ -9,6 +9,8 @@ interface KickPadProps {
   setDecay: (value: number) => void;
   volume: number;
   setVolume: (value: number) => void;
+  pan: number;
+  setPan: (value: number) => void;
   pressed: boolean;
   setPressed: (value: boolean) => void;
   trigger: (scheduledTime?: number) => void;
@@ -37,6 +39,8 @@ const KickPad = ({
   setDecay,
   volume,
   setVolume,
+  pan,
+  setPan,
   pressed,
   setPressed,
   trigger,
@@ -45,9 +49,27 @@ const KickPad = ({
 }: KickPadProps) => {
   return (
     <div
-      className={classNames(controlPanelStyles.panel, selected && controlPanelStyles.selected)}
+      className={classNames(
+        controlPanelStyles.panel,
+        selected && controlPanelStyles.selected,
+      )}
       onMouseDown={onSelect}
     >
+      <Slider
+        min={-100}
+        max={100}
+        step={1}
+        size="small"
+        value={pan}
+        onChange={(e) => setPan(e.value)}
+        label="Pan"
+        bipolar
+        orientation="horizontal"
+        valueAsLabel="interactive"
+        valueFormatter={formatPan}
+        variant="trackless"
+        cursorSize="Strip"
+      />
       <div className={controlPanelStyles.controlsRow}>
         <Slider
           min={0}

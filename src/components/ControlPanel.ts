@@ -2,6 +2,12 @@ import { css } from "@linaria/core";
 
 export const LABELED_SMALL_KNOB_HEIGHT_UNITS = 40; // 2x the default 40-unit height of a single knob, to fit the label above
 
+/** Formats a -100..100 Pan slider value as "L50"/"C"/"R50" instead of a bare signed number. */
+export const formatPan = (value: number) => {
+  if (value === 0) return "C";
+  return value < 0 ? `L${Math.abs(value)}` : `R${value}`;
+};
+
 /**
  * Shared layout classNames for a Tone.js voice's slider + knobs + trigger,
  * so every "device" reads as one grouped unit rather than loose controls

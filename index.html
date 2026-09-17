@@ -1,13 +1,26 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>web-audio-api-poc</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<!--
+  class="dark" isn't our own CSS — it's @cutoff/audio-ui-react's own
+  light/dark switch. That library derives some control colors (e.g. a
+  Slider's non-"abstract"-variant track) from its own adaptive
+  --audioui-theme-default var, which only flips from its near-black
+  light-mode default to near-white when a ".dark" class sits on an
+  ancestor (see node_modules/@cutoff/audio-ui-core/dist/styles/themes.css).
+  This app is permanently dark (see src/index.css) with no toggle, so it's
+  set once here rather than wired up as a real light/dark switch.
+-->
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Boomshakabox</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>

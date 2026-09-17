@@ -34,7 +34,6 @@ const styles = {
   `,
   pads: css`
     display: flex;
-    gap: calc(var(--audioui-unit) / 2);
   `,
   gridRow: css`
     display: flex;

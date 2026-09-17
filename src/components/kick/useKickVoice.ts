@@ -23,13 +23,14 @@ const PITCH_DROP_START = 180; // starting "click" pitch the VCO glides down from
  * and schedules everything at the precise time the look-ahead scheduler
  * asked for, rather than at "now."
  *
- * @returns The kick's `tone`/`decay`/`volume`/`pressed` state, their
+ * @returns The kick's `tone`/`decay`/`volume`/`pan`/`pressed` state, their
  * setters, and `trigger`.
  */
 export const useKickVoice = () => {
   const [tone, setTone] = useState(50); // resting fundamental frequency the pitch glide settles on, in Hz
   const [decay, setDecay] = useState(0.35); // amp envelope decay length, in seconds
   const [volume, setVolume] = useState(75); // 0-100%, overall output level
+  const [pan, setPan] = useState(0); // -100 (hard left) to 100 (hard right)
   const [pressed, setPressed] = useState(false); // drives the pad's lit state — real mousedown/up, not hover
 
   const trigger = async (scheduledTime?: number) => {
@@ -65,13 +66,20 @@ export const useKickVoice = () => {
     const makeupGain = new Tone.Gain(distortionMakeupGain(distortionAmount));
 
     // VCA: instant attack, no ramp-up, exponential decay curve
-    const ampGain = new Tone.Gain(1).connect(masterBusInput);
+    const ampGain = new Tone.Gain(1);
     ampGain.gain.setValueAtTime(level, now); // "Volume" slider sets the peak level
     ampGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+    // Stereo placement (Pan knob) sits after the VCA, before the shared
+    // bus — a plain per-hit node like the rest of this chain, since a
+    // one-shot drum hit has no reason to re-pan mid-ring the way a
+    // persistent/sustained node would.
+    const panner = new Tone.Panner(pan / 100).connect(masterBusInput);
 
     osc.connect(saturation); // VCO -> Drive
     saturation.connect(makeupGain); // Drive -> Output trim
     makeupGain.connect(ampGain); // Output trim -> VCA
+    ampGain.connect(panner); // VCA -> Pan
     osc.start(now);
     osc.stop(now + duration);
 
@@ -84,10 +92,23 @@ export const useKickVoice = () => {
         saturation.dispose();
         makeupGain.dispose();
         ampGain.dispose();
+        panner.dispose();
       },
       (duration + 0.1) * 1000,
     );
   };
 
-  return { tone, setTone, decay, setDecay, volume, setVolume, pressed, setPressed, trigger };
+  return {
+    tone,
+    setTone,
+    decay,
+    setDecay,
+    volume,
+    setVolume,
+    pan,
+    setPan,
+    pressed,
+    setPressed,
+    trigger,
+  };
 };
