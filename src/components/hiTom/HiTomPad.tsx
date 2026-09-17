@@ -1,6 +1,7 @@
 import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
 import classNames from "classnames";
 import { controlPanelStyles, formatPan } from "../ControlPanel";
+import { TONE_MIN, TONE_MAX } from "./useHiTomVoice";
 
 interface HiTomPadProps {
   tone: number;
@@ -78,8 +79,8 @@ const HiTomPad = ({
         <div className={controlPanelStyles.knobColumn}>
           <Knob
             variant="plainCap"
-            min={30}
-            max={120}
+            min={TONE_MIN}
+            max={TONE_MAX}
             size="small"
             value={tone}
             onChange={(rotation) => setTone(rotation.value)}
@@ -87,8 +88,8 @@ const HiTomPad = ({
           />
           <Knob
             variant="plainCap"
-            min={0.1}
-            max={1}
+            min={0.08}
+            max={0.18}
             size="small"
             value={decay}
             onChange={(rotation) => setDecay(rotation.value)}
