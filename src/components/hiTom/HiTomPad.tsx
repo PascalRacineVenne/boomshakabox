@@ -1,7 +1,14 @@
 import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
 import classNames from "classnames";
-import { controlPanelStyles, formatPan } from "../ControlPanel";
-import { TONE_MIN, TONE_MAX } from "./useHiTomVoice";
+import {
+  controlPanelStyles,
+  formatPan,
+  PANNING_L,
+  PANNING_R,
+  VOLUME_MAX,
+  VOLUME_MIN,
+} from "../ControlPanel";
+import { TONE_MIN, TONE_MAX, DECAY_MIN, DECAY_MAX } from "./useHiTomVoice";
 
 interface HiTomPadProps {
   tone: number;
@@ -50,8 +57,8 @@ const HiTomPad = ({
       onMouseDown={onSelect}
     >
       <Slider
-        min={-100}
-        max={100}
+        min={PANNING_L}
+        max={PANNING_R}
         step={1}
         value={pan}
         onChange={(drag) => setPan(drag.value)}
@@ -65,8 +72,8 @@ const HiTomPad = ({
       />
       <div className={controlPanelStyles.controlsRow}>
         <Slider
-          min={0}
-          max={100}
+          min={VOLUME_MIN}
+          max={VOLUME_MAX}
           step={1}
           size="small"
           value={volume}
@@ -88,8 +95,8 @@ const HiTomPad = ({
           />
           <Knob
             variant="plainCap"
-            min={0.08}
-            max={0.18}
+            min={DECAY_MIN}
+            max={DECAY_MAX}
             size="small"
             value={decay}
             onChange={(rotation) => setDecay(rotation.value)}

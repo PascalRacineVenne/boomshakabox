@@ -9,6 +9,8 @@ import { distortionMakeupGain } from "../../lib/distortionMakeupGain";
 
 export const TONE_MIN = 165; // low end of the hi tom's register (E3), in Hz
 export const TONE_MAX = 220; // high end of the hi tom's register (A3), in Hz
+export const DECAY_MIN = 0.08;
+export const DECAY_MAX = 0.6;
 
 const PITCH_DROP_RATIO = 1.15; // glide starts 15% above the settled tone — a subtle "tonk," not the kick's dramatic sweep
 const FILTER_Q = 3; // mild resonance on the tuned bandpass, per the 808 tom recipe

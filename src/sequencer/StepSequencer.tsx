@@ -6,10 +6,12 @@ import KickPad from "../components/kick/KickPad";
 import SnarePad from "../components/snare/SnarePad";
 import HiHatPad from "../components/hihat/HiHatPad";
 import HiHatOpenPad from "../components/hihatOpen/HiHatOpenPad";
+import HiTomPad from "../components/hiTom/hiTomPad";
 import { useKickVoice } from "../components/kick/useKickVoice";
 import { useSnareVoice } from "../components/snare/useSnareVoice";
 import { useHiHatVoice } from "../components/hihat/useHiHatVoice";
 import { useHiHatOpenVoice } from "../components/hihatOpen/useHiHatOpenVoice";
+import { useHiTomVoice } from "../components/hiTom/useHiTomVoice";
 import StepGrid from "./StepGrid";
 import { useStepSequencer, type TrackId } from "./useStepSequencer";
 
@@ -18,6 +20,7 @@ const TRACK_LABELS: Record<TrackId, string> = {
   snare: "Snare",
   hihat: "HH Closed",
   hihatOpen: "HH Open",
+  hiTom: "Hi Tom",
 };
 
 const styles = {
@@ -75,6 +78,7 @@ const StepSequencer = () => {
   const snareVoice = useSnareVoice();
   const hiHatVoice = useHiHatVoice();
   const hiHatOpenVoice = useHiHatOpenVoice();
+  const hiTomVoice = useHiTomVoice();
 
   const { activePattern, selectedTrack, selectTrack, currentStep, setStep } =
     useStepSequencer({
@@ -82,6 +86,7 @@ const StepSequencer = () => {
       snare: snareVoice,
       hihat: hiHatVoice,
       hihatOpen: hiHatOpenVoice,
+      hiTom: hiTomVoice,
     });
 
   return (
@@ -111,6 +116,11 @@ const StepSequencer = () => {
           {...hiHatOpenVoice}
           selected={selectedTrack === "hihatOpen"}
           onSelect={() => selectTrack("hihatOpen")}
+        />
+        <HiTomPad
+          {...hiTomVoice}
+          selected={selectedTrack === "hiTom"}
+          onSelect={() => selectTrack("hiTom")}
         />
       </div>
       <div className={styles.gridRow}>

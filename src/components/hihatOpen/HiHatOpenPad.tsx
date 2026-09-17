@@ -1,6 +1,13 @@
 import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
 import classNames from "classnames";
-import { controlPanelStyles, formatPan } from "../ControlPanel";
+import {
+  controlPanelStyles,
+  formatPan,
+  PANNING_L,
+  PANNING_R,
+  VOLUME_MAX,
+  VOLUME_MIN,
+} from "../ControlPanel";
 
 interface HiHatOpenPadProps {
   tone: number;
@@ -57,8 +64,8 @@ const HiHatOpenPad = ({
       onMouseDown={onSelect}
     >
       <Slider
-        min={-100}
-        max={100}
+        min={PANNING_L}
+        max={PANNING_R}
         step={1}
         size="small"
         value={pan}
@@ -73,8 +80,8 @@ const HiHatOpenPad = ({
       />
       <div className={controlPanelStyles.controlsRow}>
         <Slider
-          min={0}
-          max={100}
+          min={VOLUME_MIN}
+          max={VOLUME_MAX}
           step={1}
           size="small"
           value={volume}

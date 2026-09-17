@@ -1,6 +1,11 @@
 import { css } from "@linaria/core";
 
-export const LABELED_SMALL_KNOB_HEIGHT_UNITS = 40; // 2x the default 40-unit height of a single knob, to fit the label above
+export const LABELED_SMALL_KNOB_HEIGHT_UNITS = 40;
+// 2x the default 40-unit height of a single knob, to fit the label above
+export const VOLUME_MIN = 0;
+export const VOLUME_MAX = 100;
+export const PANNING_L = -100;
+export const PANNING_R = 100;
 
 /** Formats a -100..100 Pan slider value as "L50"/"C"/"R50" instead of a bare signed number. */
 export const formatPan = (value: number) => {
@@ -20,7 +25,7 @@ export const formatPan = (value: number) => {
  * import: Linaria's build-time evaluator needs to trace the whole import
  * graph of any file containing a styled/css tag, and chokes on that
  * package's ESM-only exports when both live in the same file.
- * 
+ *
  */
 export const controlPanelStyles = {
   /** Outer frame: slider+knobs row on top, trigger button centered underneath. */

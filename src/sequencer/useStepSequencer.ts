@@ -10,7 +10,13 @@ export const STEP_COUNT = 16;
  * argument at the call site — nothing inside this file's scheduler loop
  * needs to change.
  */
-export const TRACK_IDS = ["kick", "snare", "hihat", "hihatOpen"] as const;
+export const TRACK_IDS = [
+  "kick",
+  "snare",
+  "hihat",
+  "hihatOpen",
+  "hiTom",
+] as const;
 export type TrackId = (typeof TRACK_IDS)[number];
 
 type TriggerFn = (scheduledTime?: number) => void;
