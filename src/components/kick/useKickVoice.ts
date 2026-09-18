@@ -9,6 +9,11 @@ import { startAudioContext } from "../../lib/startAudioContext";
 
 const PITCH_DROP_START = 180; // starting "click" pitch the VCO glides down from, in Hz
 
+export const KICK_TONE_MIN = 30;
+export const KICK_TONE_MAX = 120;
+export const KICK_DECAY_MIN = 0.1;
+export const KICK_DECAY_MAX = 1;
+
 /**
  * The kick's live knob state and its `trigger` function — the TR-808
  * recipe behind {@link KickPad} (sine VCO + pitch glide + `Tone.Distortion`

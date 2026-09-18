@@ -8,6 +8,12 @@ import {
   VOLUME_MAX,
   VOLUME_MIN,
 } from "../ControlPanel";
+import {
+  SNARE_SNAPPY_MAX,
+  SNARE_SNAPPY_MIN,
+  SNARE_TONE_MAX,
+  SNARE_TONE_MIN,
+} from "./useSnareVoice";
 
 interface SnarePadProps {
   tone: number;
@@ -93,8 +99,8 @@ const SnarePad = ({
         <div className={controlPanelStyles.knobColumn}>
           <Knob
             variant="plainCap"
-            min={100}
-            max={300}
+            min={SNARE_TONE_MIN}
+            max={SNARE_TONE_MAX}
             size="small"
             value={tone}
             onChange={(rotation) => setTone(rotation.value)}
@@ -102,8 +108,8 @@ const SnarePad = ({
           />
           <Knob
             variant="plainCap"
-            min={0}
-            max={1}
+            min={SNARE_SNAPPY_MIN}
+            max={SNARE_SNAPPY_MAX}
             size="small"
             value={snappy}
             onChange={(rotation) => setSnappy(rotation.value)}

@@ -1,12 +1,20 @@
 import { useState } from "react";
 import * as Tone from "tone";
-import { masterBusInput, triggerMasterFilterEnvelope } from "../../lib/masterBus";
+import {
+  masterBusInput,
+  triggerMasterFilterEnvelope,
+} from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
 
 // Ratio between the two tone-voice VCOs in the original fixed-frequency
 // recipe (330/180) — preserved when the "Tone" knob shifts the base
 // frequency, so the interval between them stays the same as you tune it.
 const TONE_VOICE_RATIO = 330 / 180;
+
+export const SNARE_TONE_MIN = 100;
+export const SNARE_TONE_MAX = 300;
+export const SNARE_SNAPPY_MIN = 0;
+export const SNARE_SNAPPY_MAX = 1;
 
 /**
  * The snare's live knob state and its `trigger` function — the TR-808
