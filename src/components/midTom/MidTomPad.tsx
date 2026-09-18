@@ -60,6 +60,7 @@ const MidTomPad = ({
         min={PANNING_L}
         max={PANNING_R}
         step={1}
+        size="small"
         value={pan}
         onChange={(drag) => setPan(drag.value)}
         label="Pan"

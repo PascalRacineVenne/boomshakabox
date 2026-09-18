@@ -1,12 +1,17 @@
 import { useState } from "react";
 import * as Tone from "tone";
 import { HI_HAT_OSCILLATOR_FREQUENCIES } from "../../lib/hiHatOscillatorFrequencies";
-import { masterBusInput, triggerMasterFilterEnvelope } from "../../lib/masterBus";
+import {
+  masterBusInput,
+  triggerMasterFilterEnvelope,
+} from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
 
 // Closed hat: short, tight amp envelope with no sustain — this is what
 // makes it read as "closed" rather than the open hat's longer ring.
 const DECAY = 0.05;
+export const HH_TONE_MIN = 3000;
+export const HH_TONE_MAX = 10000;
 
 /**
  * The closed hi-hat's live knob state and its `trigger` function — the
@@ -80,5 +85,15 @@ export const useHiHatVoice = () => {
     );
   };
 
-  return { tone, setTone, volume, setVolume, pan, setPan, pressed, setPressed, trigger };
+  return {
+    tone,
+    setTone,
+    volume,
+    setVolume,
+    pan,
+    setPan,
+    pressed,
+    setPressed,
+    trigger,
+  };
 };
