@@ -8,6 +8,12 @@ import {
   VOLUME_MAX,
   VOLUME_MIN,
 } from "../ControlPanel";
+import {
+  KICK_DECAY_MAX,
+  KICK_DECAY_MIN,
+  KICK_TONE_MAX,
+  KICK_TONE_MIN,
+} from "./useKickVoice";
 
 interface KickPadProps {
   tone: number;
@@ -93,8 +99,8 @@ const KickPad = ({
         <div className={controlPanelStyles.knobColumn}>
           <Knob
             variant="plainCap"
-            min={30}
-            max={120}
+            min={KICK_TONE_MIN}
+            max={KICK_TONE_MAX}
             size="small"
             value={tone}
             onChange={(rotation) => setTone(rotation.value)}
@@ -102,8 +108,8 @@ const KickPad = ({
           />
           <Knob
             variant="plainCap"
-            min={0.1}
-            max={1}
+            min={KICK_DECAY_MIN}
+            max={KICK_DECAY_MAX}
             size="small"
             value={decay}
             onChange={(rotation) => setDecay(rotation.value)}

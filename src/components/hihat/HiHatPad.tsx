@@ -8,6 +8,7 @@ import {
   PANNING_R,
   PANNING_L,
 } from "../ControlPanel";
+import { HH_TONE_MAX, HH_TONE_MIN } from "./useHiHatVoice";
 
 interface HiHatPadProps {
   tone: number;
@@ -89,8 +90,8 @@ const HiHatPad = ({
         <div className={controlPanelStyles.knobColumn}>
           <Knob
             variant="plainCap"
-            min={3000}
-            max={10000}
+            min={HH_TONE_MIN}
+            max={HH_TONE_MAX}
             size="small"
             value={tone}
             onChange={(rotation) => setTone(rotation.value)}
