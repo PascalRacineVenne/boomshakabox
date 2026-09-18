@@ -16,6 +16,8 @@ export const TRACK_IDS = [
   "hihat",
   "hihatOpen",
   "hiTom",
+  "midTom",
+  "lowTom",
 ] as const;
 export type TrackId = (typeof TRACK_IDS)[number];
 
