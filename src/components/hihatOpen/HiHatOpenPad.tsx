@@ -1,6 +1,13 @@
 import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
 import classNames from "classnames";
-import { controlPanelStyles, formatPan } from "../ControlPanel";
+import {
+  controlPanelStyles,
+  formatPan,
+  PANNING_L,
+  PANNING_R,
+  VOLUME_MAX,
+  VOLUME_MIN,
+} from "../ControlPanel";
 
 interface HiHatOpenPadProps {
   tone: number;
@@ -50,16 +57,19 @@ const HiHatOpenPad = ({
 }: HiHatOpenPadProps) => {
   return (
     <div
-      className={classNames(controlPanelStyles.panel, selected && controlPanelStyles.selected)}
+      className={classNames(
+        controlPanelStyles.panel,
+        selected && controlPanelStyles.selected,
+      )}
       onMouseDown={onSelect}
     >
       <Slider
-        min={-100}
-        max={100}
+        min={PANNING_L}
+        max={PANNING_R}
         step={1}
         size="small"
         value={pan}
-        onChange={(e) => setPan(e.value)}
+        onChange={(drag) => setPan(drag.value)}
         label="Pan"
         bipolar
         orientation="horizontal"
@@ -70,12 +80,12 @@ const HiHatOpenPad = ({
       />
       <div className={controlPanelStyles.controlsRow}>
         <Slider
-          min={0}
-          max={100}
+          min={VOLUME_MIN}
+          max={VOLUME_MAX}
           step={1}
           size="small"
           value={volume}
-          onChange={(e) => setVolume(e.value)}
+          onChange={(drag) => setVolume(drag.value)}
           label="Volume"
           orientation="vertical"
           unit="%"
@@ -88,7 +98,7 @@ const HiHatOpenPad = ({
             max={10000}
             size="small"
             value={tone}
-            onChange={(e) => setTone(e.value)}
+            onChange={(rotation) => setTone(rotation.value)}
             label="Tone"
           />
           <Knob
@@ -97,7 +107,7 @@ const HiHatOpenPad = ({
             max={1}
             size="small"
             value={decay}
-            onChange={(e) => setDecay(e.value)}
+            onChange={(rotation) => setDecay(rotation.value)}
             label="Decay"
           />
         </div>
@@ -106,9 +116,9 @@ const HiHatOpenPad = ({
         label="OH"
         value={pressed}
         size="large"
-        onChange={(e) => {
-          setPressed(e.value);
-          if (e.value) trigger(); // fires on the real press, not on the release toggling back to false
+        onChange={(press) => {
+          setPressed(press.value);
+          if (press.value) trigger(); // fires on the real press, not on the release toggling back to false
         }}
       />
     </div>

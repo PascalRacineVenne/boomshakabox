@@ -8,12 +8,13 @@ import {
   VOLUME_MAX,
   VOLUME_MIN,
 } from "../ControlPanel";
+import { TONE_MIN, TONE_MAX, DECAY_MIN, DECAY_MAX } from "./useLowTomVoice";
 
-interface SnarePadProps {
+interface LowTomPadProps {
   tone: number;
   setTone: (value: number) => void;
-  snappy: number;
-  setSnappy: (value: number) => void;
+  decay: number;
+  setDecay: (value: number) => void;
   volume: number;
   setVolume: (value: number) => void;
   pan: number;
@@ -32,18 +33,11 @@ interface SnarePadProps {
    */
   onSelect?: () => void;
 }
-
-/**
- * Snare pad UI: Volume slider + Tone/Snappy knobs + trigger button. Pure
- * presentation over whatever state it's given — {@link useSnareVoice}
- * supplies it, currently only used by `StepSequencer`, which also
- * schedules that same instance's `trigger` for step playback.
- */
-const SnarePad = ({
+const LowTomPad = ({
   tone,
   setTone,
-  snappy,
-  setSnappy,
+  decay,
+  setDecay,
   volume,
   setVolume,
   pan,
@@ -53,7 +47,7 @@ const SnarePad = ({
   trigger,
   selected,
   onSelect,
-}: SnarePadProps) => {
+}: LowTomPadProps) => {
   return (
     <div
       className={classNames(
@@ -66,16 +60,15 @@ const SnarePad = ({
         min={PANNING_L}
         max={PANNING_R}
         step={1}
-        size="small"
         value={pan}
         onChange={(drag) => setPan(drag.value)}
         label="Pan"
-        bipolar
-        orientation="horizontal"
         valueAsLabel="interactive"
         valueFormatter={formatPan}
         variant="trackless"
         cursorSize="Strip"
+        bipolar
+        orientation="horizontal"
       />
       <div className={controlPanelStyles.controlsRow}>
         <Slider
@@ -93,8 +86,8 @@ const SnarePad = ({
         <div className={controlPanelStyles.knobColumn}>
           <Knob
             variant="plainCap"
-            min={100}
-            max={300}
+            min={TONE_MIN}
+            max={TONE_MAX}
             size="small"
             value={tone}
             onChange={(rotation) => setTone(rotation.value)}
@@ -102,17 +95,17 @@ const SnarePad = ({
           />
           <Knob
             variant="plainCap"
-            min={0}
-            max={1}
+            min={DECAY_MIN}
+            max={DECAY_MAX}
             size="small"
-            value={snappy}
-            onChange={(rotation) => setSnappy(rotation.value)}
-            label="Snappy"
+            value={decay}
+            onChange={(rotation) => setDecay(rotation.value)}
+            label="Decay"
           />
         </div>
       </div>
       <Button
-        label="Snare"
+        label="LT"
         value={pressed}
         size="large"
         onChange={(press) => {
@@ -124,4 +117,4 @@ const SnarePad = ({
   );
 };
 
-export default SnarePad;
+export default LowTomPad;

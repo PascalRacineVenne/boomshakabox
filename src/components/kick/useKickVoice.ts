@@ -1,7 +1,10 @@
 import { useState } from "react";
 import * as Tone from "tone";
 import { distortionMakeupGain } from "../../lib/distortionMakeupGain";
-import { masterBusInput, triggerMasterFilterEnvelope } from "../../lib/masterBus";
+import {
+  masterBusInput,
+  triggerMasterFilterEnvelope,
+} from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
 
 const PITCH_DROP_START = 180; // starting "click" pitch the VCO glides down from, in Hz
@@ -57,7 +60,7 @@ export const useKickVoice = () => {
     // the raw version's hand-computed tanh curve.
     const distortionAmount = 0.1;
     const saturation = new Tone.Distortion(distortionAmount);
-    saturation.oversample = "4x";
+    saturation.oversample = "2x";
 
     // Output/makeup gain (the "Output" knob you'd find after a drive stage
     // on real distortion gear): restores the peak level the Distortion

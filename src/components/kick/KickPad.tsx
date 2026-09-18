@@ -1,6 +1,13 @@
 import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
 import classNames from "classnames";
-import { controlPanelStyles, formatPan } from "../ControlPanel";
+import {
+  controlPanelStyles,
+  formatPan,
+  PANNING_L,
+  PANNING_R,
+  VOLUME_MAX,
+  VOLUME_MIN,
+} from "../ControlPanel";
 
 interface KickPadProps {
   tone: number;
@@ -56,12 +63,12 @@ const KickPad = ({
       onMouseDown={onSelect}
     >
       <Slider
-        min={-100}
-        max={100}
+        min={PANNING_L}
+        max={PANNING_R}
         step={1}
         size="small"
         value={pan}
-        onChange={(e) => setPan(e.value)}
+        onChange={(drag) => setPan(drag.value)}
         label="Pan"
         bipolar
         orientation="horizontal"
@@ -72,12 +79,12 @@ const KickPad = ({
       />
       <div className={controlPanelStyles.controlsRow}>
         <Slider
-          min={0}
-          max={100}
+          min={VOLUME_MIN}
+          max={VOLUME_MAX}
           step={1}
           size="small"
           value={volume}
-          onChange={(e) => setVolume(e.value)}
+          onChange={(drag) => setVolume(drag.value)}
           label="Volume"
           orientation="vertical"
           unit="%"
@@ -90,7 +97,7 @@ const KickPad = ({
             max={120}
             size="small"
             value={tone}
-            onChange={(e) => setTone(e.value)}
+            onChange={(rotation) => setTone(rotation.value)}
             label="Tone"
           />
           <Knob
@@ -99,7 +106,7 @@ const KickPad = ({
             max={1}
             size="small"
             value={decay}
-            onChange={(e) => setDecay(e.value)}
+            onChange={(rotation) => setDecay(rotation.value)}
             label="Decay"
           />
         </div>
@@ -108,9 +115,9 @@ const KickPad = ({
         label="Kick"
         value={pressed}
         size="large"
-        onChange={(e) => {
-          setPressed(e.value);
-          if (e.value) trigger(); // fires on the real press, not on the release toggling back to false
+        onChange={(press) => {
+          setPressed(press.value);
+          if (press.value) trigger(); // fires on the real press, not on the release toggling back to false
         }}
       />
     </div>

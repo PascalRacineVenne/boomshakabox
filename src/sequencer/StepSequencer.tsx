@@ -2,14 +2,22 @@ import { css } from "@linaria/core";
 import TempoTransportPanel from "./TempoTransportPanel";
 import MasterPanel from "../components/master/MasterPanel";
 import FilterPanel from "../components/filter/FilterPanel";
+
 import KickPad from "../components/kick/KickPad";
 import SnarePad from "../components/snare/SnarePad";
 import HiHatPad from "../components/hihat/HiHatPad";
 import HiHatOpenPad from "../components/hihatOpen/HiHatOpenPad";
+import HiTomPad from "../components/hiTom/HiTomPad";
+import MidTomPad from "../components/midTom/MidTomPad";
+import LowTomPad from "../components/lowTom/LowTomPad";
+
 import { useKickVoice } from "../components/kick/useKickVoice";
 import { useSnareVoice } from "../components/snare/useSnareVoice";
 import { useHiHatVoice } from "../components/hihat/useHiHatVoice";
 import { useHiHatOpenVoice } from "../components/hihatOpen/useHiHatOpenVoice";
+import { useHiTomVoice } from "../components/hiTom/useHiTomVoice";
+import { useMidTomVoice } from "../components/midTom/useMidTomVoice";
+import { useLowTomVoice } from "../components/lowTom/useLowTomVoice";
 import StepGrid from "./StepGrid";
 import { useStepSequencer, type TrackId } from "./useStepSequencer";
 
@@ -18,6 +26,9 @@ const TRACK_LABELS: Record<TrackId, string> = {
   snare: "Snare",
   hihat: "HH Closed",
   hihatOpen: "HH Open",
+  hiTom: "Hi Tom",
+  midTom: "Mid Tom",
+  lowTom: "Low Tom",
 };
 
 const styles = {
@@ -75,6 +86,9 @@ const StepSequencer = () => {
   const snareVoice = useSnareVoice();
   const hiHatVoice = useHiHatVoice();
   const hiHatOpenVoice = useHiHatOpenVoice();
+  const hiTomVoice = useHiTomVoice();
+  const midTomVoice = useMidTomVoice();
+  const lowTomVoice = useLowTomVoice();
 
   const { activePattern, selectedTrack, selectTrack, currentStep, setStep } =
     useStepSequencer({
@@ -82,6 +96,9 @@ const StepSequencer = () => {
       snare: snareVoice,
       hihat: hiHatVoice,
       hihatOpen: hiHatOpenVoice,
+      hiTom: hiTomVoice,
+      midTom: midTomVoice,
+      lowTom: lowTomVoice,
     });
 
   return (
@@ -111,6 +128,21 @@ const StepSequencer = () => {
           {...hiHatOpenVoice}
           selected={selectedTrack === "hihatOpen"}
           onSelect={() => selectTrack("hihatOpen")}
+        />
+        <HiTomPad
+          {...hiTomVoice}
+          selected={selectedTrack === "hiTom"}
+          onSelect={() => selectTrack("hiTom")}
+        />
+        <MidTomPad
+          {...midTomVoice}
+          selected={selectedTrack === "midTom"}
+          onSelect={() => selectTrack("midTom")}
+        />
+        <LowTomPad
+          {...lowTomVoice}
+          selected={selectedTrack === "lowTom"}
+          onSelect={() => selectTrack("lowTom")}
         />
       </div>
       <div className={styles.gridRow}>
