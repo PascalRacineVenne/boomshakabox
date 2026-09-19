@@ -19,17 +19,8 @@ import { useHiTomVoice } from "../components/hiTom/useHiTomVoice";
 import { useMidTomVoice } from "../components/midTom/useMidTomVoice";
 import { useLowTomVoice } from "../components/lowTom/useLowTomVoice";
 import StepGrid from "./StepGrid";
-import { useStepSequencer, type TrackId } from "./useStepSequencer";
-
-const TRACK_LABELS: Record<TrackId, string> = {
-  kick: "Kick",
-  snare: "Snare",
-  hihat: "HH Closed",
-  hihatOpen: "HH Open",
-  hiTom: "Hi Tom",
-  midTom: "Mid Tom",
-  lowTom: "Low Tom",
-};
+import MiniGrid from "./MiniGrid";
+import { useStepSequencer, TRACK_LABELS } from "./useStepSequencer";
 
 const styles = {
   container: css`
@@ -90,16 +81,22 @@ const StepSequencer = () => {
   const midTomVoice = useMidTomVoice();
   const lowTomVoice = useLowTomVoice();
 
-  const { activePattern, selectedTrack, selectTrack, currentStep, setStep } =
-    useStepSequencer({
-      kick: kickVoice,
-      snare: snareVoice,
-      hihat: hiHatVoice,
-      hihatOpen: hiHatOpenVoice,
-      hiTom: hiTomVoice,
-      midTom: midTomVoice,
-      lowTom: lowTomVoice,
-    });
+  const {
+    patternsDisplay,
+    activePattern,
+    selectedTrack,
+    selectTrack,
+    currentStep,
+    setStep,
+  } = useStepSequencer({
+    kick: kickVoice,
+    snare: snareVoice,
+    hihat: hiHatVoice,
+    hihatOpen: hiHatOpenVoice,
+    hiTom: hiTomVoice,
+    midTom: midTomVoice,
+    lowTom: lowTomVoice,
+  });
 
   return (
     <div className={styles.container}>
@@ -111,40 +108,53 @@ const StepSequencer = () => {
       <div className={styles.pads}>
         <KickPad
           {...kickVoice}
+          trackNumber={1}
           selected={selectedTrack === "kick"}
           onSelect={() => selectTrack("kick")}
         />
         <SnarePad
           {...snareVoice}
+          trackNumber={2}
           selected={selectedTrack === "snare"}
           onSelect={() => selectTrack("snare")}
         />
-        <HiHatPad
-          {...hiHatVoice}
-          selected={selectedTrack === "hihat"}
-          onSelect={() => selectTrack("hihat")}
-        />
-        <HiHatOpenPad
-          {...hiHatOpenVoice}
-          selected={selectedTrack === "hihatOpen"}
-          onSelect={() => selectTrack("hihatOpen")}
-        />
         <HiTomPad
           {...hiTomVoice}
+          trackNumber={3}
           selected={selectedTrack === "hiTom"}
           onSelect={() => selectTrack("hiTom")}
         />
         <MidTomPad
           {...midTomVoice}
+          trackNumber={4}
           selected={selectedTrack === "midTom"}
           onSelect={() => selectTrack("midTom")}
         />
         <LowTomPad
           {...lowTomVoice}
+          trackNumber={5}
           selected={selectedTrack === "lowTom"}
           onSelect={() => selectTrack("lowTom")}
         />
+        <HiHatPad
+          {...hiHatVoice}
+          trackNumber={6}
+          selected={selectedTrack === "hihat"}
+          onSelect={() => selectTrack("hihat")}
+        />
+        <HiHatOpenPad
+          {...hiHatOpenVoice}
+          trackNumber={7}
+          selected={selectedTrack === "hihatOpen"}
+          onSelect={() => selectTrack("hihatOpen")}
+        />
       </div>
+      <MiniGrid
+        patterns={patternsDisplay}
+        currentStep={currentStep}
+        selectedTrack={selectedTrack}
+        onSelectTrack={selectTrack}
+      />
       <div className={styles.gridRow}>
         <span className={styles.gridLabel}>{TRACK_LABELS[selectedTrack]}</span>
         <StepGrid

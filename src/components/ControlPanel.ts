@@ -62,5 +62,6 @@ export const controlPanelStyles = {
   selected: css`
     border-color: var(--accent);
     border-width: 2px;
+    background: black;
   `,
 };

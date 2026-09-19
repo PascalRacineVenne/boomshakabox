@@ -13,13 +13,24 @@ export const STEP_COUNT = 16;
 export const TRACK_IDS = [
   "kick",
   "snare",
-  "hihat",
-  "hihatOpen",
   "hiTom",
   "midTom",
   "lowTom",
+  "hihat",
+  "hihatOpen",
 ] as const;
 export type TrackId = (typeof TRACK_IDS)[number];
+
+/** Display name per track — shared by `StepSequencer`'s grid label and `MiniGrid`'s rows. */
+export const TRACK_LABELS: Record<TrackId, string> = {
+  kick: "BD",
+  snare: "SN",
+  hiTom: "HT",
+  midTom: "MT",
+  lowTom: "LT",
+  hihat: "CH",
+  hihatOpen: "OH",
+};
 
 type TriggerFn = (scheduledTime?: number) => void;
 

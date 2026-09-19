@@ -11,6 +11,7 @@ import {
 import { TONE_MIN, TONE_MAX, DECAY_MIN, DECAY_MAX } from "./useMidTomVoice";
 
 interface MidTomPadProps {
+  trackNumber: number;
   tone: number;
   setTone: (value: number) => void;
   decay: number;
@@ -34,6 +35,7 @@ interface MidTomPadProps {
   onSelect?: () => void;
 }
 const MidTomPad = ({
+  trackNumber,
   tone,
   setTone,
   decay,
@@ -106,7 +108,7 @@ const MidTomPad = ({
         </div>
       </div>
       <Button
-        label="MT"
+        label={`MT${trackNumber}`}
         value={pressed}
         size="large"
         onChange={(press) => {

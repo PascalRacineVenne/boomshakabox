@@ -11,6 +11,7 @@ import {
 import { TONE_MIN, TONE_MAX, DECAY_MIN, DECAY_MAX } from "./useLowTomVoice";
 
 interface LowTomPadProps {
+  trackNumber: number;
   tone: number;
   setTone: (value: number) => void;
   decay: number;
@@ -34,6 +35,7 @@ interface LowTomPadProps {
   onSelect?: () => void;
 }
 const LowTomPad = ({
+  trackNumber,
   tone,
   setTone,
   decay,
@@ -106,7 +108,7 @@ const LowTomPad = ({
         </div>
       </div>
       <Button
-        label="LT"
+        label={`LT${trackNumber}`}
         value={pressed}
         size="large"
         onChange={(press) => {

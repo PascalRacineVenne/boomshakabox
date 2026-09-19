@@ -16,6 +16,8 @@ import {
 } from "./useKickVoice";
 
 interface KickPadProps {
+  /** This voice's 1-based position among all tracks — shown on the trigger button, e.g. "1 Kick". */
+  trackNumber: number;
   tone: number;
   setTone: (value: number) => void;
   decay: number;
@@ -46,6 +48,7 @@ interface KickPadProps {
  * schedules that same instance's `trigger` for step playback.
  */
 const KickPad = ({
+  trackNumber,
   tone,
   setTone,
   decay,
@@ -118,7 +121,7 @@ const KickPad = ({
         </div>
       </div>
       <Button
-        label="Kick"
+        label={`BD${trackNumber}`}
         value={pressed}
         size="large"
         onChange={(press) => {
