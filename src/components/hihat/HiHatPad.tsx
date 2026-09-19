@@ -11,6 +11,7 @@ import {
 import { HH_TONE_MAX, HH_TONE_MIN } from "./useHiHatVoice";
 
 interface HiHatPadProps {
+  trackNumber: number;
   tone: number;
   setTone: (value: number) => void;
   volume: number;
@@ -39,6 +40,7 @@ interface HiHatPadProps {
  * schedules that same instance's `trigger` for step playback.
  */
 const HiHatPad = ({
+  trackNumber,
   tone,
   setTone,
   volume,
@@ -100,7 +102,7 @@ const HiHatPad = ({
         </div>
       </div>
       <Button
-        label="HH"
+        label={`HH${trackNumber}`}
         value={pressed}
         size="large"
         onChange={(press) => {

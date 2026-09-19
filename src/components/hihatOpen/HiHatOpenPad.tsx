@@ -10,6 +10,7 @@ import {
 } from "../ControlPanel";
 
 interface HiHatOpenPadProps {
+  trackNumber: number;
   tone: number;
   setTone: (value: number) => void;
   decay: number;
@@ -41,6 +42,7 @@ interface HiHatOpenPadProps {
  * step playback.
  */
 const HiHatOpenPad = ({
+  trackNumber,
   tone,
   setTone,
   decay,
@@ -113,7 +115,7 @@ const HiHatOpenPad = ({
         </div>
       </div>
       <Button
-        label="OH"
+        label={`OH${trackNumber}`}
         value={pressed}
         size="large"
         onChange={(press) => {

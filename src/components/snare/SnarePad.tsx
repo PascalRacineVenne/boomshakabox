@@ -16,6 +16,7 @@ import {
 } from "./useSnareVoice";
 
 interface SnarePadProps {
+  trackNumber: number;
   tone: number;
   setTone: (value: number) => void;
   snappy: number;
@@ -46,6 +47,7 @@ interface SnarePadProps {
  * schedules that same instance's `trigger` for step playback.
  */
 const SnarePad = ({
+  trackNumber,
   tone,
   setTone,
   snappy,
@@ -118,7 +120,7 @@ const SnarePad = ({
         </div>
       </div>
       <Button
-        label="Snare"
+        label={`SN${trackNumber}`}
         value={pressed}
         size="large"
         onChange={(press) => {

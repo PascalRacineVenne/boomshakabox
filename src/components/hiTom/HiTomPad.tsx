@@ -11,6 +11,7 @@ import {
 import { TONE_MIN, TONE_MAX, DECAY_MIN, DECAY_MAX } from "./useHiTomVoice";
 
 interface HiTomPadProps {
+  trackNumber: number;
   tone: number;
   setTone: (value: number) => void;
   decay: number;
@@ -34,6 +35,7 @@ interface HiTomPadProps {
   onSelect?: () => void;
 }
 const HiTomPad = ({
+  trackNumber,
   tone,
   setTone,
   decay,
@@ -106,7 +108,7 @@ const HiTomPad = ({
         </div>
       </div>
       <Button
-        label="Hi Tom"
+        label={`HT${trackNumber}`}
         value={pressed}
         size="large"
         onChange={(press) => {
