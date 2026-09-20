@@ -1,6 +1,6 @@
 import { css } from "@linaria/core";
 import { Flex } from "antd";
-import TempoKnob from "./TempoKnob";
+import TempoInput from "./TempoInput";
 import TransportControls from "./TransportControls";
 import MetronomeClick from "./MetronomeClick";
 
@@ -25,7 +25,7 @@ const GAP = "calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) * 0.5)";
  * Groups the sequencer's tempo input, beat pulse, transport buttons, and
  * metronome click into a 2x2 grid:
  *
- *   TempoKnob          BeatIndicator
+ *   TempoInput          BeatIndicator
  *   TransportControls  MetronomeClick
  *
  * so the tempo readout and its at-a-glance beat pulse sit on top, with the
@@ -36,7 +36,7 @@ const TempoTransportPanel = () => {
   return (
     <Flex vertical justify="center">
       <Flex align="center" gap={GAP} className={styles.grid}>
-        <TempoKnob />
+        <TempoInput />
         <TransportControls />
         <MetronomeClick />
       </Flex>

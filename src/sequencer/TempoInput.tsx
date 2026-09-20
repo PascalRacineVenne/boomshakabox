@@ -1,5 +1,5 @@
 import { css } from "@linaria/core";
-import { Flex, InputNumber } from "antd";
+import { InputNumber } from "antd";
 import { useTempo } from "./useTempo";
 
 const styles = {
@@ -16,6 +16,17 @@ const styles = {
     height: auto !important;
     border: 1px solid var(--accent) !important;
     border-radius: 8px !important;
+
+    &.ant-input-number-focused {
+      outline: none !important;
+    }
+  `,
+
+  root: css`
+    padding-inline: 0;
+    &.ant-input-number-focused {
+      outline: none !important;
+    }
   `,
 };
 
@@ -33,25 +44,23 @@ const styles = {
  * `classNames.input` prop styles the actual `<input>` directly instead of
  * fighting internal AntD class names.
  */
-const TempoKnob = () => {
+const TempoInput = () => {
   const { bpm, setBpm, min, max } = useTempo();
 
   return (
-    <Flex align="center">
-      <InputNumber
-        classNames={{ input: styles.input }}
-        variant="borderless"
-        controls={false}
-        min={min}
-        max={max}
-        precision={0}
-        value={bpm}
-        onChange={(value) => {
-          if (value !== null) setBpm(Number(value));
-        }}
-      />
-    </Flex>
+    <InputNumber
+      classNames={{ input: styles.input, root: styles.root }}
+      variant="borderless"
+      controls={false}
+      min={min}
+      max={max}
+      precision={0}
+      value={bpm}
+      onChange={(value) => {
+        if (value !== null) setBpm(Number(value));
+      }}
+    />
   );
 };
 
-export default TempoKnob;
+export default TempoInput;

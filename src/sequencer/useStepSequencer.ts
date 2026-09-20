@@ -91,11 +91,15 @@ export const useStepSequencer = (voices: Voices) => {
     voicesRef.current = voices;
   });
 
+  // A ref (not a plain closure variable) specifically so the "stop"
+  // listener below can reset it too — both this and the scheduler
+  // callback need to share the same counter.
+  const stepCountRef = useRef(0);
+
   useEffect(() => {
-    let stepCount = 0;
     const eventId = Tone.getTransport().scheduleRepeat((time) => {
-      const step = stepCount % STEP_COUNT;
-      stepCount += 1;
+      const step = stepCountRef.current % STEP_COUNT;
+      stepCountRef.current += 1;
 
       TRACK_IDS.forEach((id) => {
         if (patternsRef.current[id][step]) {
@@ -108,8 +112,25 @@ export const useStepSequencer = (voices: Voices) => {
       Tone.getDraw().schedule(() => setCurrentStep(step), time);
     }, "16n");
 
+    // Transport.stop() resets the Transport's own position to 0, but
+    // stepCountRef is a separate counter this scheduler keeps — without
+    // this, pressing Stop then Play again would resume mid-pattern
+    // instead of restarting at step 1, since stepCountRef would still
+    // hold whatever value it was at when stopped. Listening on the
+    // Transport's own "stop" event (rather than exposing a `stop`
+    // function from this hook) keeps this decoupled from whatever UI
+    // calls `Tone.getTransport().stop()` — see `TransportControls.tsx`.
+    // `Transport.pause()` deliberately does NOT emit this, so pausing
+    // and resuming still continues from where it paused.
+    const handleTransportStop = () => {
+      stepCountRef.current = 0;
+      setCurrentStep(0);
+    };
+    Tone.getTransport().on("stop", handleTransportStop);
+
     return () => {
       Tone.getTransport().clear(eventId);
+      Tone.getTransport().off("stop", handleTransportStop);
     };
   }, []);
 
