@@ -5,6 +5,7 @@ import ADSRPanel from "./components/adsr/ADSRPanel";
 
 const styles = {
   center: css`
+    margin-top: 48px;
     gap: 24px;
     flex-grow: 1;
   `,
@@ -31,9 +32,6 @@ const App = () => {
       justify="center"
       className={styles.center}
     >
-      <Typography.Title level={3} className={styles.title}>
-        Be creative!
-      </Typography.Title>
       <Space size={"large"}>
         <StepSequencer />
       </Space>

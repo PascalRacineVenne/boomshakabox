@@ -51,4 +51,24 @@ export const controlPanelStyles = {
     border-width: 2px;
     background: black;
   `,
+
+  /** A small square letter-toggle — e.g. Mute ("M"), Solo ("S") — same shape/behavior either way. */
+  toggleButton: css`
+    width: 20px;
+    height: 20px;
+    margin-top: 8px;
+    border: 1px solid var(--accent-border);
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+  `,
+
+  toggleButtonActive: css`
+    border-color: var(--contrast-1);
+    background: var(--contrast-1);
+    color: var(--bg);
+  `,
 };

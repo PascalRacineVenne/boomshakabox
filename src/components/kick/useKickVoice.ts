@@ -31,14 +31,19 @@ export const KICK_DECAY_MAX = 1;
  * and schedules everything at the precise time the look-ahead scheduler
  * asked for, rather than at "now."
  *
- * @returns The kick's `tone`/`decay`/`volume`/`pan`/`pressed` state, their
- * setters, and `trigger`.
+ * @returns The kick's `tone`/`decay`/`volume`/`pan`/`muted`/`soloed`/
+ * `pressed` state, their setters, and `trigger`.
  */
 export const useKickVoice = () => {
   const [tone, setTone] = useState(50); // resting fundamental frequency the pitch glide settles on, in Hz
   const [decay, setDecay] = useState(0.35); // amp envelope decay length, in seconds
   const [volume, setVolume] = useState(75); // 0-100%, overall output level
   const [pan, setPan] = useState(0); // -100 (hard left) to 100 (hard right)
+  // Mute/solo — see useSnareVoice.ts for the full rationale: `muted` gates
+  // `trigger`'s level without touching `volume` itself, `soloed` is
+  // visual-only for now (cross-voice silencing isn't wired up).
+  const [muted, setMuted] = useState(false);
+  const [soloed, setSolo] = useState(false);
   const [pressed, setPressed] = useState(false); // drives the pad's lit state — real mousedown/up, not hover
 
   const trigger = async (scheduledTime?: number) => {
@@ -51,7 +56,7 @@ export const useKickVoice = () => {
     const now = scheduledTime ?? Tone.now();
     const pitchDropTime = 0.05; // ~50ms glide — fast enough to read as a "click," not a siren
     const duration = decay; // "Decay" knob: short, punchy decay — fat but not a long boomy tail
-    const level = volume / 100; // Volume slider as a 0-1 multiplier applied to the VCA peak
+    const level = muted ? 0 : volume / 100; // Volume slider as a 0-1 multiplier applied to the VCA peak, forced silent while muted
 
     // Sweeps the master filter on every hit — see `triggerMasterFilterEnvelope`.
     triggerMasterFilterEnvelope(now);
@@ -115,6 +120,10 @@ export const useKickVoice = () => {
     setVolume,
     pan,
     setPan,
+    muted,
+    setMuted,
+    soloed,
+    setSolo,
     pressed,
     setPressed,
     trigger,

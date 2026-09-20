@@ -22,14 +22,19 @@ import { startAudioContext } from "../../lib/startAudioContext";
  * changes only need to reach the next triggered voice, so no direct node
  * write is wired up for live playback.
  *
- * @returns The open hi-hat's `tone`/`decay`/`volume`/`pan`/`pressed` state,
- * their setters, and `trigger`.
+ * @returns The open hi-hat's `tone`/`decay`/`volume`/`pan`/`muted`/
+ * `soloed`/`pressed` state, their setters, and `trigger`.
  */
 export const useHiHatOpenVoice = () => {
   const [tone, setTone] = useState(7000); // highpass VCF cutoff, in Hz — brightness/metallic content
   const [decay, setDecay] = useState(0.4); // amp envelope decay length, in seconds — the open hat's "ring"
   const [volume, setVolume] = useState(75); // 0-100%, overall output level
   const [pan, setPan] = useState(0); // -100 (hard left) to 100 (hard right)
+  // Mute/solo — see useSnareVoice.ts for the full rationale: `muted` gates
+  // `trigger`'s level without touching `volume` itself, `soloed` is
+  // visual-only for now (cross-voice silencing isn't wired up).
+  const [muted, setMuted] = useState(false);
+  const [soloed, setSolo] = useState(false);
   const [pressed, setPressed] = useState(false); // drives the pad's lit state — real mousedown/up, not hover
 
   const trigger = async (scheduledTime?: number) => {
@@ -41,7 +46,7 @@ export const useHiHatOpenVoice = () => {
 
     const now = scheduledTime ?? Tone.now();
     const duration = decay; // "Decay" knob: how long the open hat rings before dying out
-    const level = volume / 100; // Volume slider as a 0-1 multiplier applied to the VCA peak
+    const level = muted ? 0 : volume / 100; // Volume slider as a 0-1 multiplier applied to the VCA peak, forced silent while muted
 
     // Sweeps the master filter on every hit — see `triggerMasterFilterEnvelope`.
     triggerMasterFilterEnvelope(now);
@@ -88,6 +93,10 @@ export const useHiHatOpenVoice = () => {
     setVolume,
     pan,
     setPan,
+    muted,
+    setMuted,
+    soloed,
+    setSolo,
     pressed,
     setPressed,
     trigger,

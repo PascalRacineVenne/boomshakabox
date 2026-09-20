@@ -29,14 +29,27 @@ export const SNARE_SNAPPY_MAX = 1;
  * {@link startAudioContext}, scheduled calls fire at the precise
  * Transport time instead.
  *
- * @returns The snare's `tone`/`snappy`/`volume`/`pan`/`pressed` state,
- * their setters, and `trigger`.
+ * @returns The snare's `tone`/`snappy`/`volume`/`pan`/`muted`/`soloed`/
+ * `pressed` state, their setters, and `trigger`.
  */
 export const useSnareVoice = () => {
   const [tone, setTone] = useState(180); // base frequency of the tone voice's VCOs, in Hz
   const [snappy, setSnappy] = useState(1); // 0-1 mix level of the noise/snap voice
   const [volume, setVolume] = useState(75); // 0-100%, overall output level for both voices
   const [pan, setPan] = useState(0); // -100 (hard left) to 100 (hard right)
+  // Snare-only mute. Deliberately doesn't touch `volume` itself (no
+  // "remember the previous volume" bookkeeping needed) — `volume` always
+  // holds the real fader position, `muted` just gates whether `trigger`
+  // applies it or forces silence, same as flipping a mixer channel's mute
+  // switch without moving its fader.
+  const [muted, setMuted] = useState(false);
+  // Solo is tracked here, but — unlike `muted` — doesn't yet affect
+  // `trigger` below: silencing every *other* voice while this one is
+  // soloed needs a track-level check outside this hook (StepSequencer
+  // would need to know which track, if any, is soloed and gate every
+  // voice's trigger on it), which isn't wired up. For now this is a
+  // visual toggle only.
+  const [soloed, setSolo] = useState(false);
   const [pressed, setPressed] = useState(false); // drives the pad's lit state — real mousedown/up, not hover
 
   const trigger = async (scheduledTime?: number) => {
@@ -48,7 +61,7 @@ export const useSnareVoice = () => {
 
     const now = scheduledTime ?? Tone.now();
     const duration = 0.2; // ~200ms, matching the 808's fixed snare decay
-    const level = volume / 100; // Volume slider as a 0-1 multiplier applied to both voices' peaks
+    const level = muted ? 0 : volume / 100; // Volume slider as a 0-1 multiplier applied to both voices' peaks, forced silent while muted
 
     // Sweeps the master filter on every hit — see `triggerMasterFilterEnvelope`.
     triggerMasterFilterEnvelope(now);
@@ -103,6 +116,10 @@ export const useSnareVoice = () => {
     setVolume,
     pan,
     setPan,
+    muted,
+    setMuted,
+    soloed,
+    setSolo,
     pressed,
     setPressed,
     trigger,
