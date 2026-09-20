@@ -7,9 +7,9 @@ import {
   setMasterFilterEnvAmount,
 } from "../../lib/masterBus";
 
-const DEFAULT_CUTOFF = 20000; // Hz
+const DEFAULT_CUTOFF = 12000; // Hz
 const MIN_CUTOFF = 20;
-const MAX_CUTOFF = 20000;
+const MAX_CUTOFF = 12000;
 const DEFAULT_RESONANCE = 1; // Tone.Filter.Q
 const MIN_RESONANCE = 0.1;
 const MAX_RESONANCE = 20;

@@ -42,6 +42,8 @@ export type FilterMode =
 const masterDistortion = new Tone.Distortion(0.4);
 masterDistortion.wet.value = 0; // off by default
 
+// rolloff: -24dB/octave (Tone.Filter's default is -12) — a steeper cut for
+// a more pronounced sweep as Cutoff closes in on a sound's fundamentals.
 const masterFilter = new Tone.Filter(12000, FILTER_MODE_OPTIONS.LOWPASS.value);
 masterDistortion.connect(masterFilter);
 
