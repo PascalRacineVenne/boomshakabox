@@ -113,7 +113,6 @@ const SnarePad = ({
             onChange={(drag) => setVolume(drag.value)}
             orientation="vertical"
             unit="%"
-            valueAsLabel="interactive"
           />
         </Flex>
         <Flex vertical>
