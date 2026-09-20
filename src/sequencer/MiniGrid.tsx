@@ -89,7 +89,7 @@ const MiniGrid = ({
   onSelectTrack,
 }: MiniGridProps) => {
   return (
-    <Flex vertical gap={3} className={styles.container}>
+    <Flex vertical className={styles.container}>
       {[...TRACK_IDS].reverse().map((trackId) => (
         <Flex
           align="center"

@@ -20,6 +20,10 @@ interface HiHatOpenPadProps {
   setVolume: (value: number) => void;
   pan: number;
   setPan: (value: number) => void;
+  muted: boolean;
+  setMuted: (value: boolean) => void;
+  soloed: boolean;
+  setSolo: (value: boolean) => void;
   pressed: boolean;
   setPressed: (value: boolean) => void;
   trigger: (scheduledTime?: number) => void;
@@ -36,11 +40,11 @@ interface HiHatOpenPadProps {
 }
 
 /**
- * Open hi-hat pad UI: Volume slider + Tone/Decay knobs + trigger button.
- * Pure presentation over whatever state it's given —
- * {@link useHiHatOpenVoice} supplies it, currently only used by
- * `StepSequencer`, which also schedules that same instance's `trigger` for
- * step playback.
+ * Open hi-hat pad UI: Tone/Decay knobs, Volume slider + Pan knob +
+ * Mute/Solo, and the trigger button. Pure presentation over whatever
+ * state it's given — {@link useHiHatOpenVoice} supplies it, currently
+ * only used by `StepSequencer`, which also schedules that same instance's
+ * `trigger` for step playback.
  */
 const HiHatOpenPad = ({
   trackNumber,
@@ -52,6 +56,10 @@ const HiHatOpenPad = ({
   setVolume,
   pan,
   setPan,
+  muted,
+  setMuted,
+  soloed,
+  setSolo,
   pressed,
   setPressed,
   trigger,
@@ -68,53 +76,79 @@ const HiHatOpenPad = ({
       )}
       onMouseDown={onSelect}
     >
-      <Slider
-        min={PANNING_L}
-        max={PANNING_R}
-        step={1}
-        size="small"
-        value={pan}
-        onChange={(drag) => setPan(drag.value)}
-        label="Pan"
-        bipolar
-        orientation="horizontal"
-        valueAsLabel="interactive"
-        valueFormatter={formatPan}
-        variant="trackless"
-        cursorSize="Strip"
-      />
       <Flex align="center">
-        <Slider
-          min={VOLUME_MIN}
-          max={VOLUME_MAX}
-          step={1}
+        <Knob
+          variant="plainCap"
+          min={3000}
+          max={10000}
           size="small"
-          value={volume}
-          onChange={(drag) => setVolume(drag.value)}
-          label="Volume"
-          orientation="vertical"
-          unit="%"
-          valueAsLabel="interactive"
+          value={tone}
+          onChange={(rotation) => setTone(rotation.value)}
+          label="Tone"
         />
+        <Knob
+          variant="plainCap"
+          min={0.2}
+          max={1}
+          size="small"
+          value={decay}
+          onChange={(rotation) => setDecay(rotation.value)}
+          label="Decay"
+        />
+      </Flex>
+
+      <Flex align="center">
         <Flex vertical align="center">
+          <Slider
+            min={VOLUME_MIN}
+            max={VOLUME_MAX}
+            step={1}
+            size="normal"
+            value={volume}
+            onChange={(drag) => setVolume(drag.value)}
+            orientation="vertical"
+            unit="%"
+            valueAsLabel="interactive"
+          />
+        </Flex>
+        <Flex vertical>
           <Knob
             variant="plainCap"
-            min={3000}
-            max={10000}
+            min={PANNING_L}
+            max={PANNING_R}
+            step={1}
             size="small"
-            value={tone}
-            onChange={(rotation) => setTone(rotation.value)}
-            label="Tone"
+            value={pan}
+            onChange={(rotation) => setPan(rotation.value)}
+            label="Pan"
+            bipolar
+            valueAsLabel="interactive"
+            valueFormatter={formatPan}
           />
-          <Knob
-            variant="plainCap"
-            min={0.2}
-            max={1}
-            size="small"
-            value={decay}
-            onChange={(rotation) => setDecay(rotation.value)}
-            label="Decay"
-          />
+          <Flex gap={4}>
+            <Flex
+              align="center"
+              justify="center"
+              className={classNames(
+                controlPanelStyles.toggleButton,
+                muted && controlPanelStyles.toggleButtonActive,
+              )}
+              onClick={() => setMuted(!muted)}
+            >
+              M
+            </Flex>
+            <Flex
+              align="center"
+              justify="center"
+              className={classNames(
+                controlPanelStyles.toggleButton,
+                soloed && controlPanelStyles.toggleButtonActive,
+              )}
+              onClick={() => setSolo(!soloed)}
+            >
+              S
+            </Flex>
+          </Flex>
         </Flex>
       </Flex>
       <Button

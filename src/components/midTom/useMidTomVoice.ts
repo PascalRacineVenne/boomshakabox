@@ -20,6 +20,11 @@ export const useMidTomVoice = () => {
   const [decay, setDecay] = useState(0.13); // 808 mid toms ring for ~130ms — between the hi and low tom
   const [volume, setVolume] = useState(75);
   const [pan, setPan] = useState(0);
+  // Mute/solo — see useSnareVoice.ts for the full rationale: `muted` gates
+  // `trigger`'s level without touching `volume` itself, `soloed` is
+  // visual-only for now (cross-voice silencing isn't wired up).
+  const [muted, setMuted] = useState(false);
+  const [soloed, setSolo] = useState(false);
   const [pressed, setPressed] = useState(false);
 
   const trigger = async (scheduledTime?: number) => {
@@ -30,7 +35,7 @@ export const useMidTomVoice = () => {
     const now = scheduledTime ?? Tone.now();
     const pitchDropTime = 0.025; // faster, subtler glide than the kick's 50ms
     const duration = decay;
-    const level = volume / 100;
+    const level = muted ? 0 : volume / 100; // forced silent while muted
 
     triggerMasterFilterEnvelope(now);
 
@@ -84,6 +89,10 @@ export const useMidTomVoice = () => {
     setVolume,
     pan,
     setPan,
+    muted,
+    setMuted,
+    soloed,
+    setSolo,
     pressed,
     setPressed,
     trigger,

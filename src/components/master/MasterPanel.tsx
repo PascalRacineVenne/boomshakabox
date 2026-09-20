@@ -43,41 +43,37 @@ const MasterPanel = () => {
 
   return (
     <div className={styles.wrapper}>
-      <Flex vertical align="center" className={controlPanelStyles.panel}>
-        <Flex align="center">
-          <Flex vertical align="center">
-            <Knob
-              variant="plainCap"
-              min={0}
-              max={1}
-              size="small"
-              value={distortion}
-              onChange={(e) => setDistortion(e.value)}
-              label="Drive"
-              labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
-            />
-            <Button
-              latch
-              label="ON/OFF"
-              size="xsmall"
-              value={distortionOn}
-              onChange={(e) => setDistortionOn(e.value)}
-              labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS / 2}
-            />
-          </Flex>
-          <Knob
-            min={0}
-            max={100}
-            variant="plainCap"
-            step={1}
-            size="xlarge"
-            value={volume}
-            onChange={(e) => setVolume(e.value)}
-            label="Volume"
-            unit="%"
-            valueAsLabel="interactive"
-          />
-        </Flex>
+      <Flex align="center" className={controlPanelStyles.panel}>
+        <Knob
+          variant="plainCap"
+          min={0}
+          max={1}
+          size="small"
+          value={distortion}
+          onChange={(e) => setDistortion(e.value)}
+          label="Drive"
+          labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
+        />
+        <Button
+          latch
+          label="ON/OFF"
+          size="xsmall"
+          value={distortionOn}
+          onChange={(e) => setDistortionOn(e.value)}
+          labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS / 2}
+        />
+        <Knob
+          min={0}
+          max={100}
+          variant="plainCap"
+          step={1}
+          size="small"
+          value={volume}
+          onChange={(e) => setVolume(e.value)}
+          label="Volume"
+          unit="%"
+          valueAsLabel="interactive"
+        />
       </Flex>
       <span className={styles.title}>Master</span>
     </div>

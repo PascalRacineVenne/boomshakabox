@@ -23,9 +23,6 @@ import StepGrid from "./StepGrid";
 import MiniGrid from "./MiniGrid";
 import { useStepSequencer, TRACK_LABELS } from "./useStepSequencer";
 
-// Flex covers layout (display/direction/align/gap); these are only the
-// bits Flex's props can't express — border/radius/padding chrome, and the
-// label's own typography.
 const styles = {
   gridRowChrome: css`
     border: 1px solid var(--accent-border);
@@ -41,26 +38,6 @@ const styles = {
 
 const GAP = "calc(var(--audioui-unit) / 2)";
 
-/**
- * The full step drum sequencer.
- *
- * `useKickVoice`/`useSnareVoice`/`useHiHatVoice`/`useHiHatOpenVoice` are
- * called *here*, not inside the pad components — this is what lets the
- * sequencer's scheduler (`useStepSequencer`) reach each voice's live
- * `trigger` closure directly, using the exact same sound-generation code
- * driven by the exact same knobs shown on the pads below. Adding an
- * instrument later (Tom1, etc. — see ARCHITECTURE-SPEC.MD) means: add its
- * id to `useStepSequencer.ts`'s `TRACK_IDS`, give it a
- * `use<X>Voice`/`<X>Pad` pair under `components/`, a label in
- * `TRACK_LABELS` above, and render + pass it in here the same way
- * kick/snare/hihat/hihatOpen are below.
- *
- * There's a single 16-step grid, not one per track: pressing a pad both
- * fires that instrument's preview hit and selects it as the pattern the
- * grid is currently showing/editing. Every instrument's pattern stays
- * live and plays together regardless of which one is selected — see
- * `useStepSequencer.ts`.
- */
 const StepSequencer = () => {
   const kickVoice = useKickVoice();
   const snareVoice = useSnareVoice();
