@@ -11,6 +11,13 @@ const styles = {
     border: 1px solid var(--accent-border);
     border-radius: 8px;
   `,
+
+  title: css`
+    font-size: 11px;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  `,
 };
 
 /**
@@ -26,10 +33,13 @@ const styles = {
  */
 const TempoTransportPanel = () => {
   return (
-    <Flex align="center" className={styles.grid}>
-      <TempoKnob />
-      <TransportControls />
-      <MetronomeClick />
+    <Flex vertical justify="center">
+      <Flex align="center" className={styles.grid}>
+        <TempoKnob />
+        <TransportControls />
+        <MetronomeClick />
+      </Flex>
+      <span className={styles.title}>Transport</span>
     </Flex>
   );
 };

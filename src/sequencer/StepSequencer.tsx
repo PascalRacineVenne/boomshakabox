@@ -105,6 +105,12 @@ const StepSequencer = () => {
         <FilterPanel />
         <MasterPanel />
       </div>
+      <MiniGrid
+        patterns={patternsDisplay}
+        currentStep={currentStep}
+        selectedTrack={selectedTrack}
+        onSelectTrack={selectTrack}
+      />
       <div className={styles.pads}>
         <KickPad
           {...kickVoice}
@@ -149,12 +155,7 @@ const StepSequencer = () => {
           onSelect={() => selectTrack("hihatOpen")}
         />
       </div>
-      <MiniGrid
-        patterns={patternsDisplay}
-        currentStep={currentStep}
-        selectedTrack={selectedTrack}
-        onSelectTrack={selectTrack}
-      />
+
       <div className={styles.gridRow}>
         <span className={styles.gridLabel}>{TRACK_LABELS[selectedTrack]}</span>
         <StepGrid
