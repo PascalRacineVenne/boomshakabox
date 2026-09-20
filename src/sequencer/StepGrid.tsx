@@ -13,7 +13,7 @@ const styles = {
   group: css`
     display: flex;
     gap: 4px;
-    padding-right: 8px;
+    padding-right: 16px;
   `,
   playhead: css`
     outline: 2px solid var(--accent);
