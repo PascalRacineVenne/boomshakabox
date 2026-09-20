@@ -1,5 +1,6 @@
 import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
 import classNames from "classnames";
+import { Flex } from "antd";
 import {
   controlPanelStyles,
   formatPan,
@@ -51,7 +52,9 @@ const LowTomPad = ({
   onSelect,
 }: LowTomPadProps) => {
   return (
-    <div
+    <Flex
+      vertical
+      align="center"
       className={classNames(
         controlPanelStyles.panel,
         selected && controlPanelStyles.selected,
@@ -73,7 +76,7 @@ const LowTomPad = ({
         bipolar
         orientation="horizontal"
       />
-      <div className={controlPanelStyles.controlsRow}>
+      <Flex align="center">
         <Slider
           min={VOLUME_MIN}
           max={VOLUME_MAX}
@@ -86,7 +89,7 @@ const LowTomPad = ({
           unit="%"
           valueAsLabel="interactive"
         />
-        <div className={controlPanelStyles.knobColumn}>
+        <Flex vertical align="center">
           <Knob
             variant="plainCap"
             min={TONE_MIN}
@@ -105,8 +108,8 @@ const LowTomPad = ({
             onChange={(rotation) => setDecay(rotation.value)}
             label="Decay"
           />
-        </div>
-      </div>
+        </Flex>
+      </Flex>
       <Button
         label={`LT${trackNumber}`}
         value={pressed}
@@ -116,7 +119,7 @@ const LowTomPad = ({
           if (press.value) trigger();
         }}
       />
-    </div>
+    </Flex>
   );
 };
 

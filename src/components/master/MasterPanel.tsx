@@ -1,5 +1,6 @@
 import { Button, Knob } from "@cutoff/audio-ui-react";
 import { css } from "@linaria/core";
+import { Flex } from "antd";
 import {
   controlPanelStyles,
   LABELED_SMALL_KNOB_HEIGHT_UNITS,
@@ -42,9 +43,9 @@ const MasterPanel = () => {
 
   return (
     <div className={styles.wrapper}>
-      <div className={controlPanelStyles.panel}>
-        <div className={controlPanelStyles.controlsRow}>
-          <div className={controlPanelStyles.knobColumn}>
+      <Flex vertical align="center" className={controlPanelStyles.panel}>
+        <Flex align="center">
+          <Flex vertical align="center">
             <Knob
               variant="plainCap"
               min={0}
@@ -63,7 +64,7 @@ const MasterPanel = () => {
               onChange={(e) => setDistortionOn(e.value)}
               labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS / 2}
             />
-          </div>
+          </Flex>
           <Knob
             min={0}
             max={100}
@@ -76,8 +77,8 @@ const MasterPanel = () => {
             unit="%"
             valueAsLabel="interactive"
           />
-        </div>
-      </div>
+        </Flex>
+      </Flex>
       <span className={styles.title}>Master</span>
     </div>
   );

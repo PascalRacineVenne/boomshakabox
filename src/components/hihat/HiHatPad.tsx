@@ -1,5 +1,6 @@
 import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
 import classNames from "classnames";
+import { Flex } from "antd";
 import {
   controlPanelStyles,
   formatPan,
@@ -54,7 +55,9 @@ const HiHatPad = ({
   onSelect,
 }: HiHatPadProps) => {
   return (
-    <div
+    <Flex
+      vertical
+      align="center"
       className={classNames(
         controlPanelStyles.panel,
         selected && controlPanelStyles.selected,
@@ -76,7 +79,7 @@ const HiHatPad = ({
         variant="trackless"
         cursorSize="Strip"
       />
-      <div className={controlPanelStyles.controlsRow}>
+      <Flex align="center">
         <Slider
           min={VOLUME_MIN}
           max={VOLUME_MAX}
@@ -89,7 +92,7 @@ const HiHatPad = ({
           unit="%"
           valueAsLabel="interactive"
         />
-        <div className={controlPanelStyles.knobColumn}>
+        <Flex vertical align="center">
           <Knob
             variant="plainCap"
             min={HH_TONE_MIN}
@@ -99,8 +102,8 @@ const HiHatPad = ({
             onChange={(rotation) => setTone(rotation.value)}
             label="Tone"
           />
-        </div>
-      </div>
+        </Flex>
+      </Flex>
       <Button
         label={`HH${trackNumber}`}
         value={pressed}
@@ -110,7 +113,7 @@ const HiHatPad = ({
           if (press.value) trigger(); // fires on the real press, not on the release toggling back to false
         }}
       />
-    </div>
+    </Flex>
   );
 };
 

@@ -16,7 +16,6 @@ const styles = {
     font-family: var(--heading) !important;
     font-weight: 500 !important;
     color: var(--text-h) !important;
-    font-size: 56px !important;
     letter-spacing: -1.68px !important;
     margin: 32px 0 !important;
   `,
@@ -32,7 +31,7 @@ const App = () => {
       justify="center"
       className={styles.center}
     >
-      <Typography.Title level={1} className={styles.title}>
+      <Typography.Title level={3} className={styles.title}>
         Be creative!
       </Typography.Title>
       <Space size={"large"}>
@@ -45,7 +44,7 @@ const App = () => {
         potentially useful ADSR envelope for synth or filter modulation (not yet
         wired to any drum voice)
       </Typography.Paragraph>
-      <Typography.Title level={2} className={styles.title}>
+      <Typography.Title level={4} className={styles.title}>
         Gimme a beat
       </Typography.Title>
     </Flex>

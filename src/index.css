@@ -5,9 +5,11 @@
   --border: #2e303a;
   --accent: #c084fc;
   --accent-border: rgba(192, 132, 252, 0.5);
+  --contrast-1: #4df0b0;
+  --contrast-2: #2ec4b6;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
+  --heading: system-ui, "Segoe UI", Roboto, sans-serif;
 
   /* audio/ui base sizing unit — every control's dimensions derive from this.
      Set once here so it can be reused by custom Linaria-styled components too. */
@@ -43,4 +45,3 @@
 body {
   margin: 0;
 }
-

@@ -1,21 +1,25 @@
 import { css } from "@linaria/core";
+import { Flex } from "antd";
 import TempoKnob from "./TempoKnob";
 import TransportControls from "./TransportControls";
-import BeatIndicator from "./BeatIndicator";
 import MetronomeClick from "./MetronomeClick";
 
 const styles = {
   grid: css`
-    display: inline-grid;
-    grid-template-columns: auto auto;
-    align-items: center;
-    justify-items: center;
-    gap: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) * 0.5);
     padding: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
     border: 1px solid var(--accent-border);
     border-radius: 8px;
   `,
+
+  title: css`
+    font-size: 11px;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  `,
 };
+
+const GAP = "calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) * 0.5)";
 
 /**
  * Groups the sequencer's tempo input, beat pulse, transport buttons, and
@@ -30,12 +34,14 @@ const styles = {
  */
 const TempoTransportPanel = () => {
   return (
-    <div className={styles.grid}>
-      <TempoKnob />
-      <BeatIndicator />
-      <TransportControls />
-      <MetronomeClick />
-    </div>
+    <Flex vertical justify="center">
+      <Flex align="center" gap={GAP} className={styles.grid}>
+        <TempoKnob />
+        <TransportControls />
+        <MetronomeClick />
+      </Flex>
+      <span className={styles.title}>Transport</span>
+    </Flex>
   );
 };
 
