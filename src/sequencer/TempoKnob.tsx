@@ -5,9 +5,7 @@ import { useTempo } from "./useTempo";
 const styles = {
   container: css`
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 2px;
   `,
 
   // AntD's own rule for this element is a two-class compound selector
@@ -16,18 +14,13 @@ const styles = {
   // !important is needed here regardless of stylesheet insertion order.
   input: css`
     text-align: center !important;
-    font-size: 24px !important;
+    font-size: 20px !important;
     font-weight: 700 !important;
     line-height: 1 !important;
     color: var(--accent) !important;
     height: auto !important;
-  `,
-
-  unit: css`
-    font-size: 11px;
-    color: var(--text);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    border: 1px solid var(--accent) !important;
+    border-radius: 8px !important;
   `,
 };
 
@@ -62,7 +55,6 @@ const TempoKnob = () => {
           if (value !== null) setBpm(Number(value));
         }}
       />
-      <span className={styles.unit}>BPM</span>
     </div>
   );
 };
