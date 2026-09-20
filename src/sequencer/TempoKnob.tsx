@@ -1,13 +1,8 @@
 import { css } from "@linaria/core";
-import { InputNumber } from "antd";
+import { Flex, InputNumber } from "antd";
 import { useTempo } from "./useTempo";
 
 const styles = {
-  container: css`
-    display: flex;
-    align-items: center;
-  `,
-
   // AntD's own rule for this element is a two-class compound selector
   // (".ant-input-number .ant-input-number-input") wrapped in :where() only
   // around its own hash — that still outranks our single custom class, so
@@ -42,7 +37,7 @@ const TempoKnob = () => {
   const { bpm, setBpm, min, max } = useTempo();
 
   return (
-    <div className={styles.container}>
+    <Flex align="center">
       <InputNumber
         classNames={{ input: styles.input }}
         variant="borderless"
@@ -55,7 +50,7 @@ const TempoKnob = () => {
           if (value !== null) setBpm(Number(value));
         }}
       />
-    </div>
+    </Flex>
   );
 };
 

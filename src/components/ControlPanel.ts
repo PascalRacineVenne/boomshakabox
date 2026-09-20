@@ -21,6 +21,12 @@ export const formatPan = (value: number) => {
  * themselves are themed with (see ui-stack.md's styling model) instead of
  * introducing separate values.
  *
+ * Every one of these rows/columns is a plain AntD `Flex` at each call site
+ * now (`<Flex vertical align="center">` for the outer panel and the knob
+ * column, `<Flex align="center">` for the slider+knob-column row) rather
+ * than a class here — only chrome `Flex`'s props can't express
+ * (gap/padding/border/etc.) still needs one.
+ *
  * Kept in its own file, deliberately free of any `@cutoff/audio-ui-react`
  * import: Linaria's build-time evaluator needs to trace the whole import
  * graph of any file containing a styled/css tag, and chokes on that
@@ -30,29 +36,10 @@ export const formatPan = (value: number) => {
 export const controlPanelStyles = {
   /** Outer frame: slider+knobs row on top, trigger button centered underneath. */
   panel: css`
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
     gap: calc(var(--audioui-unit) / 4);
     padding: calc(var(--audioui-unit) / 4);
     border: 1px solid var(--accent-border);
     border-radius: 8px;
-  `,
-
-  /** Slider next to the stacked knob column. */
-  controlsRow: css`
-    display: flex;
-    align-items: center;
-  `,
-
-  /**
-   * The two instrument-specific knobs (Tone + Snappy/Decay), stacked
-   * vertically next to the volume slider.
-   */
-  knobColumn: css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
   `,
 
   /**

@@ -1,4 +1,5 @@
 import { css } from "@linaria/core";
+import { Flex } from "antd";
 import TempoTransportPanel from "./TempoTransportPanel";
 import MasterPanel from "../components/master/MasterPanel";
 import FilterPanel from "../components/filter/FilterPanel";
@@ -22,25 +23,11 @@ import StepGrid from "./StepGrid";
 import MiniGrid from "./MiniGrid";
 import { useStepSequencer, TRACK_LABELS } from "./useStepSequencer";
 
+// Flex covers layout (display/direction/align/gap); these are only the
+// bits Flex's props can't express — border/radius/padding chrome, and the
+// label's own typography.
 const styles = {
-  container: css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: calc(var(--audioui-unit) / 2);
-  `,
-  topRow: css`
-    display: flex;
-    align-items: center;
-    gap: calc(var(--audioui-unit) / 2);
-  `,
-  pads: css`
-    display: flex;
-  `,
-  gridRow: css`
-    display: flex;
-    align-items: center;
-    gap: calc(var(--audioui-unit) / 2);
+  gridRowChrome: css`
     border: 1px solid var(--accent-border);
     border-radius: 8px;
     padding: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
@@ -51,6 +38,8 @@ const styles = {
     width: 48px;
   `,
 };
+
+const GAP = "calc(var(--audioui-unit) / 2)";
 
 /**
  * The full step drum sequencer.
@@ -99,19 +88,19 @@ const StepSequencer = () => {
   });
 
   return (
-    <div className={styles.container}>
-      <div className={styles.topRow}>
+    <Flex vertical align="center" gap={GAP}>
+      <Flex align="flex-start" gap={GAP}>
         <TempoTransportPanel />
         <FilterPanel />
         <MasterPanel />
-      </div>
+      </Flex>
       <MiniGrid
         patterns={patternsDisplay}
         currentStep={currentStep}
         selectedTrack={selectedTrack}
         onSelectTrack={selectTrack}
       />
-      <div className={styles.pads}>
+      <Flex>
         <KickPad
           {...kickVoice}
           trackNumber={1}
@@ -154,17 +143,17 @@ const StepSequencer = () => {
           selected={selectedTrack === "hihatOpen"}
           onSelect={() => selectTrack("hihatOpen")}
         />
-      </div>
+      </Flex>
 
-      <div className={styles.gridRow}>
+      <Flex align="center" gap={GAP} className={styles.gridRowChrome}>
         <span className={styles.gridLabel}>{TRACK_LABELS[selectedTrack]}</span>
         <StepGrid
           active={activePattern}
           currentStep={currentStep}
           onStepChange={setStep}
         />
-      </div>
-    </div>
+      </Flex>
+    </Flex>
   );
 };
 

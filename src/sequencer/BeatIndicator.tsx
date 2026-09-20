@@ -1,13 +1,10 @@
 import { css } from "@linaria/core";
 import classNames from "classnames";
 import { useBeatPulse } from "./useBeatPulse";
+import { Flex } from "antd";
 
 const styles = {
   row: css`
-    display: flex;
-    gap: calc(var(--audioui-unit) / 8);
-    align-items: center;
-    justify-content: center;
     border: 1px solid var(--accent-border);
     padding: 8px;
     border-radius: 8px;
@@ -39,6 +36,8 @@ const styles = {
   `,
 };
 
+const GAP = "calc(var(--audioui-unit) / 8)";
+
 interface BeatIndicatorProps {
   /**
    * When provided, this indicator doubles as the metronome click's
@@ -62,7 +61,10 @@ const BeatIndicator = ({ muted, onToggleMute }: BeatIndicatorProps) => {
   const { pulse, flash } = useBeatPulse();
 
   return (
-    <div
+    <Flex
+      align="center"
+      justify="center"
+      gap={GAP}
       className={classNames(
         styles.row,
         onToggleMute && styles.rowClickable,
@@ -80,7 +82,7 @@ const BeatIndicator = ({ muted, onToggleMute }: BeatIndicatorProps) => {
           )}
         />
       ))}
-    </div>
+    </Flex>
   );
 };
 

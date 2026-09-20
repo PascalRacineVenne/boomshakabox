@@ -2,17 +2,12 @@ import { css } from "@linaria/core";
 import classNames from "classnames";
 import { Button } from "@cutoff/audio-ui-react";
 import { STEP_COUNT } from "./useStepSequencer";
+import { Flex } from "antd";
 
 const GROUP_SIZE = 4; // groups of 4 steps, matching a 4/4 beat boundary
 
 const styles = {
-  steps: css`
-    display: flex;
-    gap: 4px;
-  `,
   group: css`
-    display: flex;
-    gap: 4px;
     padding-right: 16px;
   `,
   playhead: css`
@@ -44,9 +39,9 @@ const StepGrid = ({ active, currentStep, onStepChange }: StepGridProps) => {
   const groupCount = STEP_COUNT / GROUP_SIZE;
 
   return (
-    <div className={styles.steps}>
+    <Flex gap={4}>
       {Array.from({ length: groupCount }, (_, groupIndex) => (
-        <div key={groupIndex} className={styles.group}>
+        <Flex key={groupIndex} gap={4} className={styles.group}>
           {Array.from({ length: GROUP_SIZE }, (_, i) => {
             const stepIndex = groupIndex * GROUP_SIZE + i;
             return (
@@ -63,9 +58,9 @@ const StepGrid = ({ active, currentStep, onStepChange }: StepGridProps) => {
               />
             );
           })}
-        </div>
+        </Flex>
       ))}
-    </div>
+    </Flex>
   );
 };
 

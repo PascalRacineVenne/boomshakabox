@@ -6,7 +6,6 @@ import MetronomeClick from "./MetronomeClick";
 
 const styles = {
   grid: css`
-    gap: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) * 0.5);
     padding: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
     border: 1px solid var(--accent-border);
     border-radius: 8px;
@@ -19,6 +18,8 @@ const styles = {
     letter-spacing: 0.05em;
   `,
 };
+
+const GAP = "calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) * 0.5)";
 
 /**
  * Groups the sequencer's tempo input, beat pulse, transport buttons, and
@@ -34,7 +35,7 @@ const styles = {
 const TempoTransportPanel = () => {
   return (
     <Flex vertical justify="center">
-      <Flex align="center" className={styles.grid}>
+      <Flex align="center" gap={GAP} className={styles.grid}>
         <TempoKnob />
         <TransportControls />
         <MetronomeClick />

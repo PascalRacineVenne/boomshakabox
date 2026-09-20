@@ -1,5 +1,6 @@
 import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
 import classNames from "classnames";
+import { Flex } from "antd";
 import {
   controlPanelStyles,
   formatPan,
@@ -63,7 +64,9 @@ const SnarePad = ({
   onSelect,
 }: SnarePadProps) => {
   return (
-    <div
+    <Flex
+      vertical
+      align="center"
       className={classNames(
         controlPanelStyles.panel,
         selected && controlPanelStyles.selected,
@@ -85,7 +88,7 @@ const SnarePad = ({
         variant="trackless"
         cursorSize="Strip"
       />
-      <div className={controlPanelStyles.controlsRow}>
+      <Flex align="center">
         <Slider
           min={VOLUME_MIN}
           max={VOLUME_MAX}
@@ -98,7 +101,7 @@ const SnarePad = ({
           unit="%"
           valueAsLabel="interactive"
         />
-        <div className={controlPanelStyles.knobColumn}>
+        <Flex vertical align="center">
           <Knob
             variant="plainCap"
             min={SNARE_TONE_MIN}
@@ -117,8 +120,8 @@ const SnarePad = ({
             onChange={(rotation) => setSnappy(rotation.value)}
             label="Snappy"
           />
-        </div>
-      </div>
+        </Flex>
+      </Flex>
       <Button
         label={`SN${trackNumber}`}
         value={pressed}
@@ -128,7 +131,7 @@ const SnarePad = ({
           if (press.value) trigger();
         }}
       />
-    </div>
+    </Flex>
   );
 };
 
