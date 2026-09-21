@@ -13,6 +13,7 @@ export const STEP_COUNT = 16;
 export const TRACK_IDS = [
   "kick",
   "kick2",
+  "kickSauce",
   "snare",
   "hiTom",
   "midTom",
@@ -26,6 +27,7 @@ export type TrackId = (typeof TRACK_IDS)[number];
 export const TRACK_LABELS: Record<TrackId, string> = {
   kick: "BD",
   kick2: "BD",
+  kickSauce: "KS",
   snare: "SN",
   hiTom: "HT",
   midTom: "MT",
