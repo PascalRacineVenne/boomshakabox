@@ -2,6 +2,7 @@ import { Flex, Space, Typography } from "antd";
 import { css } from "@linaria/core";
 import StepSequencer from "./sequencer/StepSequencer";
 import ADSRPanel from "./components/adsr/ADSRPanel";
+import KickSauceMembrane from "./KickSauceMembrane";
 
 const styles = {
   center: css`
@@ -35,6 +36,7 @@ const App = () => {
       <Space size={"large"}>
         <StepSequencer />
       </Space>
+      <KickSauceMembrane />
       <Space size={"large"}>
         <ADSRPanel />
       </Space>

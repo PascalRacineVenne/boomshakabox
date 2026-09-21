@@ -29,6 +29,19 @@ import {
   useKick2Voice,
 } from "../components/kick2/useKick2Voice";
 import {
+  KICKSAUCE_CLICK_MAX,
+  KICKSAUCE_CLICK_MIN,
+  KICKSAUCE_FATNESS_MAX,
+  KICKSAUCE_FATNESS_MIN,
+  KICKSAUCE_LENGTH_MAX,
+  KICKSAUCE_LENGTH_MIN,
+  KICKSAUCE_PITCH_MAX,
+  KICKSAUCE_PITCH_MIN,
+  KICKSAUCE_PUNCH_MAX,
+  KICKSAUCE_PUNCH_MIN,
+  useKickSauceVoice,
+} from "../components/kickSauce/useKickSauceVoice";
+import {
   SNARE_SNAPPY_MAX,
   SNARE_SNAPPY_MIN,
   SNARE_TONE_MAX,
@@ -69,6 +82,7 @@ import type { TrackId } from "./useStepSequencer";
 export interface AllVoices {
   kick: ReturnType<typeof useKickVoice>;
   kick2: ReturnType<typeof useKick2Voice>;
+  kickSauce: ReturnType<typeof useKickSauceVoice>;
   snare: ReturnType<typeof useSnareVoice>;
   hihat: ReturnType<typeof useHiHatVoice>;
   hihatOpen: ReturnType<typeof useHiHatOpenVoice>;
@@ -302,6 +316,164 @@ const kick2Rows = (v: AllVoices["kick2"]): VoiceParamRow[] => [
     value: `${v.click}`,
     live: true,
     control: `Click knob (${KICK2_CLICK_MIN}–${KICK2_CLICK_MAX})`,
+  },
+  {
+    key: "pan",
+    stage: "Pan",
+    detail: "stereo panner, shared by body and click layer",
+    parameter: "Position",
+    value: formatPan(v.pan),
+    live: true,
+    control: `Pan knob (${PANNING_L}–${PANNING_R})`,
+  },
+  masterEnvRow(),
+];
+
+const kickSauceRows = (v: AllVoices["kickSauce"]): VoiceParamRow[] => [
+  {
+    key: "membrane-wave",
+    stage: "MembraneSynth (body)",
+    detail: "persistent Tone.js instrument, not per-hit ephemeral nodes",
+    parameter: "Waveform",
+    value: "sine",
+    live: false,
+    control: "Fixed in code",
+  },
+  {
+    key: "membrane-punch",
+    stage: "MembraneSynth (body)",
+    detail: "persistent Tone.js instrument, not per-hit ephemeral nodes",
+    parameter: "Octaves (Punch)",
+    value: `${v.punch}`,
+    live: true,
+    control: `Punch knob (${KICKSAUCE_PUNCH_MIN}–${KICKSAUCE_PUNCH_MAX})`,
+  },
+  {
+    key: "membrane-pitchdecay",
+    stage: "MembraneSynth (body)",
+    detail: "persistent Tone.js instrument, not per-hit ephemeral nodes",
+    parameter: "Pitch Decay",
+    value: "35 ms",
+    live: false,
+    control: "Fixed in code",
+  },
+  {
+    key: "membrane-note",
+    stage: "MembraneSynth (body)",
+    detail: "persistent Tone.js instrument, not per-hit ephemeral nodes",
+    parameter: "Note (Pitch)",
+    value: `${v.pitch} Hz`,
+    live: true,
+    control: `Pitch knob (${KICKSAUCE_PITCH_MIN}–${KICKSAUCE_PITCH_MAX} Hz)`,
+  },
+  {
+    key: "membrane-decay",
+    stage: "MembraneSynth (body)",
+    detail: "persistent Tone.js instrument, not per-hit ephemeral nodes",
+    parameter: "Envelope Decay (Length)",
+    value: `${v.length.toFixed(2)}s`,
+    live: true,
+    control: `Length knob (${KICKSAUCE_LENGTH_MIN}–${KICKSAUCE_LENGTH_MAX}s)`,
+  },
+  {
+    key: "dist-amount",
+    stage: "Distortion",
+    detail: "Tone.Distortion, 4x oversample",
+    parameter: "Amount (Fatness)",
+    value: `${v.fatness}`,
+    live: true,
+    control: `Fatness knob (${KICKSAUCE_FATNESS_MIN}–${KICKSAUCE_FATNESS_MAX})`,
+  },
+  {
+    key: "lowpass",
+    stage: "Filter",
+    detail: "lowpass, post-Distortion",
+    parameter: "Cutoff",
+    value: "9000 Hz",
+    live: false,
+    control: "Fixed in code — not exposed",
+  },
+  {
+    key: "makeup",
+    stage: "Gain",
+    detail: "fixed makeup stage, post-lowpass",
+    parameter: "Gain",
+    value: "2.4x",
+    live: false,
+    control: "Fixed in code — not exposed",
+  },
+  {
+    key: "highpass",
+    stage: "Filter",
+    detail: "highpass, rumble control before the compressor",
+    parameter: "Cutoff",
+    value: "28 Hz",
+    live: false,
+    control: "Fixed in code — not exposed",
+  },
+  {
+    key: "compressor",
+    stage: "Compressor",
+    detail: "shared by body and click layer",
+    parameter: "Threshold / Ratio",
+    value: "-16dB / 4:1",
+    live: false,
+    control: "Fixed in code — not exposed",
+  },
+  {
+    key: "limiter",
+    stage: "Limiter",
+    detail: "final ceiling before Volume/Pan",
+    parameter: "Threshold",
+    value: "-1dB",
+    live: false,
+    control: "Fixed in code — not exposed",
+  },
+  {
+    key: "output-makeup",
+    stage: "Gain",
+    detail: "post-Limiter, before this app's own Volume/Pan stage",
+    parameter: "Gain",
+    value: "1.78x (+5dB)",
+    live: false,
+    control:
+      "Fixed in code — compensates for this app's Volume + Master Volume defaults (75%/75%) the reference never had to pass through",
+  },
+  {
+    key: "click-filter",
+    stage: "Filter (Click layer)",
+    detail: "bandpass on NoiseSynth, bypasses Distortion/lowpass/makeup/highpass",
+    parameter: "Cutoff",
+    value: "3200 Hz",
+    live: false,
+    control: "Fixed in code — not exposed",
+  },
+  {
+    key: "click-filter-q",
+    stage: "Filter (Click layer)",
+    detail: "bandpass on NoiseSynth, bypasses Distortion/lowpass/makeup/highpass",
+    parameter: "Q",
+    value: "0.7",
+    live: false,
+    control: "Fixed in code — not exposed",
+  },
+  {
+    key: "click-vca",
+    stage: "VCA (Click layer)",
+    detail: "NoiseSynth's own envelope, ~12ms decay",
+    parameter: "Mix (Click)",
+    value: `${v.click}`,
+    live: true,
+    control: `Click knob (${KICKSAUCE_CLICK_MIN}–${KICKSAUCE_CLICK_MAX})`,
+  },
+  {
+    key: "vca-peak",
+    stage: "VCA (Volume)",
+    detail: "final Gain stage, post-Limiter",
+    parameter: "Peak Level",
+    value: v.muted ? "0% (muted)" : `${v.volume}%`,
+    live: true,
+    control: `Volume slider (${VOLUME_MIN}–${VOLUME_MAX}%)`,
   },
   {
     key: "pan",
@@ -635,6 +807,8 @@ export const buildVoiceParamRows = (
       return kickRows(voices.kick);
     case "kick2":
       return kick2Rows(voices.kick2);
+    case "kickSauce":
+      return kickSauceRows(voices.kickSauce);
     case "snare":
       return snareRows(voices.snare);
     case "hihat":

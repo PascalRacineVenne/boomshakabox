@@ -6,6 +6,7 @@ import FilterPanel from "../components/filter/FilterPanel";
 
 import KickPad from "../components/kick/KickPad";
 import KickPad2 from "../components/kick2/KickPad2";
+import KickSaucePad from "../components/kickSauce/KickSaucePad";
 import SnarePad from "../components/snare/SnarePad";
 import HiHatPad from "../components/hihat/HiHatPad";
 import HiHatOpenPad from "../components/hihatOpen/HiHatOpenPad";
@@ -15,6 +16,7 @@ import LowTomPad from "../components/lowTom/LowTomPad";
 
 import { useKickVoice } from "../components/kick/useKickVoice";
 import { useKick2Voice } from "../components/kick2/useKick2Voice";
+import { useKickSauceVoice } from "../components/kickSauce/useKickSauceVoice";
 import { useSnareVoice } from "../components/snare/useSnareVoice";
 import { useHiHatVoice } from "../components/hihat/useHiHatVoice";
 import { useHiHatOpenVoice } from "../components/hihatOpen/useHiHatOpenVoice";
@@ -44,6 +46,7 @@ const GAP = "calc(var(--audioui-unit) / 2)";
 const StepSequencer = () => {
   const kickVoice = useKickVoice();
   const kick2Voice = useKick2Voice();
+  const kickSauceVoice = useKickSauceVoice();
   const snareVoice = useSnareVoice();
   const hiHatVoice = useHiHatVoice();
   const hiHatOpenVoice = useHiHatOpenVoice();
@@ -54,6 +57,7 @@ const StepSequencer = () => {
   const voices = {
     kick: kickVoice,
     kick2: kick2Voice,
+    kickSauce: kickSauceVoice,
     snare: snareVoice,
     hihat: hiHatVoice,
     hihatOpen: hiHatOpenVoice,
@@ -97,39 +101,45 @@ const StepSequencer = () => {
           selected={selectedTrack === "kick2"}
           onSelect={() => selectTrack("kick2")}
         />
+        <KickSaucePad
+          {...kickSauceVoice}
+          trackNumber={3}
+          selected={selectedTrack === "kickSauce"}
+          onSelect={() => selectTrack("kickSauce")}
+        />
         <SnarePad
           {...snareVoice}
-          trackNumber={3}
+          trackNumber={4}
           selected={selectedTrack === "snare"}
           onSelect={() => selectTrack("snare")}
         />
         <HiTomPad
           {...hiTomVoice}
-          trackNumber={4}
+          trackNumber={5}
           selected={selectedTrack === "hiTom"}
           onSelect={() => selectTrack("hiTom")}
         />
         <MidTomPad
           {...midTomVoice}
-          trackNumber={5}
+          trackNumber={6}
           selected={selectedTrack === "midTom"}
           onSelect={() => selectTrack("midTom")}
         />
         <LowTomPad
           {...lowTomVoice}
-          trackNumber={6}
+          trackNumber={7}
           selected={selectedTrack === "lowTom"}
           onSelect={() => selectTrack("lowTom")}
         />
         <HiHatPad
           {...hiHatVoice}
-          trackNumber={7}
+          trackNumber={8}
           selected={selectedTrack === "hihat"}
           onSelect={() => selectTrack("hihat")}
         />
         <HiHatOpenPad
           {...hiHatOpenVoice}
-          trackNumber={8}
+          trackNumber={9}
           selected={selectedTrack === "hihatOpen"}
           onSelect={() => selectTrack("hihatOpen")}
         />
