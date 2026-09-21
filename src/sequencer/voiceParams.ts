@@ -333,7 +333,7 @@ const kickSauceRows = (v: AllVoices["kickSauce"]): VoiceParamRow[] => [
   {
     key: "membrane-wave",
     stage: "MembraneSynth (body)",
-    detail: "persistent Tone.js instrument, not per-hit ephemeral nodes",
+    detail: "Tone.MembraneSynth, built fresh per hit like every other voice",
     parameter: "Waveform",
     value: "sine",
     live: false,
@@ -342,7 +342,7 @@ const kickSauceRows = (v: AllVoices["kickSauce"]): VoiceParamRow[] => [
   {
     key: "membrane-punch",
     stage: "MembraneSynth (body)",
-    detail: "persistent Tone.js instrument, not per-hit ephemeral nodes",
+    detail: "Tone.MembraneSynth, built fresh per hit like every other voice",
     parameter: "Octaves (Punch)",
     value: `${v.punch}`,
     live: true,
@@ -351,7 +351,7 @@ const kickSauceRows = (v: AllVoices["kickSauce"]): VoiceParamRow[] => [
   {
     key: "membrane-pitchdecay",
     stage: "MembraneSynth (body)",
-    detail: "persistent Tone.js instrument, not per-hit ephemeral nodes",
+    detail: "Tone.MembraneSynth, built fresh per hit like every other voice",
     parameter: "Pitch Decay",
     value: "35 ms",
     live: false,
@@ -360,7 +360,7 @@ const kickSauceRows = (v: AllVoices["kickSauce"]): VoiceParamRow[] => [
   {
     key: "membrane-note",
     stage: "MembraneSynth (body)",
-    detail: "persistent Tone.js instrument, not per-hit ephemeral nodes",
+    detail: "Tone.MembraneSynth, built fresh per hit like every other voice",
     parameter: "Note (Pitch)",
     value: `${v.pitch} Hz`,
     live: true,
@@ -369,7 +369,7 @@ const kickSauceRows = (v: AllVoices["kickSauce"]): VoiceParamRow[] => [
   {
     key: "membrane-decay",
     stage: "MembraneSynth (body)",
-    detail: "persistent Tone.js instrument, not per-hit ephemeral nodes",
+    detail: "Tone.MembraneSynth, built fresh per hit like every other voice",
     parameter: "Envelope Decay (Length)",
     value: `${v.length.toFixed(2)}s`,
     live: true,
