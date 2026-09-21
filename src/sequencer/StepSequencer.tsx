@@ -21,6 +21,7 @@ import { useMidTomVoice } from "../components/midTom/useMidTomVoice";
 import { useLowTomVoice } from "../components/lowTom/useLowTomVoice";
 import StepGrid from "./StepGrid";
 import MiniGrid from "./MiniGrid";
+import VoiceParamsTable from "./VoiceParamsTable";
 import { useStepSequencer, TRACK_LABELS } from "./useStepSequencer";
 
 const styles = {
@@ -47,14 +48,7 @@ const StepSequencer = () => {
   const midTomVoice = useMidTomVoice();
   const lowTomVoice = useLowTomVoice();
 
-  const {
-    patternsDisplay,
-    activePattern,
-    selectedTrack,
-    selectTrack,
-    currentStep,
-    setStep,
-  } = useStepSequencer({
+  const voices = {
     kick: kickVoice,
     snare: snareVoice,
     hihat: hiHatVoice,
@@ -62,7 +56,16 @@ const StepSequencer = () => {
     hiTom: hiTomVoice,
     midTom: midTomVoice,
     lowTom: lowTomVoice,
-  });
+  };
+
+  const {
+    patternsDisplay,
+    activePattern,
+    selectedTrack,
+    selectTrack,
+    currentStep,
+    setStep,
+  } = useStepSequencer(voices);
 
   return (
     <Flex vertical align="center" gap={GAP}>
@@ -130,6 +133,8 @@ const StepSequencer = () => {
           onStepChange={setStep}
         />
       </Flex>
+
+      <VoiceParamsTable selectedTrack={selectedTrack} voices={voices} />
     </Flex>
   );
 };
