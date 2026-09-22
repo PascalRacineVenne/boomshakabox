@@ -4,11 +4,13 @@ import { Flex } from "antd";
 import {
   controlPanelStyles,
   formatPan,
+  LABELED_SMALL_KNOB_HEIGHT_UNITS,
   VOLUME_MAX,
   VOLUME_MIN,
   PANNING_R,
   PANNING_L,
 } from "../ControlPanel";
+import KnobSlot from "../KnobSlot";
 import { HH_TONE_MAX, HH_TONE_MIN } from "./useHiHatVoice";
 
 interface HiHatPadProps {
@@ -73,16 +75,26 @@ const HiHatPad = ({
       )}
       onMouseDown={onSelect}
     >
-      <Flex align="center">
-        <Knob
-          variant="plainCap"
-          min={HH_TONE_MIN}
-          max={HH_TONE_MAX}
-          size="small"
-          value={tone}
-          onChange={(rotation) => setTone(rotation.value)}
-          label="Tone"
-        />
+      <Flex gap={4}>
+        <Flex vertical align="center" gap={4}>
+          <Knob
+            variant="plainCap"
+            min={HH_TONE_MIN}
+            max={HH_TONE_MAX}
+            size="small"
+            value={tone}
+            onChange={(rotation) => setTone(rotation.value)}
+            label="Tone"
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
+          />
+          <KnobSlot />
+          <KnobSlot />
+        </Flex>
+        <Flex vertical align="center" gap={4}>
+          <KnobSlot />
+          <KnobSlot />
+          <KnobSlot />
+        </Flex>
       </Flex>
 
       <Flex align="center">
@@ -97,6 +109,7 @@ const HiHatPad = ({
             orientation="vertical"
             unit="%"
             valueAsLabel="interactive"
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
         </Flex>
         <Flex vertical>
@@ -112,6 +125,7 @@ const HiHatPad = ({
             bipolar
             valueAsLabel="interactive"
             valueFormatter={formatPan}
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <Flex gap={4}>
             <Flex

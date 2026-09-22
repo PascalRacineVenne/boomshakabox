@@ -4,11 +4,13 @@ import { Flex } from "antd";
 import {
   controlPanelStyles,
   formatPan,
+  LABELED_SMALL_KNOB_HEIGHT_UNITS,
   PANNING_L,
   PANNING_R,
   VOLUME_MAX,
   VOLUME_MIN,
 } from "../ControlPanel";
+import KnobSlot from "../KnobSlot";
 import {
   SNARE_SNAPPY_MAX,
   SNARE_SNAPPY_MIN,
@@ -81,25 +83,35 @@ const SnarePad = ({
       )}
       onMouseDown={onSelect}
     >
-      <Flex align="center">
-        <Knob
-          variant="plainCap"
-          min={SNARE_TONE_MIN}
-          max={SNARE_TONE_MAX}
-          size="small"
-          value={tone}
-          onChange={(rotation) => setTone(rotation.value)}
-          label="Tone"
-        />
-        <Knob
-          variant="plainCap"
-          min={SNARE_SNAPPY_MIN}
-          max={SNARE_SNAPPY_MAX}
-          size="small"
-          value={snappy}
-          onChange={(rotation) => setSnappy(rotation.value)}
-          label="Snappy"
-        />
+      <Flex gap={4}>
+        <Flex vertical align="center" gap={4}>
+          <Knob
+            variant="plainCap"
+            min={SNARE_TONE_MIN}
+            max={SNARE_TONE_MAX}
+            size="small"
+            value={tone}
+            onChange={(rotation) => setTone(rotation.value)}
+            label="Tone"
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
+          />
+          <KnobSlot />
+          <KnobSlot />
+        </Flex>
+        <Flex vertical align="center" gap={4}>
+          <Knob
+            variant="plainCap"
+            min={SNARE_SNAPPY_MIN}
+            max={SNARE_SNAPPY_MAX}
+            size="small"
+            value={snappy}
+            onChange={(rotation) => setSnappy(rotation.value)}
+            label="Snappy"
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
+          />
+          <KnobSlot />
+          <KnobSlot />
+        </Flex>
       </Flex>
 
       <Flex align="center">
@@ -113,6 +125,7 @@ const SnarePad = ({
             onChange={(drag) => setVolume(drag.value)}
             orientation="vertical"
             unit="%"
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
         </Flex>
         <Flex vertical>
@@ -128,6 +141,7 @@ const SnarePad = ({
             bipolar
             valueAsLabel="interactive"
             valueFormatter={formatPan}
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <Flex gap={4}>
             <Flex

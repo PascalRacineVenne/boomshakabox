@@ -7,8 +7,8 @@
  *
  * Shared between any voice that layers `Tone.Distortion` after an
  * oscillator/synth and wants to restore the level it crushes (currently
- * `components/kick/useKickVoice.ts`; reach for it again for any future
- * instrument that adds a distortion/drive stage).
+ * the tom voices, e.g. `components/hiTom/useHiTomVoice.ts`; reach for it
+ * again for any future instrument that adds a distortion/drive stage).
  *
  * @param amount - The `Tone.Distortion` `distortion` amount (0-1) this
  * makeup gain is compensating for.
