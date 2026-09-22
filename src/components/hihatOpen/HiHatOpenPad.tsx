@@ -4,11 +4,13 @@ import { Flex } from "antd";
 import {
   controlPanelStyles,
   formatPan,
+  LABELED_SMALL_KNOB_HEIGHT_UNITS,
   PANNING_L,
   PANNING_R,
   VOLUME_MAX,
   VOLUME_MIN,
 } from "../ControlPanel";
+import KnobSlot from "../KnobSlot";
 
 interface HiHatOpenPadProps {
   trackNumber: number;
@@ -76,25 +78,35 @@ const HiHatOpenPad = ({
       )}
       onMouseDown={onSelect}
     >
-      <Flex align="center">
-        <Knob
-          variant="plainCap"
-          min={3000}
-          max={10000}
-          size="small"
-          value={tone}
-          onChange={(rotation) => setTone(rotation.value)}
-          label="Tone"
-        />
-        <Knob
-          variant="plainCap"
-          min={0.2}
-          max={1}
-          size="small"
-          value={decay}
-          onChange={(rotation) => setDecay(rotation.value)}
-          label="Decay"
-        />
+      <Flex gap={4}>
+        <Flex vertical align="center" gap={4}>
+          <Knob
+            variant="plainCap"
+            min={3000}
+            max={10000}
+            size="small"
+            value={tone}
+            onChange={(rotation) => setTone(rotation.value)}
+            label="Tone"
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
+          />
+          <KnobSlot />
+          <KnobSlot />
+        </Flex>
+        <Flex vertical align="center" gap={4}>
+          <Knob
+            variant="plainCap"
+            min={0.2}
+            max={1}
+            size="small"
+            value={decay}
+            onChange={(rotation) => setDecay(rotation.value)}
+            label="Decay"
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
+          />
+          <KnobSlot />
+          <KnobSlot />
+        </Flex>
       </Flex>
 
       <Flex align="center">
@@ -109,6 +121,7 @@ const HiHatOpenPad = ({
             orientation="vertical"
             unit="%"
             valueAsLabel="interactive"
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
         </Flex>
         <Flex vertical>
@@ -124,6 +137,7 @@ const HiHatOpenPad = ({
             bipolar
             valueAsLabel="interactive"
             valueFormatter={formatPan}
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <Flex gap={4}>
             <Flex

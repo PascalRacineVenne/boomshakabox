@@ -9,38 +9,18 @@ import { distortionMakeupGain } from "../lib/distortionMakeupGain";
 import { HI_HAT_OSCILLATOR_FREQUENCIES } from "../lib/hiHatOscillatorFrequencies";
 
 import {
-  KICK_DECAY_MAX,
-  KICK_DECAY_MIN,
-  KICK_TONE_MAX,
-  KICK_TONE_MIN,
+  KICK_CLICK_MAX,
+  KICK_CLICK_MIN,
+  KICK_FATNESS_MAX,
+  KICK_FATNESS_MIN,
+  KICK_LENGTH_MAX,
+  KICK_LENGTH_MIN,
+  KICK_PITCH_MAX,
+  KICK_PITCH_MIN,
+  KICK_PUNCH_MAX,
+  KICK_PUNCH_MIN,
   useKickVoice,
 } from "../components/kick/useKickVoice";
-import {
-  KICK2_CLICK_MAX,
-  KICK2_CLICK_MIN,
-  KICK2_FATNESS_MAX,
-  KICK2_FATNESS_MIN,
-  KICK2_LENGTH_MAX,
-  KICK2_LENGTH_MIN,
-  KICK2_PITCH_MAX,
-  KICK2_PITCH_MIN,
-  KICK2_PUNCH_MAX,
-  KICK2_PUNCH_MIN,
-  useKick2Voice,
-} from "../components/kick2/useKick2Voice";
-import {
-  KICKSAUCE_CLICK_MAX,
-  KICKSAUCE_CLICK_MIN,
-  KICKSAUCE_FATNESS_MAX,
-  KICKSAUCE_FATNESS_MIN,
-  KICKSAUCE_LENGTH_MAX,
-  KICKSAUCE_LENGTH_MIN,
-  KICKSAUCE_PITCH_MAX,
-  KICKSAUCE_PITCH_MIN,
-  KICKSAUCE_PUNCH_MAX,
-  KICKSAUCE_PUNCH_MIN,
-  useKickSauceVoice,
-} from "../components/kickSauce/useKickSauceVoice";
 import {
   SNARE_SNAPPY_MAX,
   SNARE_SNAPPY_MIN,
@@ -81,8 +61,6 @@ import type { TrackId } from "./useStepSequencer";
 /** One entry per {@link TrackId} — the exact shape `StepSequencer` already builds for `useStepSequencer`. */
 export interface AllVoices {
   kick: ReturnType<typeof useKickVoice>;
-  kick2: ReturnType<typeof useKick2Voice>;
-  kickSauce: ReturnType<typeof useKickSauceVoice>;
   snare: ReturnType<typeof useSnareVoice>;
   hihat: ReturnType<typeof useHiHatVoice>;
   hihatOpen: ReturnType<typeof useHiHatOpenVoice>;
@@ -116,224 +94,9 @@ const masterEnvRow = (): VoiceParamRow => ({
 
 const kickRows = (v: AllVoices["kick"]): VoiceParamRow[] => [
   {
-    key: "osc-wave",
-    stage: "Oscillator",
-    detail: "1x sine, pitch envelope",
-    parameter: "Waveform",
-    value: "sine",
-    live: false,
-    control: "Fixed in code",
-  },
-  {
-    key: "osc-start",
-    stage: "Oscillator",
-    detail: "1x sine, pitch envelope",
-    parameter: "Start Freq",
-    value: "180 Hz",
-    live: false,
-    control: "Fixed in code — the pitch-glide's starting \"click\"",
-  },
-  {
-    key: "osc-glide",
-    stage: "Oscillator",
-    detail: "1x sine, pitch envelope",
-    parameter: "Glide Time",
-    value: "50 ms",
-    live: false,
-    control: "Fixed in code",
-  },
-  {
-    key: "osc-settle",
-    stage: "Oscillator",
-    detail: "1x sine, pitch envelope",
-    parameter: "Settle Freq (Tone)",
-    value: `${v.tone} Hz`,
-    live: true,
-    control: `Tone knob (${KICK_TONE_MIN}–${KICK_TONE_MAX} Hz)`,
-  },
-  {
-    key: "dist-amount",
-    stage: "Distortion",
-    detail: "Tone.Distortion, 2x oversample",
-    parameter: "Amount",
-    value: "0.1",
-    live: false,
-    control: "Fixed in code — not exposed",
-  },
-  {
-    key: "dist-makeup",
-    stage: "Distortion",
-    detail: "Tone.Distortion, 2x oversample",
-    parameter: "Makeup Gain",
-    value: `${distortionMakeupGain(0.1).toFixed(2)}x`,
-    live: false,
-    control: "Derived from Amount",
-  },
-  {
-    key: "vca-peak",
-    stage: "VCA (Amp Envelope)",
-    detail: "instant attack, exponential decay",
-    parameter: "Peak Level",
-    value: v.muted ? "0% (muted)" : `${v.volume}%`,
-    live: true,
-    control: `Volume slider (${VOLUME_MIN}–${VOLUME_MAX}%)`,
-  },
-  {
-    key: "vca-decay",
-    stage: "VCA (Amp Envelope)",
-    detail: "instant attack, exponential decay",
-    parameter: "Decay",
-    value: `${v.decay.toFixed(2)}s`,
-    live: true,
-    control: `Decay knob (${KICK_DECAY_MIN}–${KICK_DECAY_MAX}s)`,
-  },
-  {
-    key: "pan",
-    stage: "Pan",
-    detail: "stereo panner, post-VCA",
-    parameter: "Position",
-    value: formatPan(v.pan),
-    live: true,
-    control: `Pan knob (${PANNING_L}–${PANNING_R})`,
-  },
-  masterEnvRow(),
-];
-
-const kick2Rows = (v: AllVoices["kick2"]): VoiceParamRow[] => [
-  {
-    key: "osc-wave",
-    stage: "Oscillator",
-    detail: "1x sine, pitch envelope",
-    parameter: "Waveform",
-    value: "sine",
-    live: false,
-    control: "Fixed in code",
-  },
-  {
-    key: "osc-punch",
-    stage: "Oscillator",
-    detail: "1x sine, pitch envelope",
-    parameter: "Punch (octaves above Pitch)",
-    value: `${v.punch}`,
-    live: true,
-    control: `Punch knob (${KICK2_PUNCH_MIN}–${KICK2_PUNCH_MAX})`,
-  },
-  {
-    key: "osc-start",
-    stage: "Oscillator",
-    detail: "1x sine, pitch envelope",
-    parameter: "Start Freq",
-    value: `${Math.round(v.pitch * 2 ** v.punch)} Hz`,
-    live: true,
-    control: "Pitch × 2^Punch",
-  },
-  {
-    key: "osc-glide",
-    stage: "Oscillator",
-    detail: "1x sine, pitch envelope",
-    parameter: "Glide Time",
-    value: "35 ms",
-    live: false,
-    control: "Fixed in code",
-  },
-  {
-    key: "osc-settle",
-    stage: "Oscillator",
-    detail: "1x sine, pitch envelope",
-    parameter: "Settle Freq (Pitch)",
-    value: `${v.pitch} Hz`,
-    live: true,
-    control: `Pitch knob (${KICK2_PITCH_MIN}–${KICK2_PITCH_MAX} Hz)`,
-  },
-  {
-    key: "dist-amount",
-    stage: "Distortion",
-    detail: "Tone.Distortion, 4x oversample",
-    parameter: "Amount (Fatness)",
-    value: `${v.fatness}`,
-    live: true,
-    control: `Fatness knob (${KICK2_FATNESS_MIN}–${KICK2_FATNESS_MAX})`,
-  },
-  {
-    key: "dist-makeup",
-    stage: "Distortion",
-    detail: "Tone.Distortion, 4x oversample",
-    parameter: "Makeup Gain",
-    value: `${distortionMakeupGain(v.fatness).toFixed(2)}x`,
-    live: true,
-    control: "Derived from Fatness",
-  },
-  {
-    key: "lowpass",
-    stage: "Filter",
-    detail: "lowpass, post-Distortion",
-    parameter: "Cutoff",
-    value: "9000 Hz",
-    live: false,
-    control: "Fixed in code — not exposed",
-  },
-  {
-    key: "vca-peak",
-    stage: "VCA (Amp Envelope)",
-    detail: "instant attack, exponential decay",
-    parameter: "Peak Level",
-    value: v.muted ? "0% (muted)" : `${v.volume}%`,
-    live: true,
-    control: `Volume slider (${VOLUME_MIN}–${VOLUME_MAX}%)`,
-  },
-  {
-    key: "vca-decay",
-    stage: "VCA (Amp Envelope)",
-    detail: "instant attack, exponential decay",
-    parameter: "Decay (Length)",
-    value: `${v.length.toFixed(2)}s`,
-    live: true,
-    control: `Length knob (${KICK2_LENGTH_MIN}–${KICK2_LENGTH_MAX}s)`,
-  },
-  {
-    key: "click-filter",
-    stage: "Filter (Click layer)",
-    detail: "bandpass on white noise, bypasses Distortion",
-    parameter: "Cutoff",
-    value: "3200 Hz",
-    live: false,
-    control: "Fixed in code — not exposed",
-  },
-  {
-    key: "click-filter-q",
-    stage: "Filter (Click layer)",
-    detail: "bandpass on white noise, bypasses Distortion",
-    parameter: "Q",
-    value: "0.7",
-    live: false,
-    control: "Fixed in code — not exposed",
-  },
-  {
-    key: "click-vca",
-    stage: "VCA (Click layer)",
-    detail: "exponential decay, ~30ms burst",
-    parameter: "Mix (Click)",
-    value: `${v.click}`,
-    live: true,
-    control: `Click knob (${KICK2_CLICK_MIN}–${KICK2_CLICK_MAX})`,
-  },
-  {
-    key: "pan",
-    stage: "Pan",
-    detail: "stereo panner, shared by body and click layer",
-    parameter: "Position",
-    value: formatPan(v.pan),
-    live: true,
-    control: `Pan knob (${PANNING_L}–${PANNING_R})`,
-  },
-  masterEnvRow(),
-];
-
-const kickSauceRows = (v: AllVoices["kickSauce"]): VoiceParamRow[] => [
-  {
     key: "membrane-wave",
     stage: "MembraneSynth (body)",
-    detail: "Tone.MembraneSynth, built fresh per hit like every other voice",
+    detail: "Tone.MembraneSynth, built fresh per hit",
     parameter: "Waveform",
     value: "sine",
     live: false,
@@ -342,16 +105,16 @@ const kickSauceRows = (v: AllVoices["kickSauce"]): VoiceParamRow[] => [
   {
     key: "membrane-punch",
     stage: "MembraneSynth (body)",
-    detail: "Tone.MembraneSynth, built fresh per hit like every other voice",
+    detail: "Tone.MembraneSynth, built fresh per hit",
     parameter: "Octaves (Punch)",
     value: `${v.punch}`,
     live: true,
-    control: `Punch knob (${KICKSAUCE_PUNCH_MIN}–${KICKSAUCE_PUNCH_MAX})`,
+    control: `Punch knob (${KICK_PUNCH_MIN}–${KICK_PUNCH_MAX})`,
   },
   {
     key: "membrane-pitchdecay",
     stage: "MembraneSynth (body)",
-    detail: "Tone.MembraneSynth, built fresh per hit like every other voice",
+    detail: "Tone.MembraneSynth, built fresh per hit",
     parameter: "Pitch Decay",
     value: "35 ms",
     live: false,
@@ -360,20 +123,20 @@ const kickSauceRows = (v: AllVoices["kickSauce"]): VoiceParamRow[] => [
   {
     key: "membrane-note",
     stage: "MembraneSynth (body)",
-    detail: "Tone.MembraneSynth, built fresh per hit like every other voice",
+    detail: "Tone.MembraneSynth, built fresh per hit",
     parameter: "Note (Pitch)",
     value: `${v.pitch} Hz`,
     live: true,
-    control: `Pitch knob (${KICKSAUCE_PITCH_MIN}–${KICKSAUCE_PITCH_MAX} Hz)`,
+    control: `Pitch knob (${KICK_PITCH_MIN}–${KICK_PITCH_MAX} Hz)`,
   },
   {
     key: "membrane-decay",
     stage: "MembraneSynth (body)",
-    detail: "Tone.MembraneSynth, built fresh per hit like every other voice",
+    detail: "Tone.MembraneSynth, built fresh per hit",
     parameter: "Envelope Decay (Length)",
     value: `${v.length.toFixed(2)}s`,
     live: true,
-    control: `Length knob (${KICKSAUCE_LENGTH_MIN}–${KICKSAUCE_LENGTH_MAX}s)`,
+    control: `Length knob (${KICK_LENGTH_MIN}–${KICK_LENGTH_MAX}s)`,
   },
   {
     key: "dist-amount",
@@ -382,7 +145,7 @@ const kickSauceRows = (v: AllVoices["kickSauce"]): VoiceParamRow[] => [
     parameter: "Amount (Fatness)",
     value: `${v.fatness}`,
     live: true,
-    control: `Fatness knob (${KICKSAUCE_FATNESS_MIN}–${KICKSAUCE_FATNESS_MAX})`,
+    control: `Fatness knob (${KICK_FATNESS_MIN}–${KICK_FATNESS_MAX})`,
   },
   {
     key: "lowpass",
@@ -442,7 +205,8 @@ const kickSauceRows = (v: AllVoices["kickSauce"]): VoiceParamRow[] => [
   {
     key: "click-filter",
     stage: "Filter (Click layer)",
-    detail: "bandpass on NoiseSynth, bypasses Distortion/lowpass/makeup/highpass",
+    detail:
+      "bandpass on NoiseSynth, bypasses Distortion/lowpass/makeup/highpass",
     parameter: "Cutoff",
     value: "3200 Hz",
     live: false,
@@ -451,7 +215,8 @@ const kickSauceRows = (v: AllVoices["kickSauce"]): VoiceParamRow[] => [
   {
     key: "click-filter-q",
     stage: "Filter (Click layer)",
-    detail: "bandpass on NoiseSynth, bypasses Distortion/lowpass/makeup/highpass",
+    detail:
+      "bandpass on NoiseSynth, bypasses Distortion/lowpass/makeup/highpass",
     parameter: "Q",
     value: "0.7",
     live: false,
@@ -464,7 +229,7 @@ const kickSauceRows = (v: AllVoices["kickSauce"]): VoiceParamRow[] => [
     parameter: "Mix (Click)",
     value: `${v.click}`,
     live: true,
-    control: `Click knob (${KICKSAUCE_CLICK_MIN}–${KICKSAUCE_CLICK_MAX})`,
+    control: `Click knob (${KICK_CLICK_MIN}–${KICK_CLICK_MAX})`,
   },
   {
     key: "vca-peak",
@@ -683,7 +448,13 @@ const hihatOpenRows = (v: AllVoices["hihatOpen"]): VoiceParamRow[] => [
 
 /** Shared by HiTom/MidTom/LowTom — identical recipe, only the tuning/range constants differ. */
 const tomRows = (
-  v: { tone: number; decay: number; volume: number; pan: number; muted: boolean },
+  v: {
+    tone: number;
+    decay: number;
+    volume: number;
+    pan: number;
+    muted: boolean;
+  },
   toneMin: number,
   toneMax: number,
   decayMin: number,
@@ -805,10 +576,6 @@ export const buildVoiceParamRows = (
   switch (trackId) {
     case "kick":
       return kickRows(voices.kick);
-    case "kick2":
-      return kick2Rows(voices.kick2);
-    case "kickSauce":
-      return kickSauceRows(voices.kickSauce);
     case "snare":
       return snareRows(voices.snare);
     case "hihat":

@@ -1,25 +1,67 @@
 import { useState } from "react";
 import * as Tone from "tone";
-import { distortionMakeupGain } from "../../lib/distortionMakeupGain";
 import {
   masterBusInput,
   triggerMasterFilterEnvelope,
 } from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
 
-const PITCH_DROP_START = 180; // starting "click" pitch the VCO glides down from, in Hz
+// Ported from a reference recipe (src/KickSauceMembrane.tsx) that used
+// Tone.MembraneSynth + Tone.NoiseSynth directly instead of hand-built
+// oscillator/envelope nodes — an earlier attempt at this same sound from
+// raw primitives didn't nail it, since MembraneSynth's own internal
+// pitch-envelope curve is part of what makes this recipe sound right.
+// Built fresh per hit and disposed afterward, same ephemeral-node
+// lifecycle every other useXVoice hook uses — a fresh MembraneSynth/
+// NoiseSynth sounds identical to a reused one, since its envelope/pitch-
+// sweep always resets from `now` on `triggerAttackRelease` regardless of
+// whether the instance is new or recycled.
 
-export const KICK_TONE_MIN = 30;
-export const KICK_TONE_MAX = 120;
-export const KICK_DECAY_MIN = 0.1;
-export const KICK_DECAY_MAX = 1;
+export const KICK_PITCH_MIN = 34; // Hz
+export const KICK_PITCH_MAX = 72; // Hz
+export const KICK_PUNCH_MIN = 2; // octaves the pitch envelope starts above Pitch
+export const KICK_PUNCH_MAX = 9;
+export const KICK_LENGTH_MIN = 0.12; // seconds
+export const KICK_LENGTH_MAX = 0.7;
+export const KICK_CLICK_MIN = 0; // 0-1 mix
+export const KICK_CLICK_MAX = 1;
+export const KICK_FATNESS_MIN = 0; // 0-1, Tone.Distortion amount
+export const KICK_FATNESS_MAX = 1;
+
+const PITCH_DECAY = 0.035; // seconds — fixed, MembraneSynth's own pitch-envelope time
+const RELEASE_TAIL = 0.05; // seconds — added to Length when triggering, matches the reference's `decay + 0.05`
+const ENVELOPE_RELEASE = 0.05; // seconds — MembraneSynth's own envelope.release
+const CLICK_TRIGGER_DURATION = 0.02; // seconds — passed to the click NoiseSynth's triggerAttackRelease
+
+// The reference recipe's Limiter connects straight to `.toDestination()` —
+// its -1dB peak IS the final output level. Ours instead continues through
+// two more gain stages the reference never had to survive: this voice's
+// own Volume slider and the shared master bus's Volume knob (`masterGain`
+// in lib/masterBus.ts), both defaulting to 75%. Left uncompensated, that's
+// an extra ~-5dB (0.75 x 0.75) versus the reference at matching knob
+// positions. This fixed makeup gain cancels exactly that, so at each
+// hook's own default (75%/75%) this voice's peak matches the reference's;
+// turning either Volume knob up or down from there still scales it
+// normally, same as any other voice.
+const OUTPUT_MAKEUP_GAIN = 1 / (0.75 * 0.75); // ~1.78x, +5dB
+
+const DEFAULTS_KICK = {
+  pitch: 48,
+  punch: 5,
+  decay: 0.32,
+  click: 0.4,
+  drive: 0,
+};
 
 /**
- * The kick's live knob state and its `trigger` function — the TR-808
- * recipe behind {@link KickPad} (sine VCO + pitch glide + `Tone.Distortion`
- * fatness stage). Kept separate from the pad's presentation so the step
- * sequencer can hold this same instance and schedule its `trigger`
- * directly (see `sequencer/useStepSequencer.ts`).
+ * The kick's live knob state and its `trigger` function — a
+ * `Tone.MembraneSynth`/`Tone.NoiseSynth` recipe built fresh on every hit,
+ * faithfully porting a reference recipe's own master chain (Distortion ->
+ * lowpass -> makeup gain -> highpass -> Compressor -> Limiter) rather than
+ * trimming it down, since fidelity to that exact sound is the point. The
+ * Limiter's output then feeds this app's usual Volume/Pan stage and shared
+ * `masterBusInput`, so Master Drive/Filter and the master filter envelope
+ * still reach it like every other voice.
  *
  * `trigger` accepts an optional `scheduledTime`: called with none (a
  * manual pad press), it unlocks the audio context via
@@ -31,91 +73,113 @@ export const KICK_DECAY_MAX = 1;
  * and schedules everything at the precise time the look-ahead scheduler
  * asked for, rather than at "now."
  *
- * @returns The kick's `tone`/`decay`/`volume`/`pan`/`muted`/`soloed`/
- * `pressed` state, their setters, and `trigger`.
+ * @returns The kick's `pitch`/`punch`/`length`/`click`/`fatness`/
+ * `volume`/`pan`/`muted`/`soloed`/`pressed` state, their setters, and
+ * `trigger`.
  */
 export const useKickVoice = () => {
-  const [tone, setTone] = useState(50); // resting fundamental frequency the pitch glide settles on, in Hz
-  const [decay, setDecay] = useState(0.35); // amp envelope decay length, in seconds
-  const [volume, setVolume] = useState(75); // 0-100%, overall output level
-  const [pan, setPan] = useState(0); // -100 (hard left) to 100 (hard right)
+  const [pitch, setPitch] = useState(DEFAULTS_KICK.pitch); // note frequency passed at trigger time, in Hz
+  const [punch, setPunch] = useState(DEFAULTS_KICK.punch); // MembraneSynth octaves — how many octaves above Pitch the sweep starts
+  const [length, setLength] = useState(DEFAULTS_KICK.decay); // MembraneSynth envelope.decay, in seconds
+  const [click, setClick] = useState(DEFAULTS_KICK.click); // 0-1 mix level of the noise click layer
+  const [fatness, setFatness] = useState(DEFAULTS_KICK.drive); // 0-1, Tone.Distortion amount on the body
+  const [volume, setVolume] = useState(75);
+  const [pan, setPan] = useState(0);
   // Mute/solo — see useSnareVoice.ts for the full rationale: `muted` gates
   // `trigger`'s level without touching `volume` itself, `soloed` is
   // visual-only for now (cross-voice silencing isn't wired up).
   const [muted, setMuted] = useState(false);
   const [soloed, setSolo] = useState(false);
-  const [pressed, setPressed] = useState(false); // drives the pad's lit state — real mousedown/up, not hover
+  const [pressed, setPressed] = useState(false);
 
   const trigger = async (scheduledTime?: number) => {
-    // Skipped for scheduled calls: the Transport is only ever running
-    // after Start already passed this gate once.
     if (scheduledTime === undefined) {
       await startAudioContext();
     }
 
     const now = scheduledTime ?? Tone.now();
-    const pitchDropTime = 0.05; // ~50ms glide — fast enough to read as a "click," not a siren
-    const duration = decay; // "Decay" knob: short, punchy decay — fat but not a long boomy tail
-    const level = muted ? 0 : volume / 100; // Volume slider as a 0-1 multiplier applied to the VCA peak, forced silent while muted
+    const duration = length + RELEASE_TAIL; // "Length" knob
+    const level = muted ? 0 : volume / 100;
 
-    // Sweeps the master filter on every hit — see `triggerMasterFilterEnvelope`.
     triggerMasterFilterEnvelope(now);
 
-    // VCO with a pitch envelope: starts bright, glides down to the sub fundamental
-    const osc = new Tone.Oscillator(PITCH_DROP_START, "sine");
-    osc.frequency.exponentialRampToValueAtTime(tone, now + pitchDropTime); // "Tone" knob: the pitch it settles on
-
-    // Saturation stage (Drive knob): Tone.Distortion is a prebuilt
-    // WaveShaper wrapper — the "0.4" is the same kind of drive amount as
-    // the raw version's hand-computed tanh curve.
-    const distortionAmount = 0.1;
-    const saturation = new Tone.Distortion(distortionAmount);
-    saturation.oversample = "2x";
-
-    // Output/makeup gain (the "Output" knob you'd find after a drive stage
-    // on real distortion gear): restores the peak level the Distortion
-    // curve crushed, so the drive adds harmonics without also quietly
-    // thinning out the kick.
-    const makeupGain = new Tone.Gain(distortionMakeupGain(distortionAmount));
-
-    // VCA: instant attack, no ramp-up, exponential decay curve
-    const ampGain = new Tone.Gain(1);
-    ampGain.gain.setValueAtTime(level, now); // "Volume" slider sets the peak level
-    ampGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-    // Stereo placement (Pan knob) sits after the VCA, before the shared
-    // bus — a plain per-hit node like the rest of this chain, since a
-    // one-shot drum hit has no reason to re-pan mid-ring the way a
-    // persistent/sustained node would.
     const panner = new Tone.Panner(pan / 100).connect(masterBusInput);
+    const volumeGain = new Tone.Gain(level).connect(panner);
+    const outputMakeup = new Tone.Gain(OUTPUT_MAKEUP_GAIN).connect(volumeGain);
 
-    osc.connect(saturation); // VCO -> Drive
-    saturation.connect(makeupGain); // Drive -> Output trim
-    makeupGain.connect(ampGain); // Output trim -> VCA
-    ampGain.connect(panner); // VCA -> Pan
-    osc.start(now);
-    osc.stop(now + duration);
+    // Reference recipe's own master chain, preserved in full rather than
+    // trimmed down to this app's shared masterBus — that chain is what
+    // gives this recipe its exact character.
+    const limiter = new Tone.Limiter(-1).connect(outputMakeup);
+    const compressor = new Tone.Compressor({
+      threshold: -16,
+      ratio: 4,
+      attack: 0.003,
+      release: 0.12,
+    }).connect(limiter);
+    const highpass = new Tone.Filter(28, "highpass").connect(compressor);
+    const makeupGain = new Tone.Gain(2.4).connect(highpass);
+    const lowpass = new Tone.Filter(9000, "lowpass").connect(makeupGain);
 
-    // Tone.js nodes need an explicit .dispose() once their sound has
-    // finished, unlike a disconnected raw OscillatorNode which is
-    // garbage-collected on its own.
+    const dist = new Tone.Distortion({
+      distortion: fatness, // "Fatness" knob
+      oversample: "4x",
+    }).connect(lowpass);
+    const kick = new Tone.MembraneSynth({
+      pitchDecay: PITCH_DECAY,
+      octaves: punch, // "Punch" knob
+      oscillator: { type: "sine" },
+      envelope: {
+        attack: 0.001,
+        decay: length,
+        sustain: 0,
+        release: ENVELOPE_RELEASE,
+      },
+    }).connect(dist);
+
+    const clickFilter = new Tone.Filter(3200, "bandpass");
+    clickFilter.Q.value = 0.7;
+    const clickGain = new Tone.Gain(click * 0.6); // "Click" knob mix
+    const clickSynth = new Tone.NoiseSynth({
+      noise: { type: "white" },
+      envelope: { attack: 0.0005, decay: 0.012, sustain: 0 },
+    });
+    clickSynth.chain(clickFilter, clickGain, compressor);
+
+    kick.triggerAttackRelease(pitch, duration, now); // "Pitch" knob
+    clickSynth.triggerAttackRelease(CLICK_TRIGGER_DURATION, now);
+
     setTimeout(
       () => {
-        osc.dispose();
-        saturation.dispose();
+        kick.dispose();
+        clickSynth.dispose();
+        clickFilter.dispose();
+        clickGain.dispose();
+        dist.dispose();
+        lowpass.dispose();
         makeupGain.dispose();
-        ampGain.dispose();
+        highpass.dispose();
+        compressor.dispose();
+        limiter.dispose();
+        outputMakeup.dispose();
+        volumeGain.dispose();
         panner.dispose();
       },
-      (duration + 0.1) * 1000,
+      (duration + ENVELOPE_RELEASE + 0.1) * 1000,
     );
   };
 
   return {
-    tone,
-    setTone,
-    decay,
-    setDecay,
+    pitch,
+    setPitch,
+    punch,
+    setPunch,
+    length,
+    setLength,
+    click,
+    setClick,
+    fatness,
+    setFatness,
     volume,
     setVolume,
     pan,
