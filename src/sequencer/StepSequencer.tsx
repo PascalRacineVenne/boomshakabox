@@ -144,6 +144,7 @@ const StepSequencer = () => {
         <Flex gap={GAP}>
           <span className={styles.gridLabel} />
           <VelocityRow
+            active={activePattern}
             velocities={activeVelocities}
             onVelocityChange={setVelocity}
           />
