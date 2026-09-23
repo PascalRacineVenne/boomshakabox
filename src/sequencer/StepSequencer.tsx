@@ -23,6 +23,7 @@ import StepGrid from "./StepGrid";
 import MiniGrid from "./MiniGrid";
 import VoiceParamsTable from "./VoiceParamsTable";
 import { useStepSequencer, TRACK_LABELS } from "./useStepSequencer";
+import EffectsPanel from "../components/filter/EffectsPanel";
 
 const styles = {
   gridRowChrome: css`
@@ -72,6 +73,7 @@ const StepSequencer = () => {
       <Flex align="flex-start" gap={GAP}>
         <TempoTransportPanel />
         <FilterPanel />
+        <EffectsPanel />
         <MasterPanel />
       </Flex>
       <MiniGrid
