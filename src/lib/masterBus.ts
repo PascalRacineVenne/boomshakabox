@@ -1,4 +1,5 @@
 import * as Tone from "tone";
+import { effectsBusInput, effectsBusOutput } from "./effectsBus";
 
 /**
  * The master filter's selectable modes, keyed by name so call sites read as
@@ -19,9 +20,12 @@ export type FilterMode =
 /**
  * The single master output chain every drum voice's final VCA connects
  * into (`.connect(masterBusInput)`) instead of calling `.toDestination()`
- * directly: Drive -> Filter -> Volume -> Destination, the way a drum
- * machine's mixer has one overdrive, one sweepable filter, and one master
- * fader after all the individual channel strips.
+ * directly: Filter -> Effects Bus -> Volume -> Limiter -> Destination, the
+ * way a drum machine's mixer has a couple of filter/effect inserts, one
+ * master fader, and a brickwall limiter riding shotgun on the output so
+ * nothing actually clips. (There used to be a master Drive/overdrive stage
+ * here too — removed once the effects bus's own Drive, `lib/effectsBus.ts`,
+ * became the one drive control worth keeping.)
  *
  * Created once at module load and kept alive for the whole session (this
  * project's node-lifecycle rule, ARCHITECTURE-SPEC.MD). There's exactly
@@ -32,26 +36,37 @@ export type FilterMode =
  *
  * The metronome click (`useMetronomeClick.ts`) deliberately does NOT run
  * through this bus — it's a reference/practice tone, not part of the mix,
- * so master volume/drive/filter shouldn't affect it.
- *
- * Drive on/off is implemented via the effect's own `.wet` signal (0 =
- * fully dry/bypassed, 1 = fully wet) rather than physically
- * connecting/disconnecting nodes — keeps the audio graph static, per the
- * architecture rule against rewiring nodes at runtime.
+ * so master volume/filter shouldn't affect it.
  */
-const masterDistortion = new Tone.Distortion(0.4);
-masterDistortion.wet.value = 0; // off by default
-
 const masterFilter = new Tone.Filter(12000, FILTER_MODE_OPTIONS.LOWPASS.value);
-masterDistortion.connect(masterFilter);
 
-const masterGain = new Tone.Gain(0.75).toDestination();
-masterFilter.connect(masterGain);
+// Effects bus (lib/effectsBus.ts) sits after the original sweepable filter
+// and before the final Volume stage — its own independent knobs
+// (FilterPanel/EffectsPanel), the way a real mixer might chain a filter
+// insert into a separate effects insert.
+masterFilter.connect(effectsBusInput);
+
+const masterGain = new Tone.Gain(0.75);
+effectsBusOutput.connect(masterGain);
+
+// Final brickwall safety net before the actual output — every stage above
+// (filter resonance, effects bus drive/resonance, however many voices
+// stack up on a busy step) can push level around, and Volume itself only
+// ever attenuates (max 100% = unity), never boosts; this is what actually
+// guarantees the master out never clips regardless of what those add up
+// to. -1dB rather than 0dB leaves a hair of headroom for inter-sample
+// peaks, standard mastering-limiter practice. Kept as a rare-overs safety
+// net, not a workhorse squasher — if this is audibly engaging under normal
+// use, that's a sign something upstream (e.g. effects bus Drive) is
+// putting out too much level and should be trimmed at the source instead
+// of compensating by dropping this threshold further.
+const masterLimiter = new Tone.Limiter(-1).toDestination();
+masterGain.connect(masterLimiter);
 
 /** Where every voice's final node should `.connect()` into. */
-export const masterBusInput = masterDistortion;
+export const masterBusInput = masterFilter;
 
-export { masterDistortion, masterFilter, masterGain };
+export { masterFilter, masterGain, masterLimiter };
 
 // ---- Master filter envelope ----
 //
