@@ -32,9 +32,11 @@ export const TRACK_LABELS: Record<TrackId, string> = {
   hihatOpen: "OH",
 };
 
-type TriggerFn = (scheduledTime?: number) => void;
+type TriggerFn = (scheduledTime?: number, velocity?: number) => void;
 
 type Voices = Record<TrackId, { trigger: TriggerFn }>;
+
+const DEFAULT_VELOCITY = 80; // 0-100%, matches the per-voice Volume slider convention
 
 const emptyPattern = (): boolean[] => Array(STEP_COUNT).fill(false);
 
@@ -42,6 +44,15 @@ const initialPatterns = (): Record<TrackId, boolean[]> =>
   Object.fromEntries(TRACK_IDS.map((id) => [id, emptyPattern()])) as Record<
     TrackId,
     boolean[]
+  >;
+
+const defaultVelocities = (): number[] =>
+  Array(STEP_COUNT).fill(DEFAULT_VELOCITY);
+
+const initialVelocities = (): Record<TrackId, number[]> =>
+  Object.fromEntries(TRACK_IDS.map((id) => [id, defaultVelocities()])) as Record<
+    TrackId,
+    number[]
   >;
 
 /**
@@ -67,15 +78,33 @@ const initialPatterns = (): Record<TrackId, boolean[]> =>
  * a manual pad press would call, just at a precise Transport time instead
  * of "now."
  *
+ * Per-step velocity follows the exact same ref/useState split as patterns,
+ * one 16-length array per track, defaulting every step to 80. The
+ * scheduler passes the current step's velocity as `trigger`'s second
+ * argument; every voice hook multiplies it into `volume` as a 0-100%
+ * factor, so velocity always reads as "how hard the pad's own Volume gets
+ * hit," not an independent level.
+ *
  * @param voices - One entry per {@link TrackId}, each with the `trigger`
  * function this schedules (from that instrument's `useXVoice` hook).
- * @returns The display-only pattern/playhead state, the currently
- * selected track, and handlers for toggling steps and switching tracks.
+ * @returns The display-only pattern/velocity/playhead state, the currently
+ * selected track, and handlers for toggling steps, editing velocity, and
+ * switching tracks.
  */
 export const useStepSequencer = (voices: Voices) => {
   const patternsRef = useRef<Record<TrackId, boolean[]>>(initialPatterns());
   const [patternsDisplay, setPatternsDisplay] =
     useState<Record<TrackId, boolean[]>>(initialPatterns);
+
+  // Per-step velocity, one 16-length array per track — same ref-for-the-
+  // scheduler/useState-for-the-UI split as patterns above, and the same
+  // "always live, only one track's shown at a time" model.
+  const velocitiesRef = useRef<Record<TrackId, number[]>>(
+    initialVelocities(),
+  );
+  const [velocitiesDisplay, setVelocitiesDisplay] =
+    useState<Record<TrackId, number[]>>(initialVelocities);
+
   const [selectedTrack, setSelectedTrack] = useState<TrackId>(TRACK_IDS[0]);
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -103,7 +132,7 @@ export const useStepSequencer = (voices: Voices) => {
 
       TRACK_IDS.forEach((id) => {
         if (patternsRef.current[id][step]) {
-          voicesRef.current[id].trigger(time);
+          voicesRef.current[id].trigger(time, velocitiesRef.current[id][step]);
         }
       });
 
@@ -143,12 +172,24 @@ export const useStepSequencer = (voices: Voices) => {
     setPatternsDisplay((prev) => ({ ...prev, [track]: updated })); // 2. visual only
   };
 
+  const setVelocity = (stepIndex: number, velocity: number) => {
+    const track = selectedTrack;
+    const updated = velocitiesRef.current[track].slice();
+    updated[stepIndex] = velocity;
+    velocitiesRef.current[track] = updated; // 1. ref write — read by the scheduler's next pass over this step
+
+    setVelocitiesDisplay((prev) => ({ ...prev, [track]: updated })); // 2. visual only
+  };
+
   return {
     patternsDisplay,
     activePattern: patternsDisplay[selectedTrack],
+    velocitiesDisplay,
+    activeVelocities: velocitiesDisplay[selectedTrack],
     selectedTrack,
     selectTrack: setSelectedTrack,
     currentStep,
     setStep,
+    setVelocity,
   };
 };

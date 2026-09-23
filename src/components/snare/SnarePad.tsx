@@ -106,7 +106,7 @@ const SnarePad = ({
             size="small"
             value={snappy}
             onChange={(rotation) => setSnappy(rotation.value)}
-            label="Snappy"
+            label="Snap"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <KnobSlot />

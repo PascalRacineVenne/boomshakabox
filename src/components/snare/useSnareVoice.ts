@@ -52,7 +52,7 @@ export const useSnareVoice = () => {
   const [soloed, setSolo] = useState(false);
   const [pressed, setPressed] = useState(false); // drives the pad's lit state — real mousedown/up, not hover
 
-  const trigger = async (scheduledTime?: number) => {
+  const trigger = async (scheduledTime?: number, velocity = 100) => {
     // Skipped for scheduled calls: the Transport is only ever running
     // after Start already passed this gate once.
     if (scheduledTime === undefined) {
@@ -61,7 +61,7 @@ export const useSnareVoice = () => {
 
     const now = scheduledTime ?? Tone.now();
     const duration = 0.2; // ~200ms, matching the 808's fixed snare decay
-    const level = muted ? 0 : volume / 100; // Volume slider as a 0-1 multiplier applied to both voices' peaks, forced silent while muted
+    const level = muted ? 0 : (volume / 100) * (velocity / 100); // Volume slider x the step's velocity (0-100%), forced silent while muted
 
     // Sweeps the master filter on every hit — see `triggerMasterFilterEnvelope`.
     triggerMasterFilterEnvelope(now);

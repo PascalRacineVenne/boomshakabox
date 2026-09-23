@@ -20,6 +20,7 @@ import { useHiTomVoice } from "../components/hiTom/useHiTomVoice";
 import { useMidTomVoice } from "../components/midTom/useMidTomVoice";
 import { useLowTomVoice } from "../components/lowTom/useLowTomVoice";
 import StepGrid from "./StepGrid";
+import VelocityRow from "./VelocityRow";
 import MiniGrid from "./MiniGrid";
 import VoiceParamsTable from "./VoiceParamsTable";
 import { useStepSequencer, TRACK_LABELS } from "./useStepSequencer";
@@ -62,10 +63,12 @@ const StepSequencer = () => {
   const {
     patternsDisplay,
     activePattern,
+    activeVelocities,
     selectedTrack,
     selectTrack,
     currentStep,
     setStep,
+    setVelocity,
   } = useStepSequencer(voices);
 
   return (
@@ -127,13 +130,25 @@ const StepSequencer = () => {
         />
       </Flex>
 
-      <Flex align="center" gap={GAP} className={styles.gridRowChrome}>
-        <span className={styles.gridLabel}>{TRACK_LABELS[selectedTrack]}</span>
-        <StepGrid
-          active={activePattern}
-          currentStep={currentStep}
-          onStepChange={setStep}
-        />
+      <Flex vertical gap={4} className={styles.gridRowChrome}>
+        <Flex align="center" gap={GAP}>
+          <span className={styles.gridLabel}>
+            {TRACK_LABELS[selectedTrack]}
+          </span>
+          <StepGrid
+            active={activePattern}
+            currentStep={currentStep}
+            onStepChange={setStep}
+          />
+        </Flex>
+        <Flex gap={GAP}>
+          <span className={styles.gridLabel} />
+          <VelocityRow
+            active={activePattern}
+            velocities={activeVelocities}
+            onVelocityChange={setVelocity}
+          />
+        </Flex>
       </Flex>
 
       <VoiceParamsTable selectedTrack={selectedTrack} voices={voices} />
