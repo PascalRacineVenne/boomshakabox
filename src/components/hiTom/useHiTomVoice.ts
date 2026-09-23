@@ -27,7 +27,7 @@ export const useHiTomVoice = () => {
   const [soloed, setSolo] = useState(false);
   const [pressed, setPressed] = useState(false);
 
-  const trigger = async (scheduledTime?: number) => {
+  const trigger = async (scheduledTime?: number, velocity = 100) => {
     if (scheduledTime === undefined) {
       await startAudioContext();
     }
@@ -35,7 +35,7 @@ export const useHiTomVoice = () => {
     const now = scheduledTime ?? Tone.now();
     const pitchDropTime = 0.025; // faster, subtler glide than the kick's 50ms
     const duration = decay;
-    const level = muted ? 0 : volume / 100; // forced silent while muted
+    const level = muted ? 0 : (volume / 100) * (velocity / 100); // Volume x the step's velocity (0-100%), forced silent while muted
 
     triggerMasterFilterEnvelope(now);
 

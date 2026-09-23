@@ -71,7 +71,10 @@ const DEFAULTS_KICK = {
  * `Tone.Transport.scheduleRepeat` callback), it skips that gate entirely —
  * the Transport can only be running after Start already passed it once —
  * and schedules everything at the precise time the look-ahead scheduler
- * asked for, rather than at "now."
+ * asked for, rather than at "now." `velocity` (0-100, default 100 for a
+ * manual press) is the sequencer's per-step hit strength — see
+ * `useStepSequencer.ts` — multiplied into `volume` rather than treated as
+ * an independent level.
  *
  * @returns The kick's `pitch`/`punch`/`length`/`click`/`fatness`/
  * `volume`/`pan`/`muted`/`soloed`/`pressed` state, their setters, and
@@ -92,14 +95,14 @@ export const useKickVoice = () => {
   const [soloed, setSolo] = useState(false);
   const [pressed, setPressed] = useState(false);
 
-  const trigger = async (scheduledTime?: number) => {
+  const trigger = async (scheduledTime?: number, velocity = 100) => {
     if (scheduledTime === undefined) {
       await startAudioContext();
     }
 
     const now = scheduledTime ?? Tone.now();
     const duration = length + RELEASE_TAIL; // "Length" knob
-    const level = muted ? 0 : volume / 100;
+    const level = muted ? 0 : (volume / 100) * (velocity / 100); // velocity: 0-100%, the step's hit strength as a fraction of Volume
 
     triggerMasterFilterEnvelope(now);
 
