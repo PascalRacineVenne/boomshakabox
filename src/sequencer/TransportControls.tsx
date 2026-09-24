@@ -1,7 +1,5 @@
 import { css } from "@linaria/core";
-import { useState } from "react";
 import { Button, Space } from "antd";
-import * as Tone from "tone";
 import { PlayBevIcon } from "../icons/transport/PlayBevIcon";
 import { PauseBevIcon } from "../icons/transport/PauseBevIcon";
 import { StopBevIcon } from "../icons/transport/StopBevIcon";
@@ -15,25 +13,17 @@ const styles = {
   `,
 };
 
-const TransportControls = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
+interface TransportControlsProps {
+  isPlaying: boolean;
+  togglePlayPause: () => void;
+  stop: () => void;
+}
 
-  const handleTogglePlayPause = async () => {
-    await Tone.start();
-    if (isPlaying) {
-      Tone.getTransport().pause();
-      setIsPlaying(false);
-    } else {
-      Tone.getTransport().start();
-      setIsPlaying(true);
-    }
-  };
-
-  const handleStop = () => {
-    Tone.getTransport().stop();
-    setIsPlaying(false);
-  };
-
+const TransportControls = ({
+  isPlaying,
+  togglePlayPause,
+  stop,
+}: TransportControlsProps) => {
   return (
     <Space>
       <Button
@@ -46,7 +36,7 @@ const TransportControls = () => {
             <PlayBevIcon style={{ fontSize: TRANSPORT_ICON_SIZE }} />
           )
         }
-        onClick={handleTogglePlayPause}
+        onClick={togglePlayPause}
         aria-label={isPlaying ? "Pause" : "Play"}
       />
       <Button
@@ -58,7 +48,7 @@ const TransportControls = () => {
             }}
           />
         }
-        onClick={handleStop}
+        onClick={stop}
         aria-label="Stop"
       />
     </Space>

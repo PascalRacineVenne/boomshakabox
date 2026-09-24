@@ -33,6 +33,5 @@ export const renderOfflineWaveform = async (
 
   const left = buffer.getChannelData(0);
   const right = buffer.getChannelData(1);
-  console.log({ left, right });
   return left.map((sample, i) => (sample + right[i]) / 2);
 };

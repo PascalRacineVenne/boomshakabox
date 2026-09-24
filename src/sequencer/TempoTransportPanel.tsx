@@ -21,12 +21,26 @@ const styles = {
 
 const GAP = "calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) * 0.5)";
 
-const TempoTransportPanel = () => {
+interface TempoTransportPanelProps {
+  isPlaying: boolean;
+  togglePlayPause: () => void;
+  stop: () => void;
+}
+
+const TempoTransportPanel = ({
+  isPlaying,
+  togglePlayPause,
+  stop,
+}: TempoTransportPanelProps) => {
   return (
     <Flex vertical justify="center">
       <Flex align="center" gap={GAP} className={styles.grid}>
         <TempoInput />
-        <TransportControls />
+        <TransportControls
+          isPlaying={isPlaying}
+          togglePlayPause={togglePlayPause}
+          stop={stop}
+        />
         <MetronomeClick />
       </Flex>
       <span className={styles.title}>Transport</span>
