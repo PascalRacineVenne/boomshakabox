@@ -1,6 +1,5 @@
 import { css } from "@linaria/core";
 import { Button, Flex } from "antd";
-// import { DeleteOutlined } from "@ant-design/icons";
 import TempoTransportPanel from "./TempoTransportPanel";
 import MasterPanel from "../components/master/MasterPanel";
 import FilterPanel from "../components/filter/FilterPanel";
@@ -28,7 +27,7 @@ import { useStepSequencer, TRACK_LABELS } from "./useStepSequencer";
 import EffectsPanel from "../components/filter/EffectsPanel";
 
 const styles = {
-  gridRowChrome: css`
+  gridRow: css`
     border: 1px solid var(--accent-border);
     border-radius: 8px;
     padding: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
@@ -38,21 +37,23 @@ const styles = {
     color: var(--text);
     width: 48px;
   `,
-  clearButton: css`
+  clearButtonWrap: css`
     width: 48px;
     font-size: 10px;
     color: var(--text);
+  `,
+  clearButton: css`
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    background: black !important;
+    border: 1px solid var(--contrast-2) !important;
+    box-shadow: 1px 1px 4px var(--contrast-2) !important;
 
-    .ant-btn {
-      background: black;
-      border: 1px solid var(--contrast-2);
-      box-shadow: 1px 1px 4px var(--contrast-2);
-      width: 22px;
-
-      &:hover {
-        border: 1px solid var(--contrast-1) !important;
-        box-shadow: 1px 1px 4px var(--contrast-1);
-      }
+    &:hover {
+      border-color: var(--contrast-1) !important;
+      box-shadow: 1px 1px 4px var(--contrast-1) !important;
     }
   `,
 };
@@ -149,7 +150,7 @@ const StepSequencer = () => {
         />
       </Flex>
 
-      <Flex vertical gap={4} className={styles.gridRowChrome}>
+      <Flex vertical gap={4} className={styles.gridRow}>
         <Flex align="center" gap={GAP}>
           <span className={styles.gridLabel}>
             {TRACK_LABELS[selectedTrack]}
@@ -160,17 +161,17 @@ const StepSequencer = () => {
             onStepChange={setStep}
           />
         </Flex>
-        <Flex gap={GAP}>
+        <Flex gap={GAP} align="flex-start">
           <Flex
             vertical
             align="center"
-            justify="center"
-            className={styles.clearButton}
+            gap={2}
+            className={styles.clearButtonWrap}
           >
             <Button
-              variant="outlined"
               type="text"
               size="small"
+              className={styles.clearButton}
               title={`Clear ${TRACK_LABELS[selectedTrack]}'s steps`}
               onClick={clearTrack}
             />
