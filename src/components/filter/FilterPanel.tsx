@@ -9,9 +9,6 @@ const FILTER_MODE_OPTIONS_LIST = Object.values(FILTER_MODE_OPTIONS);
 
 const styles = {
   grid: css`
-    display: grid;
-    align-items: center;
-    justify-items: center;
     gap: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
     padding: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
     border: 1px solid var(--accent-border);
@@ -26,12 +23,6 @@ const styles = {
   `,
 };
 
-/**
- * Master filter panel: Cutoff, Resonance, Env Amount, and Mode (HP/LP/BP)
- * in a 2x2 grid. Sits on the mix as a whole (see `lib/masterBus.ts` for
- * the shared `Tone.Filter` every voice's output runs through), between
- * the Transport and Master panels.
- */
 const FilterPanel = () => {
   const {
     cutoff,
@@ -50,7 +41,7 @@ const FilterPanel = () => {
 
   return (
     <Flex vertical align={"center"} gap={2}>
-      <div className={styles.grid}>
+      <Flex align="center" justify="center" className={styles.grid}>
         <Space>
           <Knob
             variant="plainCap"
@@ -93,7 +84,7 @@ const FilterPanel = () => {
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
         </Space>
-      </div>
+      </Flex>
       <span className={styles.title}>Filter</span>
     </Flex>
   );

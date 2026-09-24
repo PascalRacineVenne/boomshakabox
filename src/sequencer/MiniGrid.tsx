@@ -33,11 +33,6 @@ const styles = {
     color: var(--accent);
   `,
 
-  steps: css`
-    display: flex;
-    gap: 2px;
-  `,
-
   step: css`
     width: 8px;
     height: 6px;
@@ -54,10 +49,6 @@ const styles = {
     outline-offset: 1px;
   `,
 
-  // A separator after steps 4/8/12 — the same beat-boundary grouping
-  // `StepGrid`'s own GROUP_SIZE does, just drawn as a rule instead of a
-  // wider gap since the mini steps are small enough that spacing alone
-  // wouldn't read as a grouping.
   stepGroupEnd: css`
     margin-right: 6px;
     padding-right: 4px;
@@ -65,7 +56,7 @@ const styles = {
   `,
 };
 
-const GROUP_SIZE = 4; // groups of 4 steps, matching a 4/4 beat boundary
+const GROUP_SIZE = 4;
 
 interface MiniGridProps {
   patterns: Record<TrackId, boolean[]>;
@@ -74,14 +65,6 @@ interface MiniGridProps {
   onSelectTrack: (id: TrackId) => void;
 }
 
-/**
- * A compact, read-only overview of every track's pattern at once — the
- * "see the whole kit" counterpart to `StepGrid`, which only ever shows/
- * edits the one currently-selected track. Purely presentational: reuses
- * `useStepSequencer`'s existing `patternsDisplay`/`currentStep` state
- * directly, no new sequencer logic. Clicking a row selects that track,
- * same as clicking its pad.
- */
 const MiniGrid = ({
   patterns,
   currentStep,
@@ -107,7 +90,7 @@ const MiniGrid = ({
             {TRACK_LABELS[trackId]}
             {TRACK_IDS.indexOf(trackId) + 1}
           </span>
-          <div className={styles.steps}>
+          <Flex gap={2}>
             {Array.from({ length: STEP_COUNT }, (_, stepIndex) => (
               <div
                 key={stepIndex}
@@ -121,7 +104,7 @@ const MiniGrid = ({
                 )}
               />
             ))}
-          </div>
+          </Flex>
         </Flex>
       ))}
     </Flex>

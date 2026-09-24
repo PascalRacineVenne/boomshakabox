@@ -39,24 +39,10 @@ const styles = {
 const GAP = "calc(var(--audioui-unit) / 8)";
 
 interface BeatIndicatorProps {
-  /**
-   * When provided, this indicator doubles as the metronome click's
-   * mute/unmute toggle (replacing `MetronomeClick`'s old On/Off button):
-   * a simple bordered outline at rest while muted, filled `--contrast-1`
-   * while unmuted, clicking flips it. Omit both for a purely visual,
-   * non-interactive pulse (e.g. `TempoTransportPanel`'s own instance).
-   */
   muted?: boolean;
   onToggleMute?: () => void;
 }
 
-/**
- * Minimal visual metronome: two dots, one per alternating beat (see
- * `useBeatPulse.ts`). Whichever dot the current beat lands on flashes
- * `--accent` briefly; the other stays at its resting look. A tempo pulse
- * to glance at, not a bar-position readout — deliberately doesn't track
- * all 4 beats of the bar.
- */
 const BeatIndicator = ({ muted, onToggleMute }: BeatIndicatorProps) => {
   const { pulse, flash } = useBeatPulse();
 

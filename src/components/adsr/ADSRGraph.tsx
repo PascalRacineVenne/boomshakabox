@@ -15,12 +15,9 @@ const COORDINATE_HEIGHT = 100;
 const COORDINATE_WIDTH = 100;
 const SUSTAIN_PHASE_WIDTH = 10;
 
-// Time gridlines are placed at exponentially growing steps (1e-6, 1e-6*e,
-// 1e-6*e^2, ...) so they read as a log timeline rather than a linear one —
-// matches how the ear perceives short attack/decay times.
 const INITIAL_TIME_STEP = 1e-6;
 const MAX_TIME_STEP = 100;
-const MIN_VISIBLE_TIME_RATIO = 1e-2; // steps closer together than this (as a fraction of total time) are skipped
+const MIN_VISIBLE_TIME_RATIO = 1e-2;
 
 const styles = {
   background: css`
@@ -54,7 +51,6 @@ const styles = {
   `,
 };
 
-/** The width of each phase: [attackWidth, decayWidth, sustainWidth, releaseWidth] */
 const getPhaseLengths = (
   attack: number,
   decay: number,
@@ -62,13 +58,10 @@ const getPhaseLengths = (
 ): [number, number, number, number] => {
   const totalTime = attack + decay + release;
 
-  // Percent of total envelope time (not counting sustain)
   const relativeAttack = attack / totalTime;
   const relativeDecay = decay / totalTime;
   const relativeRelease = release / totalTime;
 
-  // Distribute the width left after the sustain phase according to the
-  // relative length of each remaining phase
   const remainingWidth = COORDINATE_WIDTH - SUSTAIN_PHASE_WIDTH;
   const absoluteAttack = relativeAttack * remainingWidth;
   const absoluteDecay = relativeDecay * remainingWidth;
@@ -80,11 +73,9 @@ const getPhaseLengths = (
 const linearStrokeTo = (deltaX: number, deltaY: number) =>
   `l ${deltaX} ${deltaY}`;
 
-/** An svg path command resembling an exponential curve */
 const exponentialStrokeTo = (deltaX: number, deltaY: number) =>
   `c ${deltaX / 5} ${deltaY / 2} ${deltaX / 2} ${deltaY} ${deltaX} ${deltaY}`;
 
-/** An svg path `d` attribute resembling an envelope shape given its ADSR parameters */
 const generatePath = (
   attack: number,
   decay: number,
@@ -98,7 +89,7 @@ const generatePath = (
   );
 
   const strokes = [
-    `M 0 ${COORDINATE_HEIGHT}`, // Start at the bottom
+    `M 0 ${COORDINATE_HEIGHT}`,
     linearStrokeTo(attackWidth, -COORDINATE_HEIGHT),
     exponentialStrokeTo(decayWidth, COORDINATE_HEIGHT * (1 - sustain)),
     linearStrokeTo(sustainWidth, 0),
@@ -108,7 +99,6 @@ const generatePath = (
   return strokes.join(" ");
 };
 
-/** Exponentially growing time steps, from `INITIAL_TIME_STEP` up until `MAX_TIME_STEP`/`totalTime` */
 const buildLogTimeSteps = (
   currentTimeStep: number,
   totalTime: number,
@@ -122,7 +112,6 @@ const buildLogTimeSteps = (
   ];
 };
 
-/** A series of gridlines with exponentially increasing distance between them */
 const renderTimeLines = (
   attack: number,
   decay: number,
@@ -150,15 +139,12 @@ const renderTimeLines = (
     });
 };
 
-/** A dividing line between each phase */
 const renderPhaseLines = (
   attack: number,
   decay: number,
   release: number,
   phaseLineStyle?: CSSProperties,
 ): ReactNode[] => {
-  // Cumulative boundary position after each phase except the last
-  // (release) — a dividing line only makes sense between two phases.
   const phaseWidths = getPhaseLengths(attack, decay, release).slice(0, -1);
   const phaseBoundaryPositions = phaseWidths.reduce<number[]>(
     (positions, phaseWidth) => [

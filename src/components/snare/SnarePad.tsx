@@ -35,24 +35,10 @@ interface SnarePadProps {
   pressed: boolean;
   setPressed: (value: boolean) => void;
   trigger: (scheduledTime?: number) => void;
-  /** Highlights this pad — true when it's the instrument the step grid is currently editing. */
   selected?: boolean;
-  /**
-   * Called on any real interaction with the panel — pressing the trigger,
-   * turning a knob, dragging the slider — so this pad can be selected
-   * without necessarily hearing it. See the `onMouseDown` on the outer
-   * panel div below: selection is a property of the whole panel, not tied
-   * to the trigger button's own onChange.
-   */
   onSelect?: () => void;
 }
 
-/**
- * Snare pad UI: Volume slider + Tone/Snappy knobs + trigger button. Pure
- * presentation over whatever state it's given — {@link useSnareVoice}
- * supplies it, currently only used by `StepSequencer`, which also
- * schedules that same instance's `trigger` for step playback.
- */
 const SnarePad = ({
   trackNumber,
   tone,

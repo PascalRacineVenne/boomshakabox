@@ -58,7 +58,6 @@ import {
 
 import type { TrackId } from "./useStepSequencer";
 
-/** One entry per {@link TrackId} — the exact shape `StepSequencer` already builds for `useStepSequencer`. */
 export interface AllVoices {
   kick: ReturnType<typeof useKickVoice>;
   snare: ReturnType<typeof useSnareVoice>;
@@ -252,7 +251,7 @@ const kickRows = (v: AllVoices["kick"]): VoiceParamRow[] => [
   masterEnvRow(),
 ];
 
-const SNARE_TONE_RATIO = 330 / 180; // mirrors useSnareVoice.ts's TONE_VOICE_RATIO
+const SNARE_TONE_RATIO = 330 / 180;
 
 const snareRows = (v: AllVoices["snare"]): VoiceParamRow[] => [
   {
@@ -446,7 +445,6 @@ const hihatOpenRows = (v: AllVoices["hihatOpen"]): VoiceParamRow[] => [
   masterEnvRow(),
 ];
 
-/** Shared by HiTom/MidTom/LowTom — identical recipe, only the tuning/range constants differ. */
 const tomRows = (
   v: {
     tone: number;
@@ -562,13 +560,6 @@ const tomRows = (
   masterEnvRow(),
 ];
 
-/**
- * Flattens the currently selected voice's `trigger()` recipe into one row
- * per parameter — live-knob-controlled or hardcoded — so it reads as a
- * signal-chain inventory: what it is, its current value, and whether it's
- * worth exposing as a new control or just hand-tuning in code. Dev tool for
- * {@link VoiceParamsTable}, not a user-facing feature.
- */
 export const buildVoiceParamRows = (
   trackId: TrackId,
   voices: AllVoices,
