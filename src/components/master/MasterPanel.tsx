@@ -4,7 +4,7 @@ import { Flex } from "antd";
 import {
   controlPanelStyles,
   LABELED_SMALL_KNOB_HEIGHT_UNITS,
-} from "../ControlPanel";
+} from "../shared/ControlPanel";
 import { useMasterBus } from "./useMasterBus";
 
 const styles = {

@@ -1,6 +1,6 @@
 import { Knob } from "@cutoff/audio-ui-react";
 import { css } from "@linaria/core";
-import { LABELED_SMALL_KNOB_HEIGHT_UNITS } from "../ControlPanel";
+import { LABELED_SMALL_KNOB_HEIGHT_UNITS } from "../shared/ControlPanel";
 import ADSRGraph from "./ADSRGraph";
 import { useADSR } from "./useADSR";
 

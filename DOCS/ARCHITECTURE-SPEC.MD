@@ -36,7 +36,7 @@ automation) — just live knob manipulation of a current value.
   glitches/GC pauses.
 
 > **⚠️ Known, deliberate exception — Kick and Snare.** `useKickVoice`/
-> `useSnareVoice` (`src/components/kick/`, `src/components/snare/`) build a
+> `useSnareVoice` (`src/components/voices/kick/`, `src/components/voices/snare/`) build a
 > fresh `Tone.Oscillator`/`Tone.Gain`/`Tone.Distortion`/`Tone.Noise`/
 > `Tone.Filter` chain on **every** `trigger()` call, including calls made
 > from the sequencer's scheduled callback — the opposite of this rule.
@@ -138,7 +138,7 @@ The illustrative shape below is still a reasonable *starting point* for a
 generic N-track sequencer, but it's pseudocode for the general case, not a
 description of the current codebase — see the side notes on rules 2 and 3
 above for how Kick/Snare actually differ, and read
-`src/sequencer/useStepSequencer.ts` + `src/components/kick/useKickVoice.ts`
+`src/sequencer/grid/useStepSequencer.ts` + `src/components/voices/kick/useKickVoice.ts`
 for the real, current source of truth.
 
 ```tsx
@@ -199,7 +199,7 @@ Tone.getTransport().scheduleRepeat((time) => {
 
 **Built:**
 
-- Kick and Snare voices (`src/components/kick/`, `src/components/snare/`),
+- Kick and Snare voices (`src/components/voices/kick/`, `src/components/voices/snare/`),
   each a `use<X>Voice` hook (sound + live knob state) paired with a
   presentational `<X>Pad>` component.
 - A single shared 16-step grid (`sequencer/StepGrid.tsx`) — one pattern per
@@ -212,7 +212,7 @@ Tone.getTransport().scheduleRepeat((time) => {
   scheduler loop.
 - Tempo, Transport (Start/Stop), and the metronome click/beat indicator,
   all synced to the one shared `Tone.getTransport()`.
-- Per-instrument folder layout (`components/<instrument>/`) established and
+- Per-instrument folder layout (`components/voices/<instrument>/`) established and
   ready to replicate for the remaining tracks.
 
 **Not yet built:**

@@ -1,5 +1,5 @@
 import { useHotkeys } from "react-hotkeys-hook";
-import type { TrackId } from "./useStepSequencer";
+import type { TrackId } from "./grid/useStepSequencer";
 
 const VOICE_KEYS = ["1", "2", "3", "4", "5", "6", "7", "8"];
 const MUTE_KEYS = VOICE_KEYS.map((key) => `shift+${key}`);
@@ -42,7 +42,7 @@ interface DrumMachineTransport {
  * is undefined).
  */
 export const useDrumMachineHotkeys = (
-  orderedTrackIds: TrackId[],
+  orderedTrackIds: readonly TrackId[],
   orderedVoices: HotkeyVoice[],
   transport: DrumMachineTransport,
   selectTrack: (id: TrackId) => void,

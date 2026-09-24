@@ -1,32 +1,32 @@
 import { css } from "@linaria/core";
 import { Button, Collapse, Flex } from "antd";
-import TempoTransportPanel from "./TempoTransportPanel";
+import TempoTransportPanel from "./transport/TempoTransportPanel";
 import MasterPanel from "../components/master/MasterPanel";
 import FilterPanel from "../components/filter/FilterPanel";
 
-import KickPad from "../components/kick/KickPad";
-import SnarePad from "../components/snare/SnarePad";
-import HiHatPad from "../components/hihat/HiHatPad";
-import HiHatOpenPad from "../components/hihatOpen/HiHatOpenPad";
-import HiTomPad from "../components/hiTom/HiTomPad";
-import MidTomPad from "../components/midTom/MidTomPad";
-import LowTomPad from "../components/lowTom/LowTomPad";
+import KickPad from "../components/voices/kick/KickPad";
+import SnarePad from "../components/voices/snare/SnarePad";
+import HiHatPad from "../components/voices/hiHat/HiHatPad";
+import HiHatOpenPad from "../components/voices/hiHatOpen/HiHatOpenPad";
+import HiTomPad from "../components/voices/hiTom/HiTomPad";
+import MidTomPad from "../components/voices/midTom/MidTomPad";
+import LowTomPad from "../components/voices/lowTom/LowTomPad";
 
-import { useKickVoice } from "../components/kick/useKickVoice";
-import { useSnareVoice } from "../components/snare/useSnareVoice";
-import { useHiHatVoice } from "../components/hihat/useHiHatVoice";
-import { useHiHatOpenVoice } from "../components/hihatOpen/useHiHatOpenVoice";
-import { useHiTomVoice } from "../components/hiTom/useHiTomVoice";
-import { useMidTomVoice } from "../components/midTom/useMidTomVoice";
-import { useLowTomVoice } from "../components/lowTom/useLowTomVoice";
-import StepGrid from "./StepGrid";
-import VelocityRow from "./VelocityRow";
-import VoiceScope from "./VoiceScope";
-import MiniGrid from "./MiniGrid";
-import VoiceParamsTable from "./VoiceParamsTable";
-import { useStepSequencer, TRACK_IDS, TRACK_LABELS } from "./useStepSequencer";
-import EffectsPanel from "../components/filter/EffectsPanel";
-import { useTransportPlayback } from "./useTransportPlayback";
+import { useKickVoice } from "../components/voices/kick/useKickVoice";
+import { useSnareVoice } from "../components/voices/snare/useSnareVoice";
+import { useHiHatVoice } from "../components/voices/hiHat/useHiHatVoice";
+import { useHiHatOpenVoice } from "../components/voices/hiHatOpen/useHiHatOpenVoice";
+import { useHiTomVoice } from "../components/voices/hiTom/useHiTomVoice";
+import { useMidTomVoice } from "../components/voices/midTom/useMidTomVoice";
+import { useLowTomVoice } from "../components/voices/lowTom/useLowTomVoice";
+import StepGrid from "./grid/StepGrid";
+import VelocityRow from "./grid/VelocityRow";
+import VoiceScope from "./oscilloscope/VoiceScope";
+import MiniGrid from "./grid/MiniGrid";
+import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
+import { useStepSequencer, TRACK_IDS, TRACK_LABELS } from "./grid/useStepSequencer";
+import EffectsPanel from "../components/effects/EffectsPanel";
+import { useTransportPlayback } from "./transport/useTransportPlayback";
 import { useDrumMachineHotkeys } from "./useDrumMachineHotkeys";
 
 const styles = {
