@@ -6,9 +6,6 @@ import { LABELED_SMALL_KNOB_HEIGHT_UNITS } from "../ControlPanel";
 
 const styles = {
   grid: css`
-    display: grid;
-    align-items: center;
-    justify-items: center;
     gap: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
     padding: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
     border: 1px solid var(--accent-border);
@@ -23,15 +20,6 @@ const styles = {
   `,
 };
 
-/**
- * Effects bus panel: Cutoff, Resonance, and Drive — the three live params
- * `useEffectsBus` currently exposes for the Moog-ladder-style chain living
- * in `lib/effectsBus.ts` (Distortion -> Filter(rolloff: -24) -> Compressor
- * -> Limiter). No Mode or Env Amount, unlike the original `FilterPanel` —
- * this bus's controls will grow/change as whatever's in `effectsBus.ts`
- * does. Sits in the live master bus after `FilterPanel`'s filter (see
- * `lib/masterBus.ts`).
- */
 const EffectsPanel = () => {
   const {
     cutoff,
@@ -47,8 +35,8 @@ const EffectsPanel = () => {
   } = useEffectsBus();
 
   return (
-    <Flex vertical align={"center"} gap={2}>
-      <div className={styles.grid}>
+    <Flex vertical align="center" gap={2}>
+      <Flex align="center" justify="center" className={styles.grid}>
         <Space>
           <Knob
             variant="plainCap"
@@ -81,7 +69,7 @@ const EffectsPanel = () => {
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
         </Space>
-      </div>
+      </Flex>
       <span className={styles.title}>Effects</span>
     </Flex>
   );

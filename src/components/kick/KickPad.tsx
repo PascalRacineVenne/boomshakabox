@@ -24,7 +24,6 @@ import {
 } from "./useKickVoice";
 
 interface KickPadProps {
-  /** This voice's 1-based position among all tracks — shown on the trigger button, e.g. "BD1". */
   trackNumber: number;
   pitch: number;
   setPitch: (value: number) => void;
@@ -47,24 +46,10 @@ interface KickPadProps {
   pressed: boolean;
   setPressed: (value: boolean) => void;
   trigger: (scheduledTime?: number) => void;
-  /** Highlights this pad — true when it's the instrument the step grid is currently editing. */
   selected?: boolean;
-  /**
-   * Called on any real interaction with the panel — pressing the trigger,
-   * turning a knob, dragging the slider — so this pad can be selected
-   * without necessarily hearing it. See the `onMouseDown` on the outer
-   * panel div below: selection is a property of the whole panel, not tied
-   * to the trigger button's own onChange.
-   */
   onSelect?: () => void;
 }
 
-/**
- * Kick pad UI: Pitch/Punch/Length/Click/Fatness knobs in a 2-column grid
- * (Pitch/Punch, Length/Click, Fatness alone), Volume slider + Pan knob +
- * Mute/Solo, and the trigger button. Pure presentation over whatever
- * state it's given — {@link useKickVoice} supplies it.
- */
 const KickPad = ({
   trackNumber,
   pitch,
@@ -220,7 +205,7 @@ const KickPad = ({
         size="large"
         onChange={(press) => {
           setPressed(press.value);
-          if (press.value) trigger(); // fires on the real press, not on the release toggling back to false
+          if (press.value) trigger();
         }}
       />
     </Flex>

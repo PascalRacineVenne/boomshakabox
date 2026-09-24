@@ -7,22 +7,19 @@ import {
 } from "../../lib/masterBus";
 import { distortionMakeupGain } from "../../lib/distortionMakeupGain";
 
-export const TONE_MIN = 80; // low end of the low tom's register (D#2), in Hz
-export const TONE_MAX = 100; // high end of the low tom's register (G2), in Hz
+export const TONE_MIN = 80;
+export const TONE_MAX = 100;
 export const DECAY_MIN = 0.08;
 export const DECAY_MAX = 0.6;
 
-const PITCH_DROP_RATIO = 1.15; // glide starts 15% above the settled tone — a subtle "tonk," not the kick's dramatic sweep
-const FILTER_Q = 3; // mild resonance on the tuned bandpass, per the 808 tom recipe
+const PITCH_DROP_RATIO = 1.15;
+const FILTER_Q = 3;
 
 export const useLowTomVoice = () => {
-  const [tone, setTone] = useState(90); // mid-register low tom pitch, in Hz — see TONE_MIN/TONE_MAX
-  const [decay, setDecay] = useState(0.2); // 808 low toms ring the longest of the three, ~200ms
+  const [tone, setTone] = useState(90);
+  const [decay, setDecay] = useState(0.2);
   const [volume, setVolume] = useState(75);
   const [pan, setPan] = useState(0);
-  // Mute/solo — see useSnareVoice.ts for the full rationale: `muted` gates
-  // `trigger`'s level without touching `volume` itself, `soloed` is
-  // visual-only for now (cross-voice silencing isn't wired up).
   const [muted, setMuted] = useState(false);
   const [soloed, setSolo] = useState(false);
   const [pressed, setPressed] = useState(false);
@@ -33,21 +30,19 @@ export const useLowTomVoice = () => {
     }
 
     const now = scheduledTime ?? Tone.now();
-    const pitchDropTime = 0.025; // faster, subtler glide than the kick's 50ms
+    const pitchDropTime = 0.025;
     const duration = decay;
-    const level = muted ? 0 : (volume / 100) * (velocity / 100); // Volume x the step's velocity (0-100%), forced silent while muted
+    const level = muted ? 0 : (volume / 100) * (velocity / 100);
 
     triggerMasterFilterEnvelope(now);
 
     const osc = new Tone.Oscillator(tone * PITCH_DROP_RATIO, "sine");
-    osc.frequency.exponentialRampToValueAtTime(tone, now + pitchDropTime); // "Tone" knob: the pitch it settles on
+    osc.frequency.exponentialRampToValueAtTime(tone, now + pitchDropTime);
 
-    // Bandpass filter tuned to the fundamental with mild resonance — this
-    // tuned/resonant quality is what reads as a tom instead of a kick.
     const filter = new Tone.Filter(tone, "bandpass");
     filter.Q.value = FILTER_Q;
 
-    const distortionAmount = 0.04; // lighter than the kick's — brightens the attack without fattening the tail
+    const distortionAmount = 0.04;
     const saturation = new Tone.Distortion(distortionAmount);
     saturation.oversample = "2x";
 

@@ -36,13 +36,6 @@ const styles = {
   `,
 };
 
-/**
- * Attack/Decay/Sustain/Release knobs for `useADSR`'s envelope, with a live
- * `ADSRGraph` preview beneath that redraws as the knobs move. Not yet
- * wired to any drum voice — that relationship (how a voice's own trigger
- * feeds off this envelope) is still an open design question, see
- * `useADSR.ts`.
- */
 const ADSRPanel = () => {
   const { attack, decay, sustain, release, setADSR } = useADSR();
 

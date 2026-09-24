@@ -8,13 +8,6 @@ import {
 import { useMasterBus } from "./useMasterBus";
 
 const styles = {
-  wrapper: css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-  `,
-
   title: css`
     font-size: 11px;
     color: var(--text);
@@ -23,21 +16,11 @@ const styles = {
   `,
 };
 
-/**
- * Master bus panel: just the overall Volume knob, sitting on the mix as a
- * whole rather than any one instrument — see `lib/masterBus.ts` for the
- * shared Gain chain every voice's output feeds into. (There used to be a
- * Drive knob + on/off toggle here too — removed once the effects bus's
- * own Drive, `EffectsPanel.tsx`, became the one drive control worth
- * keeping.) Same Knob layout as the drum pads (`controlPanelStyles`) so it
- * reads as one more channel strip alongside them, just for the master bus
- * instead of one voice.
- */
 const MasterPanel = () => {
   const { volume, setVolume } = useMasterBus();
 
   return (
-    <div className={styles.wrapper}>
+    <Flex align="center" justify="center" gap={2}>
       <Flex align="center" className={controlPanelStyles.panel}>
         <Knob
           min={0}
@@ -54,7 +37,7 @@ const MasterPanel = () => {
         />
       </Flex>
       <span className={styles.title}>Master</span>
-    </div>
+    </Flex>
   );
 };
 

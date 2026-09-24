@@ -15,26 +15,10 @@ const styles = {
   `,
 };
 
-/**
- * Play/Pause + Stop for `Tone.getTransport()` — the shared clock the step
- * sequencer schedules against. Plain AntD per the sequencer plan: transport
- * is a utility control, not an expressive performance control like the
- * drum trigger pads, so it doesn't need the audio-ui-react look.
- *
- * Play/Pause is one button whose icon/label flip with `isPlaying`:
- * `Transport.pause()` holds position, so pressing Play again resumes
- * mid-pattern. Stop is a separate button — `Transport.stop()` resets
- * position to 0, which is also what `useStepSequencer` listens for (via
- * the Transport's own "stop" event) to reset its own step counter, so
- * Stop then Play always restarts the pattern from step 1 rather than
- * resuming where it left off.
- */
 const TransportControls = () => {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const handleTogglePlayPause = async () => {
-    // Required by browser autoplay policy — must run in direct response to
-    // a user gesture, same as every other trigger in this project.
     await Tone.start();
     if (isPlaying) {
       Tone.getTransport().pause();

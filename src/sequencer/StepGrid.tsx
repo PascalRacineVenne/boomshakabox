@@ -4,7 +4,7 @@ import { Button } from "@cutoff/audio-ui-react";
 import { STEP_COUNT } from "./useStepSequencer";
 import { Flex } from "antd";
 
-const GROUP_SIZE = 4; // groups of 4 steps, matching a 4/4 beat boundary
+const GROUP_SIZE = 4;
 
 const styles = {
   group: css`
@@ -23,18 +23,6 @@ interface StepGridProps {
   onStepChange: (stepIndex: number, active: boolean) => void;
 }
 
-/**
- * The single 16-step toggle row, grouped in 4s to show beat boundaries —
- * the same "make the bar structure visible" idea as `BeatIndicator`'s
- * larger downbeat dot. There is only one grid: it always shows and edits
- * whichever instrument is currently selected (see `StepSequencer.tsx`),
- * not one grid per track. The currently-playing step gets an accent
- * outline, driven by the sequencer's `Tone.Draw`-synced `currentStep`.
- *
- * `Button` in latch mode natively supports press-and-drag painting across
- * steps — it toggles each step the pointer enters while still held — so no
- * custom drag handling is needed here.
- */
 const StepGrid = ({ active, currentStep, onStepChange }: StepGridProps) => {
   const groupCount = STEP_COUNT / GROUP_SIZE;
 

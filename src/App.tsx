@@ -6,13 +6,9 @@ import ADSRPanel from "./components/adsr/ADSRPanel";
 const styles = {
   center: css`
     margin-top: 48px;
-    gap: 24px;
     flex-grow: 1;
   `,
 
-  // AntD's own Title rule outranks a single custom class (same
-  // :where()-wrapped-hash situation as TempoKnob's input override), so
-  // !important is needed regardless of stylesheet insertion order.
   title: css`
     font-family: var(--heading) !important;
     font-weight: 500 !important;
@@ -30,7 +26,7 @@ const App = () => {
       vertical
       align="center"
       justify="center"
-      className={styles.center}
+      gap={24}
     >
       <Space size={"large"}>
         <StepSequencer />

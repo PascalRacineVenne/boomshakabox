@@ -30,15 +30,7 @@ interface MidTomPadProps {
   pressed: boolean;
   setPressed: (value: boolean) => void;
   trigger: (scheduledTime?: number) => void;
-  /** Highlights this pad — true when it's the instrument the step grid is currently editing. */
   selected?: boolean;
-  /**
-   * Called on any real interaction with the panel — pressing the trigger,
-   * turning a knob, dragging the slider — so this pad can be selected
-   * without necessarily hearing it. See the `onMouseDown` on the outer
-   * panel div below: selection is a property of the whole panel, not tied
-   * to the trigger button's own onChange.
-   */
   onSelect?: () => void;
 }
 const MidTomPad = ({
