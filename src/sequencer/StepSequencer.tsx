@@ -1,5 +1,6 @@
 import { css } from "@linaria/core";
-import { Flex } from "antd";
+import { Button, Flex } from "antd";
+import { ClearOutlined } from "@ant-design/icons";
 import TempoTransportPanel from "./TempoTransportPanel";
 import MasterPanel from "../components/master/MasterPanel";
 import FilterPanel from "../components/filter/FilterPanel";
@@ -37,6 +38,11 @@ const styles = {
     color: var(--text);
     width: 48px;
   `,
+  clearButton: css`
+    width: 48px;
+    display: flex;
+    justify-content: center;
+  `,
 };
 
 const GAP = "calc(var(--audioui-unit) / 2)";
@@ -69,6 +75,7 @@ const StepSequencer = () => {
     currentStep,
     setStep,
     setVelocity,
+    clearTrack,
   } = useStepSequencer(voices);
 
   return (
@@ -142,7 +149,16 @@ const StepSequencer = () => {
           />
         </Flex>
         <Flex gap={GAP}>
-          <span className={styles.gridLabel} />
+          <span className={styles.clearButton}>
+            <Button
+              danger
+              type="text"
+              size="small"
+              icon={<ClearOutlined />}
+              title={`Clear ${TRACK_LABELS[selectedTrack]}'s steps`}
+              onClick={clearTrack}
+            />
+          </span>
           <VelocityRow
             active={activePattern}
             velocities={activeVelocities}
