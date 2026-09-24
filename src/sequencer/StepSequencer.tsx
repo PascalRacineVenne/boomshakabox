@@ -23,8 +23,16 @@ import StepGrid from "./grid/StepGrid";
 import VelocityRow from "./grid/VelocityRow";
 import VoiceScope from "./oscilloscope/VoiceScope";
 import MiniGrid from "./grid/MiniGrid";
+import LengthControl from "./grid/LengthControl";
+import PageTabs from "./grid/PageTabs";
+import PatternOverview from "./grid/PatternOverview";
 import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
-import { useStepSequencer, TRACK_IDS, TRACK_LABELS } from "./grid/useStepSequencer";
+import {
+  useStepSequencer,
+  TRACK_IDS,
+  TRACK_LABELS,
+  STEP_COUNT,
+} from "./grid/useStepSequencer";
 import EffectsPanel from "../components/effects/EffectsPanel";
 import { useTransportPlayback } from "./transport/useTransportPlayback";
 import { useDrumMachineHotkeys } from "./useDrumMachineHotkeys";
@@ -117,6 +125,10 @@ const StepSequencer = () => {
     setStep,
     setVelocity,
     clearTrack,
+    length,
+    setLength,
+    viewedPage,
+    goToPage,
   } = useStepSequencer(voices);
 
   const transportPlayback = useTransportPlayback();
@@ -128,6 +140,16 @@ const StepSequencer = () => {
     selectTrack,
   );
 
+  // StepGrid always shows one page's worth of steps, indexed locally
+  // (0-15) — translate the sequencer's global playhead into that local
+  // frame, or -1 if the playhead is currently on a different page than
+  // the one being viewed (nothing on this page should show as "playing").
+  const pageRelativeStep =
+    Math.floor(currentStep / STEP_COUNT) === viewedPage
+      ? currentStep % STEP_COUNT
+      : -1;
+  const showPager = length > STEP_COUNT;
+
   return (
     <Flex vertical align="center" gap={GAP}>
       <Flex align="flex-start" gap={GAP}>
@@ -136,6 +158,7 @@ const StepSequencer = () => {
           togglePlayPause={transportPlayback.togglePlayPause}
           stop={transportPlayback.stop}
         />
+        <LengthControl length={length} onChange={setLength} />
         <FilterPanel />
         <EffectsPanel />
         <MasterPanel />
@@ -164,6 +187,7 @@ const StepSequencer = () => {
         <MiniGrid
           patterns={patternsDisplay}
           currentStep={currentStep}
+          length={length}
           selectedTrack={selectedTrack}
           onSelectTrack={selectTrack}
         />
@@ -214,14 +238,31 @@ const StepSequencer = () => {
       </Flex>
 
       <Flex vertical gap={4} className={styles.gridRow}>
+        {showPager && (
+          <Flex vertical gap={4}>
+            <PageTabs
+              length={length}
+              viewedPage={viewedPage}
+              onSelectPage={goToPage}
+            />
+            <PatternOverview
+              patterns={patternsDisplay}
+              currentStep={currentStep}
+              length={length}
+              viewedPage={viewedPage}
+              onSelectPage={goToPage}
+            />
+          </Flex>
+        )}
         <Flex align="center" gap={GAP}>
           <span className={styles.gridLabel}>
             {TRACK_LABELS[selectedTrack]}
           </span>
           <StepGrid
             active={activePattern}
-            currentStep={currentStep}
+            currentStep={pageRelativeStep}
             onStepChange={setStep}
+            startNumber={viewedPage * STEP_COUNT + 1}
           />
         </Flex>
         <Flex gap={GAP} align="flex-start">

@@ -1,11 +1,6 @@
 import { css } from "@linaria/core";
 import classNames from "classnames";
-import {
-  STEP_COUNT,
-  TRACK_IDS,
-  TRACK_LABELS,
-  type TrackId,
-} from "./useStepSequencer";
+import { TRACK_IDS, TRACK_LABELS, type TrackId } from "./useStepSequencer";
 import { Flex } from "antd";
 
 const styles = {
@@ -61,6 +56,7 @@ const GROUP_SIZE = 4;
 interface MiniGridProps {
   patterns: Record<TrackId, boolean[]>;
   currentStep: number;
+  length: number;
   selectedTrack: TrackId;
   onSelectTrack: (id: TrackId) => void;
 }
@@ -68,6 +64,7 @@ interface MiniGridProps {
 const MiniGrid = ({
   patterns,
   currentStep,
+  length,
   selectedTrack,
   onSelectTrack,
 }: MiniGridProps) => {
@@ -91,7 +88,7 @@ const MiniGrid = ({
             {TRACK_IDS.indexOf(trackId) + 1}
           </span>
           <Flex gap={2}>
-            {Array.from({ length: STEP_COUNT }, (_, stepIndex) => (
+            {Array.from({ length }, (_, stepIndex) => (
               <div
                 key={stepIndex}
                 className={classNames(
@@ -99,7 +96,7 @@ const MiniGrid = ({
                   patterns[trackId][stepIndex] && styles.stepActive,
                   stepIndex === currentStep && styles.stepPlayhead,
                   (stepIndex + 1) % GROUP_SIZE === 0 &&
-                    stepIndex !== STEP_COUNT - 1 &&
+                    stepIndex !== length - 1 &&
                     styles.stepGroupEnd,
                 )}
               />
