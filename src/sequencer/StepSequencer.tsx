@@ -1,6 +1,6 @@
 import { css } from "@linaria/core";
 import { Button, Flex } from "antd";
-import { ClearOutlined } from "@ant-design/icons";
+// import { DeleteOutlined } from "@ant-design/icons";
 import TempoTransportPanel from "./TempoTransportPanel";
 import MasterPanel from "../components/master/MasterPanel";
 import FilterPanel from "../components/filter/FilterPanel";
@@ -34,14 +34,26 @@ const styles = {
     padding: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
   `,
   gridLabel: css`
-    font-size: 12px;
+    font-size: 14px;
     color: var(--text);
     width: 48px;
   `,
   clearButton: css`
     width: 48px;
-    display: flex;
-    justify-content: center;
+    font-size: 10px;
+    color: var(--text);
+
+    .ant-btn {
+      background: black;
+      border: 1px solid var(--contrast-2);
+      box-shadow: 1px 1px 4px var(--contrast-2);
+      width: 22px;
+
+      &:hover {
+        border: 1px solid var(--contrast-1) !important;
+        box-shadow: 1px 1px 4px var(--contrast-1);
+      }
+    }
   `,
 };
 
@@ -149,16 +161,21 @@ const StepSequencer = () => {
           />
         </Flex>
         <Flex gap={GAP}>
-          <span className={styles.clearButton}>
+          <Flex
+            vertical
+            align="center"
+            justify="center"
+            className={styles.clearButton}
+          >
             <Button
-              danger
+              variant="outlined"
               type="text"
               size="small"
-              icon={<ClearOutlined />}
               title={`Clear ${TRACK_LABELS[selectedTrack]}'s steps`}
               onClick={clearTrack}
             />
-          </span>
+            CLEAR
+          </Flex>
           <VelocityRow
             active={activePattern}
             velocities={activeVelocities}
