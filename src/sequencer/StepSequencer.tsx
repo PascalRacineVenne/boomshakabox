@@ -1,5 +1,5 @@
 import { css } from "@linaria/core";
-import { Button, Flex } from "antd";
+import { Button, Collapse, Flex } from "antd";
 import TempoTransportPanel from "./TempoTransportPanel";
 import MasterPanel from "../components/master/MasterPanel";
 import FilterPanel from "../components/filter/FilterPanel";
@@ -21,12 +21,35 @@ import { useMidTomVoice } from "../components/midTom/useMidTomVoice";
 import { useLowTomVoice } from "../components/lowTom/useLowTomVoice";
 import StepGrid from "./StepGrid";
 import VelocityRow from "./VelocityRow";
+import VoiceScope from "./VoiceScope";
 import MiniGrid from "./MiniGrid";
 import VoiceParamsTable from "./VoiceParamsTable";
 import { useStepSequencer, TRACK_LABELS } from "./useStepSequencer";
 import EffectsPanel from "../components/filter/EffectsPanel";
 
 const styles = {
+  scopeCollapse: css`
+    width: fit-content;
+    border: none;
+
+    .ant-collapse-header {
+      padding: 0 0 4px !important;
+      align-items: center !important;
+    }
+    .ant-collapse-expand-icon {
+      color: var(--contrast-1) !important;
+    }
+    .ant-collapse-title {
+      font-size: 11px !important;
+      color: var(--text) !important;
+      text-align: left !important;
+    }
+    .ant-collapse-body {
+      background: black;
+      border: 1px solid var(--accent-border);
+      border-radius: 0 0 8px 8px;
+    }
+  `,
   gridRow: css`
     border: 1px solid var(--accent-border);
     border-radius: 8px;
@@ -99,12 +122,29 @@ const StepSequencer = () => {
         <EffectsPanel />
         <MasterPanel />
       </Flex>
-      <MiniGrid
-        patterns={patternsDisplay}
-        currentStep={currentStep}
-        selectedTrack={selectedTrack}
-        onSelectTrack={selectTrack}
-      />
+      <Flex align="flex-start" gap={GAP}>
+        <Collapse
+          size="small"
+          className={styles.scopeCollapse}
+          defaultActiveKey={["scope"]}
+          destroyOnHidden
+          items={[
+            {
+              key: "scope",
+              label: `${TRACK_LABELS[selectedTrack]} — waveform`,
+              children: (
+                <VoiceScope key={selectedTrack} voice={voices[selectedTrack]} />
+              ),
+            },
+          ]}
+        />
+        <MiniGrid
+          patterns={patternsDisplay}
+          currentStep={currentStep}
+          selectedTrack={selectedTrack}
+          onSelectTrack={selectTrack}
+        />
+      </Flex>
       <Flex>
         <KickPad
           {...kickVoice}
