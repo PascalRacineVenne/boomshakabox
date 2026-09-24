@@ -25,6 +25,7 @@ import VoiceScope from "./oscilloscope/VoiceScope";
 import MiniGrid from "./grid/MiniGrid";
 import LengthControl from "./grid/LengthControl";
 import PageTabs from "./grid/PageTabs";
+import PageDots from "./grid/PageDots";
 import PatternOverview from "./grid/PatternOverview";
 import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
 import {
@@ -184,13 +185,22 @@ const StepSequencer = () => {
             },
           ]}
         />
-        <MiniGrid
-          patterns={patternsDisplay}
-          currentStep={currentStep}
-          length={length}
-          selectedTrack={selectedTrack}
-          onSelectTrack={selectTrack}
-        />
+        <Flex vertical gap={4} align="center">
+          <MiniGrid
+            patterns={patternsDisplay}
+            currentStep={pageRelativeStep}
+            viewedPage={viewedPage}
+            selectedTrack={selectedTrack}
+            onSelectTrack={selectTrack}
+          />
+          {showPager && (
+            <PageDots
+              length={length}
+              viewedPage={viewedPage}
+              onSelectPage={goToPage}
+            />
+          )}
+        </Flex>
       </Flex>
       <Flex>
         <KickPad
