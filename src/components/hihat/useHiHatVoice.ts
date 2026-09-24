@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import * as Tone from "tone";
 import { HI_HAT_OSCILLATOR_FREQUENCIES } from "../../lib/hiHatOscillatorFrequencies";
 import {
@@ -6,7 +6,8 @@ import {
   triggerMasterFilterEnvelope,
 } from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
-import { SCOPE_WAVEFORM_SIZE } from "../../lib/voiceScope";
+import { renderOfflineWaveform, useScopeWaveform } from "../../lib/voiceScope";
+import { computeLevel } from "../../lib/voiceLevel";
 
 const DECAY = 0.05;
 export const HH_TONE_MIN = 3000;
@@ -57,14 +58,10 @@ const buildAndTriggerHiHat = (
   };
 };
 
-const renderHiHatFullWaveform = async (
-  params: HiHatChainParams,
-): Promise<Float32Array> => {
-  const buffer = await Tone.Offline(({ destination }) => {
-    buildAndTriggerHiHat(params, 0, destination);
-  }, DECAY + 0.05);
-  return buffer.getChannelData(0);
-};
+const renderHiHatFullWaveform = (params: HiHatChainParams) =>
+  renderOfflineWaveform(DECAY + 0.05, (now, destination) =>
+    buildAndTriggerHiHat(params, now, destination),
+  );
 
 export const useHiHatVoice = () => {
   const [tone, setTone] = useState(7000);
@@ -74,17 +71,7 @@ export const useHiHatVoice = () => {
   const [soloed, setSolo] = useState(false);
   const [pressed, setPressed] = useState(false);
 
-  // Persistent live-oscilloscope tap — see useKickVoice.ts's waveformRef
-  // for the full rationale (mount-only effect, StrictMode-safe).
-  const waveformRef = useRef<Tone.Waveform | null>(null);
-  useEffect(() => {
-    const waveform = new Tone.Waveform(SCOPE_WAVEFORM_SIZE);
-    waveformRef.current = waveform;
-    return () => {
-      waveform.dispose();
-      waveformRef.current = null;
-    };
-  }, []);
+  const waveformRef = useScopeWaveform();
 
   const trigger = async (scheduledTime?: number, velocity = 100) => {
     if (scheduledTime === undefined) {
@@ -92,7 +79,7 @@ export const useHiHatVoice = () => {
     }
 
     const now = scheduledTime ?? Tone.now();
-    const level = muted ? 0 : (volume / 100) * (velocity / 100); // Volume x the step's velocity (0-100%), forced silent while muted
+    const level = computeLevel(muted, volume, velocity);
 
     triggerMasterFilterEnvelope(now);
 
@@ -109,7 +96,7 @@ export const useHiHatVoice = () => {
   // On-demand full-hit render for VoiceScope — see useKickVoice.ts's
   // renderFullWaveform for why this isn't a self-driving effect.
   const renderFullWaveform = useCallback(() => {
-    const level = muted ? 0 : volume / 100;
+    const level = computeLevel(muted, volume);
     return renderHiHatFullWaveform({ tone, level, pan });
   }, [tone, volume, pan, muted]);
 

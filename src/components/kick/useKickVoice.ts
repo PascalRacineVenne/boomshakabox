@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import * as Tone from "tone";
 import {
   masterBusInput,
   triggerMasterFilterEnvelope,
 } from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
-import { SCOPE_WAVEFORM_SIZE } from "../../lib/voiceScope";
+import { renderOfflineWaveform, useScopeWaveform } from "../../lib/voiceScope";
+import { computeLevel } from "../../lib/voiceLevel";
 
 export const KICK_PITCH_MIN = 34;
 export const KICK_PITCH_MAX = 72;
@@ -126,15 +127,11 @@ const buildAndTriggerKick = (
 // once. Skips triggerMasterFilterEnvelope (a global master-bus side effect
 // that shouldn't fire from a background render) and startAudioContext (the
 // offline context manages its own lifecycle).
-const renderKickFullWaveform = async (
-  params: KickChainParams,
-): Promise<Float32Array> => {
-  const renderLength =
-    params.length + RELEASE_TAIL + ENVELOPE_RELEASE + 0.05;
-  const buffer = await Tone.Offline(({ destination }) => {
-    buildAndTriggerKick(params, 0, destination);
-  }, renderLength);
-  return buffer.getChannelData(0);
+const renderKickFullWaveform = (params: KickChainParams) => {
+  const renderLength = params.length + RELEASE_TAIL + ENVELOPE_RELEASE + 0.05;
+  return renderOfflineWaveform(renderLength, (now, destination) =>
+    buildAndTriggerKick(params, now, destination),
+  );
 };
 
 export const useKickVoice = () => {
@@ -149,24 +146,7 @@ export const useKickVoice = () => {
   const [soloed, setSolo] = useState(false);
   const [pressed, setPressed] = useState(false);
 
-  // Prototype: a persistent Tone.Waveform this voice's panner taps into on
-  // every hit (in parallel with masterBusInput, not instead of it), so a UI
-  // component can read its current buffer for a live oscilloscope-style
-  // display. Built/disposed in a mount-only effect rather than the render
-  // body — see useADSR.ts for why (StrictMode's dev-only mount→cleanup→
-  // mount replay leaves a render-body-created ref permanently null
-  // otherwise). Every other node in trigger() stays ephemeral/per-hit as
-  // usual; only this analyser is long-lived, since something has to be
-  // there to read from between hits.
-  const waveformRef = useRef<Tone.Waveform | null>(null);
-  useEffect(() => {
-    const waveform = new Tone.Waveform(SCOPE_WAVEFORM_SIZE);
-    waveformRef.current = waveform;
-    return () => {
-      waveform.dispose();
-      waveformRef.current = null;
-    };
-  }, []);
+  const waveformRef = useScopeWaveform();
 
   const trigger = async (scheduledTime?: number, velocity = 100) => {
     if (scheduledTime === undefined) {
@@ -174,7 +154,7 @@ export const useKickVoice = () => {
     }
 
     const now = scheduledTime ?? Tone.now();
-    const level = muted ? 0 : (volume / 100) * (velocity / 100);
+    const level = computeLevel(muted, volume, velocity);
 
     triggerMasterFilterEnvelope(now);
 
@@ -195,7 +175,7 @@ export const useKickVoice = () => {
   // called while a scope panel showing this voice is actually open, so
   // nothing renders offline audio for a voice nobody's looking at.
   const renderFullWaveform = useCallback(() => {
-    const level = muted ? 0 : volume / 100;
+    const level = computeLevel(muted, volume);
     return renderKickFullWaveform({ pitch, punch, length, click, fatness, level, pan });
   }, [pitch, punch, length, click, fatness, volume, pan, muted]);
 

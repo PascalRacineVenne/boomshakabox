@@ -1,29 +1,23 @@
 import { useEffect, useRef } from "react";
 import type { RefObject } from "react";
 import type * as Tone from "tone";
-import { css } from "@linaria/core";
-
-const WIDTH = 160;
-const HEIGHT = 130; // roughly matches MiniGrid's own height, so the row reads evenly
-
-const styles = {
-  canvas: css`
-    border: 1px solid var(--accent-border);
-    border-radius: 8px;
-    background: black;
-  `,
-};
+import {
+  SCOPE_CANVAS_WIDTH,
+  SCOPE_CANVAS_HEIGHT,
+  scopeCanvasClass,
+  resolveScopeStrokeColor,
+} from "./scopeCanvas";
 
 interface WaveformDisplayProps {
   waveformRef: RefObject<Tone.Waveform | null>;
 }
 
 /**
- * Prototype: a live oscilloscope-style view of one voice's current
- * waveform buffer — reads whatever `waveformRef` points at (see
- * `useKickVoice.ts`'s own `waveformRef` for how that persistent analyser
- * gets populated; every hit's ephemeral chain taps into it in parallel
- * with the audible signal path).
+ * A live oscilloscope-style view of one voice's current waveform buffer —
+ * reads whatever `waveformRef` points at (see `useScopeWaveform` in
+ * lib/voiceScope.ts for how that persistent analyser gets populated; every
+ * hit's ephemeral chain taps into it in parallel with the audible signal
+ * path).
  *
  * Draws continuously via `requestAnimationFrame`, deliberately NOT
  * `Tone.Draw` — that's for syncing UI updates to precise
@@ -40,12 +34,7 @@ const WaveformDisplay = ({ waveformRef }: WaveformDisplayProps) => {
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
 
-    // Canvas doesn't reliably resolve CSS custom properties across engines
-    // when passed straight to strokeStyle, so resolve --contrast-1 to a
-    // concrete color once up front instead.
-    const strokeColor = getComputedStyle(canvas)
-      .getPropertyValue("--contrast-1")
-      .trim();
+    const strokeColor = resolveScopeStrokeColor(canvas);
 
     let frameId: number;
 
@@ -80,9 +69,9 @@ const WaveformDisplay = ({ waveformRef }: WaveformDisplayProps) => {
   return (
     <canvas
       ref={canvasRef}
-      width={WIDTH}
-      height={HEIGHT}
-      className={styles.canvas}
+      width={SCOPE_CANVAS_WIDTH}
+      height={SCOPE_CANVAS_HEIGHT}
+      className={scopeCanvasClass}
     />
   );
 };

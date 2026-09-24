@@ -1,11 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import * as Tone from "tone";
 import {
   masterBusInput,
   triggerMasterFilterEnvelope,
 } from "../../lib/masterBus";
 import { startAudioContext } from "../../lib/startAudioContext";
-import { SCOPE_WAVEFORM_SIZE } from "../../lib/voiceScope";
+import { renderOfflineWaveform, useScopeWaveform } from "../../lib/voiceScope";
+import { computeLevel } from "../../lib/voiceLevel";
 
 // Ratio between the two tone-voice VCOs in the original fixed-frequency
 // recipe (330/180) — preserved when the "Tone" knob shifts the base
@@ -74,14 +75,10 @@ const buildAndTriggerSnare = (
   };
 };
 
-const renderSnareFullWaveform = async (
-  params: SnareChainParams,
-): Promise<Float32Array> => {
-  const buffer = await Tone.Offline(({ destination }) => {
-    buildAndTriggerSnare(params, 0, destination);
-  }, DURATION + 0.05);
-  return buffer.getChannelData(0);
-};
+const renderSnareFullWaveform = (params: SnareChainParams) =>
+  renderOfflineWaveform(DURATION + 0.05, (now, destination) =>
+    buildAndTriggerSnare(params, now, destination),
+  );
 
 export const useSnareVoice = () => {
   const [tone, setTone] = useState(180);
@@ -92,17 +89,7 @@ export const useSnareVoice = () => {
   const [soloed, setSolo] = useState(false);
   const [pressed, setPressed] = useState(false);
 
-  // Persistent live-oscilloscope tap — see useKickVoice.ts's waveformRef
-  // for the full rationale (mount-only effect, StrictMode-safe).
-  const waveformRef = useRef<Tone.Waveform | null>(null);
-  useEffect(() => {
-    const waveform = new Tone.Waveform(SCOPE_WAVEFORM_SIZE);
-    waveformRef.current = waveform;
-    return () => {
-      waveform.dispose();
-      waveformRef.current = null;
-    };
-  }, []);
+  const waveformRef = useScopeWaveform();
 
   const trigger = async (scheduledTime?: number, velocity = 100) => {
     if (scheduledTime === undefined) {
@@ -110,7 +97,7 @@ export const useSnareVoice = () => {
     }
 
     const now = scheduledTime ?? Tone.now();
-    const level = muted ? 0 : (volume / 100) * (velocity / 100);
+    const level = computeLevel(muted, volume, velocity);
 
     triggerMasterFilterEnvelope(now);
 
@@ -127,7 +114,7 @@ export const useSnareVoice = () => {
   // On-demand full-hit render for VoiceScope — see useKickVoice.ts's
   // renderFullWaveform for why this isn't a self-driving effect.
   const renderFullWaveform = useCallback(() => {
-    const level = muted ? 0 : volume / 100;
+    const level = computeLevel(muted, volume);
     return renderSnareFullWaveform({ tone, snappy, level, pan });
   }, [tone, snappy, volume, pan, muted]);
 

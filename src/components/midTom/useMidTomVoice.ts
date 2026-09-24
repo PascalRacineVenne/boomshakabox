@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import * as Tone from "tone";
 import { startAudioContext } from "../../lib/startAudioContext";
 import {
@@ -6,7 +6,8 @@ import {
   triggerMasterFilterEnvelope,
 } from "../../lib/masterBus";
 import { distortionMakeupGain } from "../../lib/distortionMakeupGain";
-import { SCOPE_WAVEFORM_SIZE } from "../../lib/voiceScope";
+import { renderOfflineWaveform, useScopeWaveform } from "../../lib/voiceScope";
+import { computeLevel } from "../../lib/voiceLevel";
 
 export const TONE_MIN = 120;
 export const TONE_MAX = 160;
@@ -74,14 +75,10 @@ const buildAndTriggerMidTom = (
   };
 };
 
-const renderMidTomFullWaveform = async (
-  params: MidTomChainParams,
-): Promise<Float32Array> => {
-  const buffer = await Tone.Offline(({ destination }) => {
-    buildAndTriggerMidTom(params, 0, destination);
-  }, params.decay + 0.05);
-  return buffer.getChannelData(0);
-};
+const renderMidTomFullWaveform = (params: MidTomChainParams) =>
+  renderOfflineWaveform(params.decay + 0.05, (now, destination) =>
+    buildAndTriggerMidTom(params, now, destination),
+  );
 
 export const useMidTomVoice = () => {
   const [tone, setTone] = useState(140);
@@ -92,17 +89,7 @@ export const useMidTomVoice = () => {
   const [soloed, setSolo] = useState(false);
   const [pressed, setPressed] = useState(false);
 
-  // Persistent live-oscilloscope tap — see useKickVoice.ts's waveformRef
-  // for the full rationale (mount-only effect, StrictMode-safe).
-  const waveformRef = useRef<Tone.Waveform | null>(null);
-  useEffect(() => {
-    const waveform = new Tone.Waveform(SCOPE_WAVEFORM_SIZE);
-    waveformRef.current = waveform;
-    return () => {
-      waveform.dispose();
-      waveformRef.current = null;
-    };
-  }, []);
+  const waveformRef = useScopeWaveform();
 
   const trigger = async (scheduledTime?: number, velocity = 100) => {
     if (scheduledTime === undefined) {
@@ -110,7 +97,7 @@ export const useMidTomVoice = () => {
     }
 
     const now = scheduledTime ?? Tone.now();
-    const level = muted ? 0 : (volume / 100) * (velocity / 100);
+    const level = computeLevel(muted, volume, velocity);
 
     triggerMasterFilterEnvelope(now);
 
@@ -127,7 +114,7 @@ export const useMidTomVoice = () => {
   // On-demand full-hit render for VoiceScope — see useKickVoice.ts's
   // renderFullWaveform for why this isn't a self-driving effect.
   const renderFullWaveform = useCallback(() => {
-    const level = muted ? 0 : volume / 100;
+    const level = computeLevel(muted, volume);
     return renderMidTomFullWaveform({ tone, decay, level, pan });
   }, [tone, decay, volume, pan, muted]);
 

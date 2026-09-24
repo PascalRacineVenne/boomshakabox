@@ -1,16 +1,10 @@
 import { useEffect, useRef } from "react";
-import { css } from "@linaria/core";
-
-const WIDTH = 160;
-const HEIGHT = 130; // matches WaveformDisplay's own size, so the pair reads as one row
-
-const styles = {
-  canvas: css`
-    border: 1px solid var(--accent-border);
-    border-radius: 8px;
-    background: black;
-  `,
-};
+import {
+  SCOPE_CANVAS_WIDTH,
+  SCOPE_CANVAS_HEIGHT,
+  scopeCanvasClass,
+  resolveScopeStrokeColor,
+} from "./scopeCanvas";
 
 interface FullWaveformDisplayProps {
   data: Float32Array | null;
@@ -19,9 +13,9 @@ interface FullWaveformDisplayProps {
 /**
  * A complete, static picture of one full hit — unlike WaveformDisplay's
  * live rolling analyser window (only ever a few ms of "right now"), this
- * data comes from an offline render of the entire hit (see
- * useKickVoice.ts's renderKickFullWaveform), so the whole duration can be
- * drawn at once, closer to how a sample browser shows a pre-recorded file.
+ * data comes from an offline render of the entire hit (see each
+ * useXVoice.ts's renderFullWaveform), so the whole duration can be drawn
+ * at once, closer to how a sample browser shows a pre-recorded file.
  */
 const FullWaveformDisplay = ({ data }: FullWaveformDisplayProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -31,9 +25,7 @@ const FullWaveformDisplay = ({ data }: FullWaveformDisplayProps) => {
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
 
-    const strokeColor = getComputedStyle(canvas)
-      .getPropertyValue("--contrast-1")
-      .trim();
+    const strokeColor = resolveScopeStrokeColor(canvas);
 
     const { width, height } = canvas;
     ctx.clearRect(0, 0, width, height);
@@ -70,9 +62,9 @@ const FullWaveformDisplay = ({ data }: FullWaveformDisplayProps) => {
   return (
     <canvas
       ref={canvasRef}
-      width={WIDTH}
-      height={HEIGHT}
-      className={styles.canvas}
+      width={SCOPE_CANVAS_WIDTH}
+      height={SCOPE_CANVAS_HEIGHT}
+      className={scopeCanvasClass}
     />
   );
 };
