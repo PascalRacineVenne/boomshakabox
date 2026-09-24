@@ -109,6 +109,16 @@ export const useStepSequencer = (voices: Voices) => {
     setVelocitiesDisplay((prev) => ({ ...prev, [track]: updated }));
   };
 
+  const clearTrack = () => {
+    const track = selectedTrack;
+
+    patternsRef.current[track] = emptyPattern();
+    setPatternsDisplay((prev) => ({ ...prev, [track]: emptyPattern() }));
+
+    velocitiesRef.current[track] = defaultVelocities();
+    setVelocitiesDisplay((prev) => ({ ...prev, [track]: defaultVelocities() }));
+  };
+
   return {
     patternsDisplay,
     activePattern: patternsDisplay[selectedTrack],
@@ -119,5 +129,6 @@ export const useStepSequencer = (voices: Voices) => {
     currentStep,
     setStep,
     setVelocity,
+    clearTrack,
   };
 };
