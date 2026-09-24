@@ -16,10 +16,6 @@ interface HiHatOpenChainParams {
   pan: number;
 }
 
-// Shared between live playback (connected to masterBusInput) and offline
-// rendering for VoiceScope's full-waveform preview (connected to an
-// OfflineAudioContext's destination instead) — see useKickVoice.ts for why
-// this split exists.
 const buildAndTriggerHiHatOpen = (
   { tone, decay, level, pan }: HiHatOpenChainParams,
   now: number,
@@ -55,11 +51,6 @@ const buildAndTriggerHiHatOpen = (
   };
 };
 
-const renderHiHatOpenFullWaveform = (params: HiHatOpenChainParams) =>
-  renderOfflineWaveform(params.decay + 0.05, (now, destination) =>
-    buildAndTriggerHiHatOpen(params, now, destination),
-  );
-
 export const useHiHatOpenVoice = () => {
   const [tone, setTone] = useState(7000);
   const [decay, setDecay] = useState(0.4);
@@ -91,11 +82,11 @@ export const useHiHatOpenVoice = () => {
     setTimeout(dispose, (duration + 0.1) * 1000);
   };
 
-  // On-demand full-hit render for VoiceScope — see useKickVoice.ts's
-  // renderFullWaveform for why this isn't a self-driving effect.
   const renderFullWaveform = useCallback(() => {
     const level = computeLevel(muted, volume);
-    return renderHiHatOpenFullWaveform({ tone, decay, level, pan });
+    return renderOfflineWaveform(decay + 0.05, (now, destination) =>
+      buildAndTriggerHiHatOpen({ tone, decay, level, pan }, now, destination),
+    );
   }, [tone, decay, volume, pan, muted]);
 
   return {

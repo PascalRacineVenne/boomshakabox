@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import type { RefObject } from "react";
 import * as Tone from "tone";
 
-// Shared by every useXVoice.ts hook's live-oscilloscope tap — small enough to redraw every animation frame cheaply.
 export const SCOPE_WAVEFORM_SIZE = 256;
 
 export interface VoiceScopeSource {

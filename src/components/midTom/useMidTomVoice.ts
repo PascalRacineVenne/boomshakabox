@@ -26,10 +26,6 @@ interface MidTomChainParams {
   pan: number;
 }
 
-// Shared between live playback (connected to masterBusInput) and offline
-// rendering for VoiceScope's full-waveform preview (connected to an
-// OfflineAudioContext's destination instead) — see useKickVoice.ts for why
-// this split exists.
 const buildAndTriggerMidTom = (
   { tone, decay, level, pan }: MidTomChainParams,
   now: number,
@@ -52,7 +48,7 @@ const buildAndTriggerMidTom = (
   ampGain.gain.exponentialRampToValueAtTime(0.001, now + decay);
 
   const panner = new Tone.Panner(pan / 100).connect(destination);
-  if (waveform) panner.connect(waveform); // parallel tap, doesn't affect the audible signal path
+  if (waveform) panner.connect(waveform);
 
   osc.connect(filter);
   filter.connect(saturation);
@@ -74,11 +70,6 @@ const buildAndTriggerMidTom = (
     },
   };
 };
-
-const renderMidTomFullWaveform = (params: MidTomChainParams) =>
-  renderOfflineWaveform(params.decay + 0.05, (now, destination) =>
-    buildAndTriggerMidTom(params, now, destination),
-  );
 
 export const useMidTomVoice = () => {
   const [tone, setTone] = useState(140);
@@ -111,11 +102,11 @@ export const useMidTomVoice = () => {
     setTimeout(dispose, (duration + 0.1) * 1000);
   };
 
-  // On-demand full-hit render for VoiceScope — see useKickVoice.ts's
-  // renderFullWaveform for why this isn't a self-driving effect.
   const renderFullWaveform = useCallback(() => {
     const level = computeLevel(muted, volume);
-    return renderMidTomFullWaveform({ tone, decay, level, pan });
+    return renderOfflineWaveform(decay + 0.05, (now, destination) =>
+      buildAndTriggerMidTom({ tone, decay, level, pan }, now, destination),
+    );
   }, [tone, decay, volume, pan, muted]);
 
   return {

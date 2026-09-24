@@ -26,10 +26,6 @@ interface LowTomChainParams {
   pan: number;
 }
 
-// Shared between live playback (connected to masterBusInput) and offline
-// rendering for VoiceScope's full-waveform preview (connected to an
-// OfflineAudioContext's destination instead) — see useKickVoice.ts for why
-// this split exists.
 const buildAndTriggerLowTom = (
   { tone, decay, level, pan }: LowTomChainParams,
   now: number,
@@ -52,7 +48,7 @@ const buildAndTriggerLowTom = (
   ampGain.gain.exponentialRampToValueAtTime(0.001, now + decay);
 
   const panner = new Tone.Panner(pan / 100).connect(destination);
-  if (waveform) panner.connect(waveform); // parallel tap, doesn't affect the audible signal path
+  if (waveform) panner.connect(waveform);
 
   osc.connect(filter);
   filter.connect(saturation);
@@ -74,11 +70,6 @@ const buildAndTriggerLowTom = (
     },
   };
 };
-
-const renderLowTomFullWaveform = (params: LowTomChainParams) =>
-  renderOfflineWaveform(params.decay + 0.05, (now, destination) =>
-    buildAndTriggerLowTom(params, now, destination),
-  );
 
 export const useLowTomVoice = () => {
   const [tone, setTone] = useState(90);
@@ -111,11 +102,11 @@ export const useLowTomVoice = () => {
     setTimeout(dispose, (duration + 0.1) * 1000);
   };
 
-  // On-demand full-hit render for VoiceScope — see useKickVoice.ts's
-  // renderFullWaveform for why this isn't a self-driving effect.
   const renderFullWaveform = useCallback(() => {
     const level = computeLevel(muted, volume);
-    return renderLowTomFullWaveform({ tone, decay, level, pan });
+    return renderOfflineWaveform(decay + 0.05, (now, destination) =>
+      buildAndTriggerLowTom({ tone, decay, level, pan }, now, destination),
+    );
   }, [tone, decay, volume, pan, muted]);
 
   return {

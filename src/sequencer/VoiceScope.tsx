@@ -11,19 +11,6 @@ interface VoiceScopeProps {
   voice: VoiceScopeSource;
 }
 
-/**
- * Both waveform views for whichever voice is currently selected — a live
- * rolling window (WaveformDisplay, reading voice.waveformRef directly) and
- * a complete offline-rendered hit (FullWaveformDisplay, recomputed here on
- * a debounce via voice.renderFullWaveform). Meant to be mounted only while
- * its containing Collapse panel is open (see StepSequencer.tsx's
- * destroyOnHidden), so neither the rAF/canvas loop nor the offline-render
- * debounce below does any work for a voice nobody's looking at.
- *
- * StepSequencer.tsx renders this with `key={selectedTrack}` — remounting
- * on voice switch gives fullWaveform a fresh initial `null` for free,
- * rather than clearing it by hand in an effect.
- */
 const VoiceScope = ({ voice }: VoiceScopeProps) => {
   const { waveformRef, renderFullWaveform } = voice;
   const [fullWaveform, setFullWaveform] = useState<Float32Array | null>(null);

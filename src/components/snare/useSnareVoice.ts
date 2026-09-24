@@ -27,10 +27,6 @@ interface SnareChainParams {
   pan: number;
 }
 
-// Shared between live playback (connected to masterBusInput) and offline
-// rendering for VoiceScope's full-waveform preview (connected to an
-// OfflineAudioContext's destination instead) — see useKickVoice.ts for why
-// this split exists.
 const buildAndTriggerSnare = (
   { tone, snappy, level, pan }: SnareChainParams,
   now: number,
@@ -38,7 +34,7 @@ const buildAndTriggerSnare = (
   waveform?: Tone.Waveform | null,
 ) => {
   const panner = new Tone.Panner(pan / 100).connect(destination);
-  if (waveform) panner.connect(waveform); // parallel tap, doesn't affect the audible signal path
+  if (waveform) panner.connect(waveform);
 
   const toneGain = new Tone.Gain(1).connect(panner);
   toneGain.gain.setValueAtTime(0.7 * level, now);
@@ -75,11 +71,6 @@ const buildAndTriggerSnare = (
   };
 };
 
-const renderSnareFullWaveform = (params: SnareChainParams) =>
-  renderOfflineWaveform(DURATION + 0.05, (now, destination) =>
-    buildAndTriggerSnare(params, now, destination),
-  );
-
 export const useSnareVoice = () => {
   const [tone, setTone] = useState(180);
   const [snappy, setSnappy] = useState(1);
@@ -111,11 +102,11 @@ export const useSnareVoice = () => {
     setTimeout(dispose, (duration + 0.1) * 1000);
   };
 
-  // On-demand full-hit render for VoiceScope — see useKickVoice.ts's
-  // renderFullWaveform for why this isn't a self-driving effect.
   const renderFullWaveform = useCallback(() => {
     const level = computeLevel(muted, volume);
-    return renderSnareFullWaveform({ tone, snappy, level, pan });
+    return renderOfflineWaveform(DURATION + 0.05, (now, destination) =>
+      buildAndTriggerSnare({ tone, snappy, level, pan }, now, destination),
+    );
   }, [tone, snappy, volume, pan, muted]);
 
   return {

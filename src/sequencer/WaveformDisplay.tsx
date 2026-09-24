@@ -12,20 +12,6 @@ interface WaveformDisplayProps {
   waveformRef: RefObject<Tone.Waveform | null>;
 }
 
-/**
- * A live oscilloscope-style view of one voice's current waveform buffer —
- * reads whatever `waveformRef` points at (see `useScopeWaveform` in
- * lib/voiceScope.ts for how that persistent analyser gets populated; every
- * hit's ephemeral chain taps into it in parallel with the audible signal
- * path).
- *
- * Draws continuously via `requestAnimationFrame`, deliberately NOT
- * `Tone.Draw` — that's for syncing UI updates to precise
- * Transport-scheduled times (the step playhead); this has no scheduled
- * event to sync to, it's just "redraw whatever's currently in the
- * analyser buffer, every frame," the standard case `requestAnimationFrame`
- * is actually for.
- */
 const WaveformDisplay = ({ waveformRef }: WaveformDisplayProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 

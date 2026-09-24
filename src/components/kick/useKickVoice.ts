@@ -44,12 +44,6 @@ interface KickChainParams {
   pan: number;
 }
 
-// The full trigger()-chain topology, shared between live playback (connected
-// to masterBusInput) and offline rendering (connected straight to an
-// OfflineAudioContext's destination, for the full-waveform preview — see
-// renderKickFullWaveform below). Nodes created in here bind to whatever
-// context is "current" at call time, which is how Tone.Offline's callback
-// captures them automatically as long as this runs synchronously inside it.
 const buildAndTriggerKick = (
   { pitch, punch, length, click, fatness, level, pan }: KickChainParams,
   now: number,
@@ -59,7 +53,7 @@ const buildAndTriggerKick = (
   const duration = length + RELEASE_TAIL;
 
   const panner = new Tone.Panner(pan / 100).connect(destination);
-  if (waveform) panner.connect(waveform); // parallel tap, doesn't affect the audible signal path
+  if (waveform) panner.connect(waveform);
   const volumeGain = new Tone.Gain(level).connect(panner);
   const outputMakeup = new Tone.Gain(OUTPUT_MAKEUP_GAIN).connect(volumeGain);
 
@@ -122,18 +116,6 @@ const buildAndTriggerKick = (
   };
 };
 
-// Renders one full hit through an OfflineAudioContext so the entire
-// waveform — not just a live rolling window — can be captured and drawn at
-// once. Skips triggerMasterFilterEnvelope (a global master-bus side effect
-// that shouldn't fire from a background render) and startAudioContext (the
-// offline context manages its own lifecycle).
-const renderKickFullWaveform = (params: KickChainParams) => {
-  const renderLength = params.length + RELEASE_TAIL + ENVELOPE_RELEASE + 0.05;
-  return renderOfflineWaveform(renderLength, (now, destination) =>
-    buildAndTriggerKick(params, now, destination),
-  );
-};
-
 export const useKickVoice = () => {
   const [pitch, setPitch] = useState(DEFAULTS_KICK.pitch);
   const [punch, setPunch] = useState(DEFAULTS_KICK.punch);
@@ -168,15 +150,16 @@ export const useKickVoice = () => {
     setTimeout(dispose, (duration + ENVELOPE_RELEASE + 0.1) * 1000);
   };
 
-  // On-demand full-hit render for VoiceScope — a complete, static picture
-  // of the current settings' hit, via Tone.Offline (see
-  // renderKickFullWaveform above), unlike waveformRef's rolling few-ms
-  // window. Deliberately not self-driving (no effect/state in here): only
-  // called while a scope panel showing this voice is actually open, so
-  // nothing renders offline audio for a voice nobody's looking at.
   const renderFullWaveform = useCallback(() => {
     const level = computeLevel(muted, volume);
-    return renderKickFullWaveform({ pitch, punch, length, click, fatness, level, pan });
+    const renderLength = length + RELEASE_TAIL + ENVELOPE_RELEASE + 0.05;
+    return renderOfflineWaveform(renderLength, (now, destination) =>
+      buildAndTriggerKick(
+        { pitch, punch, length, click, fatness, level, pan },
+        now,
+        destination,
+      ),
+    );
   }, [pitch, punch, length, click, fatness, volume, pan, muted]);
 
   return {
