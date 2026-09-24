@@ -24,8 +24,10 @@ import VelocityRow from "./VelocityRow";
 import VoiceScope from "./VoiceScope";
 import MiniGrid from "./MiniGrid";
 import VoiceParamsTable from "./VoiceParamsTable";
-import { useStepSequencer, TRACK_LABELS } from "./useStepSequencer";
+import { useStepSequencer, TRACK_IDS, TRACK_LABELS } from "./useStepSequencer";
 import EffectsPanel from "../components/filter/EffectsPanel";
+import { useTransportPlayback } from "./useTransportPlayback";
+import { useDrumMachineHotkeys } from "./useDrumMachineHotkeys";
 
 const styles = {
   scopeRow: css`
@@ -117,10 +119,23 @@ const StepSequencer = () => {
     clearTrack,
   } = useStepSequencer(voices);
 
+  const transportPlayback = useTransportPlayback();
+  const orderedVoices = TRACK_IDS.map((id) => voices[id]);
+  useDrumMachineHotkeys(
+    TRACK_IDS,
+    orderedVoices,
+    transportPlayback,
+    selectTrack,
+  );
+
   return (
     <Flex vertical align="center" gap={GAP}>
       <Flex align="flex-start" gap={GAP}>
-        <TempoTransportPanel />
+        <TempoTransportPanel
+          isPlaying={transportPlayback.isPlaying}
+          togglePlayPause={transportPlayback.togglePlayPause}
+          stop={transportPlayback.stop}
+        />
         <FilterPanel />
         <EffectsPanel />
         <MasterPanel />

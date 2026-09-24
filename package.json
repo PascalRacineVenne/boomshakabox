@@ -19,6 +19,7 @@
     "classnames": "^2.5.1",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "react-hotkeys-hook": "^5.3.3",
     "tone": "^15.1.22"
   },
   "devDependencies": {
