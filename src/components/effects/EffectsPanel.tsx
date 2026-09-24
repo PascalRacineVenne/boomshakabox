@@ -1,11 +1,8 @@
-import { CycleButton, Knob } from "@cutoff/audio-ui-react";
+import { Knob } from "@cutoff/audio-ui-react";
 import { css } from "@linaria/core";
-import { useFilterBus } from "./useFilterBus";
-import { FILTER_MODE_OPTIONS, type FilterMode } from "../../lib/masterBus";
+import { useEffectsBus } from "./useEffectsBus";
 import { Flex, Space } from "antd";
 import { LABELED_SMALL_KNOB_HEIGHT_UNITS } from "../shared/ControlPanel";
-
-const FILTER_MODE_OPTIONS_LIST = Object.values(FILTER_MODE_OPTIONS);
 
 const styles = {
   grid: css`
@@ -23,7 +20,7 @@ const styles = {
   `,
 };
 
-const FilterPanel = () => {
+const EffectsPanel = () => {
   const {
     cutoff,
     setCutoff,
@@ -33,14 +30,12 @@ const FilterPanel = () => {
     setResonance,
     minResonance,
     maxResonance,
-    mode,
-    setMode,
-    envAmount,
-    setEnvAmount,
-  } = useFilterBus();
+    drive,
+    setDrive,
+  } = useEffectsBus();
 
   return (
-    <Flex vertical align={"center"} gap={2}>
+    <Flex vertical align="center" gap={2}>
       <Flex align="center" justify="center" className={styles.grid}>
         <Space>
           <Knob
@@ -66,28 +61,18 @@ const FilterPanel = () => {
           <Knob
             variant="plainCap"
             size="small"
-            min={-1}
+            min={0}
             max={1}
-            value={envAmount}
-            bipolar={true}
-            onChange={(rotation) => setEnvAmount(rotation.value)}
-            label="Env"
-            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
-          />
-
-          <CycleButton
-            size="small"
-            label="Mode"
-            options={FILTER_MODE_OPTIONS_LIST}
-            value={mode}
-            onChange={(rotation) => setMode(rotation.value as FilterMode)}
+            value={drive}
+            onChange={(rotation) => setDrive(rotation.value)}
+            label="Drive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
         </Space>
       </Flex>
-      <span className={styles.title}>Filter</span>
+      <span className={styles.title}>Effects</span>
     </Flex>
   );
 };
 
-export default FilterPanel;
+export default EffectsPanel;
