@@ -28,8 +28,11 @@ import { useStepSequencer, TRACK_LABELS } from "./useStepSequencer";
 import EffectsPanel from "../components/filter/EffectsPanel";
 
 const styles = {
+  scopeRow: css`
+    width: 100%;
+    padding: var(--audioui-unit);
+  `,
   scopeCollapse: css`
-    width: fit-content;
     border: none;
 
     .ant-collapse-header {
@@ -122,7 +125,12 @@ const StepSequencer = () => {
         <EffectsPanel />
         <MasterPanel />
       </Flex>
-      <Flex align="flex-start" gap={GAP}>
+      <Flex
+        align="flex-start"
+        justify="center"
+        gap={GAP}
+        className={styles.scopeRow}
+      >
         <Collapse
           size="small"
           className={styles.scopeCollapse}

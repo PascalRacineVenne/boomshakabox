@@ -10,13 +10,6 @@ interface FullWaveformDisplayProps {
   data: Float32Array | null;
 }
 
-/**
- * A complete, static picture of one full hit — unlike WaveformDisplay's
- * live rolling analyser window (only ever a few ms of "right now"), this
- * data comes from an offline render of the entire hit (see each
- * useXVoice.ts's renderFullWaveform), so the whole duration can be drawn
- * at once, closer to how a sample browser shows a pre-recorded file.
- */
 const FullWaveformDisplay = ({ data }: FullWaveformDisplayProps) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -35,10 +28,6 @@ const FullWaveformDisplay = ({ data }: FullWaveformDisplayProps) => {
     ctx.strokeStyle = strokeColor;
     ctx.lineWidth = 1.5;
 
-    // A full hit is tens of thousands of samples, far more than this canvas
-    // has pixels, so plot each column's min/max (like a DAW's waveform
-    // view) rather than one point per sample — preserves peaks that a naive
-    // every-Nth-sample readout would miss.
     for (let x = 0; x < width; x++) {
       const start = Math.floor((x / width) * data.length);
       const end = Math.floor(((x + 1) / width) * data.length);
