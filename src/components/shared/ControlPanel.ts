@@ -65,4 +65,15 @@ export const controlPanelStyles = {
   triggerLabelActive: css`
     color: var(--bg);
   `,
+
+  sequencerDot: css`
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+  `,
+
+  sequencerDotActive: css`
+    background: var(--contrast-1);
+  `,
 };

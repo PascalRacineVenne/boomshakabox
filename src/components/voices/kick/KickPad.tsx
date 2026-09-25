@@ -49,6 +49,7 @@ interface KickPadProps {
   trigger: (scheduledTime?: number) => void;
   selected?: boolean;
   onSelect?: () => void;
+  sequencerHit?: boolean;
 }
 
 const KickPad = ({
@@ -76,6 +77,7 @@ const KickPad = ({
   trigger,
   selected,
   onSelect,
+  sequencerHit,
 }: KickPadProps) => {
   return (
     <Flex
@@ -205,6 +207,7 @@ const KickPad = ({
         pressed={pressed}
         setPressed={setPressed}
         trigger={trigger}
+        sequencerHit={sequencerHit}
       />
     </Flex>
   );

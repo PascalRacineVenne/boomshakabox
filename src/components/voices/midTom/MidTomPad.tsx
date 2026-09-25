@@ -33,6 +33,7 @@ interface MidTomPadProps {
   trigger: (scheduledTime?: number) => void;
   selected?: boolean;
   onSelect?: () => void;
+  sequencerHit?: boolean;
 }
 const MidTomPad = ({
   trackNumber,
@@ -53,6 +54,7 @@ const MidTomPad = ({
   trigger,
   selected,
   onSelect,
+  sequencerHit,
 }: MidTomPadProps) => {
   return (
     <Flex
@@ -156,6 +158,7 @@ const MidTomPad = ({
         pressed={pressed}
         setPressed={setPressed}
         trigger={trigger}
+        sequencerHit={sequencerHit}
       />
     </Flex>
   );

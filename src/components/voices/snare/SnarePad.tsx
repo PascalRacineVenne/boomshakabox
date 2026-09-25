@@ -38,6 +38,7 @@ interface SnarePadProps {
   trigger: (scheduledTime?: number) => void;
   selected?: boolean;
   onSelect?: () => void;
+  sequencerHit?: boolean;
 }
 
 const SnarePad = ({
@@ -59,6 +60,7 @@ const SnarePad = ({
   trigger,
   selected,
   onSelect,
+  sequencerHit,
 }: SnarePadProps) => {
   return (
     <Flex
@@ -161,6 +163,7 @@ const SnarePad = ({
         pressed={pressed}
         setPressed={setPressed}
         trigger={trigger}
+        sequencerHit={sequencerHit}
       />
     </Flex>
   );

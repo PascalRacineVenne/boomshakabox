@@ -32,6 +32,7 @@ interface HiHatOpenPadProps {
   trigger: (scheduledTime?: number) => void;
   selected?: boolean;
   onSelect?: () => void;
+  sequencerHit?: boolean;
 }
 
 const HiHatOpenPad = ({
@@ -53,6 +54,7 @@ const HiHatOpenPad = ({
   trigger,
   selected,
   onSelect,
+  sequencerHit,
 }: HiHatOpenPadProps) => {
   return (
     <Flex
@@ -156,6 +158,7 @@ const HiHatOpenPad = ({
         pressed={pressed}
         setPressed={setPressed}
         trigger={trigger}
+        sequencerHit={sequencerHit}
       />
     </Flex>
   );

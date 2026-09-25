@@ -31,6 +31,7 @@ interface HiHatPadProps {
   trigger: (scheduledTime?: number) => void;
   selected?: boolean;
   onSelect?: () => void;
+  sequencerHit?: boolean;
 }
 
 const HiHatPad = ({
@@ -50,6 +51,7 @@ const HiHatPad = ({
   trigger,
   selected,
   onSelect,
+  sequencerHit,
 }: HiHatPadProps) => {
   return (
     <Flex
@@ -144,6 +146,7 @@ const HiHatPad = ({
         pressed={pressed}
         setPressed={setPressed}
         trigger={trigger}
+        sequencerHit={sequencerHit}
       />
     </Flex>
   );

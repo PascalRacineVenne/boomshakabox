@@ -73,7 +73,7 @@ const EffectsPanel = () => {
             size="small"
             min={0}
             max={1}
-            value={drive}
+            value={0}
             // onChange={(rotation) => setVerb(rotation.value)}
             label="Verb"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
@@ -83,7 +83,7 @@ const EffectsPanel = () => {
             size="small"
             min={0}
             max={1}
-            value={drive}
+            value={0}
             // onChange={(rotation) => setDelay(rotation.value)}
             label="Delay"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
