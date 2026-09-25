@@ -163,7 +163,7 @@ const StepSequencer = () => {
   return (
     <Flex vertical align="center" gap={GAP} className={styles.sequencer}>
       <Flex align="flex-start" justify="space-between" gap={GAP}>
-        <BoomPurpleIcon style={{ fontSize: 120 }} />
+        <BoomPurpleIcon style={{ fontSize: 100 }} />
         <TempoTransportPanel
           isPlaying={transportPlayback.isPlaying}
           togglePlayPause={transportPlayback.togglePlayPause}
