@@ -21,7 +21,7 @@ interface StepGridProps {
   active: boolean[];
   currentStep: number;
   onStepChange: (stepIndex: number, active: boolean) => void;
-  startNumber?: number; // label offset — lets a page show absolute step numbers (e.g. 17-32) instead of always 1-16
+  startNumber?: number;
 }
 
 const StepGrid = ({

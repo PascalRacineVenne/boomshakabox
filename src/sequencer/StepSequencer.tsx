@@ -1,5 +1,5 @@
 import { css } from "@linaria/core";
-import { Button, Flex, Typography } from "antd";
+import { Button, Flex, Typography, Collapse } from "antd";
 import TempoTransportPanel from "./transport/TempoTransportPanel";
 import MasterPanel from "../components/master/MasterPanel";
 
@@ -25,8 +25,7 @@ import VelocityRow from "./grid/VelocityRow";
 import VoiceScope from "./oscilloscope/VoiceScope";
 import MiniGrid from "./grid/MiniGrid";
 import LengthControl from "./grid/LengthControl";
-import PageTabs from "./grid/PageTabs";
-import PatternOverview from "./grid/PatternOverview";
+import RangeTabs from "./grid/RangeTabs";
 // import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
 import {
   useStepSequencer,
@@ -37,6 +36,7 @@ import {
 import EffectsPanel from "../components/effects/EffectsPanel";
 import { useTransportPlayback } from "./transport/useTransportPlayback";
 import { useDrumMachineHotkeys } from "./useDrumMachineHotkeys";
+import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
 
 const styles = {
   scopeRow: css`
@@ -44,24 +44,32 @@ const styles = {
     align-items: stretch !important;
   `,
   scopeCollapse: css`
-    border: none;
+    border: 1px solid var(--accent-border) !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+    background: black;
+
+    .ant-collapse-item {
+      border: none !important;
+    }
 
     .ant-collapse-header {
-      padding: 0 0 4px !important;
       align-items: center !important;
     }
+
+    .ant-collapse-title {
+      font-size: 12px !important;
+      color: var(--text) !important;
+    }
+
     .ant-collapse-expand-icon {
       color: var(--contrast-1) !important;
     }
-    .ant-collapse-title {
-      font-size: 11px !important;
-      color: var(--text) !important;
-      text-align: left !important;
-    }
+
     .ant-collapse-body {
-      background: black;
-      border: 1px solid var(--accent-border);
-      border-radius: 0 0 8px 8px;
+      background: black !important;
+      border-top: 1px solid var(--accent-border) !important;
+      color: var(--text);
     }
   `,
   gridRow: css`
@@ -154,10 +162,10 @@ const StepSequencer = () => {
     clearTrack,
     length,
     setLength,
-    viewedPage,
-    goToPage,
-    miniPage,
-    goToMiniPage,
+    viewedRange,
+    goToRange,
+    miniRange,
+    goToMiniRange,
     sequencerHits,
   } = useStepSequencer(voices);
 
@@ -170,8 +178,8 @@ const StepSequencer = () => {
     selectTrack,
   );
 
-  const pageRelativeStep =
-    Math.floor(currentStep / STEP_COUNT) === viewedPage
+  const rangeRelativeStep =
+    Math.floor(currentStep / STEP_COUNT) === viewedRange
       ? currentStep % STEP_COUNT
       : -1;
 
@@ -199,10 +207,10 @@ const StepSequencer = () => {
           patterns={patternsDisplay}
           currentStep={currentStep}
           length={length}
-          miniPage={miniPage}
+          miniRange={miniRange}
           selectedTrack={selectedTrack}
           onSelectTrack={selectTrack}
-          onSelectPage={goToMiniPage}
+          onSelectRange={goToMiniRange}
         />
       </Flex>
       <Flex>
@@ -259,17 +267,10 @@ const StepSequencer = () => {
 
       <Flex vertical gap={4} className={styles.gridRow}>
         <Flex gap={4}>
-          <PageTabs
+          <RangeTabs
             length={length}
-            viewedPage={viewedPage}
-            onSelectPage={goToPage}
-          />
-          <PatternOverview
-            patterns={patternsDisplay}
-            currentStep={currentStep}
-            length={length}
-            viewedPage={viewedPage}
-            onSelectPage={goToPage}
+            viewedRange={viewedRange}
+            onSelectRange={goToRange}
           />
         </Flex>
 
@@ -279,9 +280,9 @@ const StepSequencer = () => {
           </span>
           <StepGrid
             active={activePattern}
-            currentStep={pageRelativeStep}
+            currentStep={rangeRelativeStep}
             onStepChange={setStep}
-            startNumber={viewedPage * STEP_COUNT + 1}
+            startNumber={viewedRange * STEP_COUNT + 1}
           />
         </Flex>
         <Flex gap={GAP} align="flex-start">
@@ -307,8 +308,18 @@ const StepSequencer = () => {
           />
         </Flex>
       </Flex>
-
-      {/* <VoiceParamsTable selectedTrack={selectedTrack} voices={voices} /> */}
+      <Collapse
+        className={styles.scopeCollapse}
+        items={[
+          {
+            key: "1",
+            label: "Voices Params table",
+            children: (
+              <VoiceParamsTable selectedTrack={selectedTrack} voices={voices} />
+            ),
+          },
+        ]}
+      />
     </Flex>
   );
 };
