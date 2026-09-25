@@ -7,9 +7,34 @@ import { StopBevIcon } from "../../icons/transport/StopBevIcon";
 const TRANSPORT_ICON_SIZE = 32;
 
 const styles = {
+  // align-self: stretch only takes effect on an item whose cross-size is
+  // auto — antd's own Button/Space CSS sets an explicit height (e.g. via
+  // --ant-control-height), which disqualifies it from stretching even
+  // though that height isn't literally what we want. height: auto here
+  // clears antd's explicit value so stretch can take over; height: 100%
+  // would NOT work for this — a percentage still counts as "explicit" for
+  // this check even when it fails to resolve, so it blocks stretch the
+  // same way antd's own fixed height does.
+  space: css`
+    align-self: stretch !important;
+    height: auto !important;
+    border: 1px solid var(--accent-border);
+    padding-inline: 8px;
+    border-radius: 8px !important;
+
+    .ant-space-item {
+      display: flex;
+      align-items: stretch;
+      align-self: stretch !important;
+      height: auto !important;
+    }
+  `,
+
   button: css`
     background: calc(var(--accent) / 2) !important;
     border: none !important;
+    align-self: stretch !important;
+    height: auto !important;
   `,
 };
 
@@ -25,7 +50,7 @@ const TransportControls = ({
   stop,
 }: TransportControlsProps) => {
   return (
-    <Space>
+    <Space className={styles.space}>
       <Button
         className={styles.button}
         type="primary"

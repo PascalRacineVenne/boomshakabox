@@ -1,11 +1,6 @@
 import { css } from "@linaria/core";
 import classNames from "classnames";
-import {
-  STEP_COUNT,
-  TRACK_IDS,
-  TRACK_LABELS,
-  type TrackId,
-} from "./useStepSequencer";
+import { TRACK_IDS, TRACK_LABELS, type TrackId } from "./useStepSequencer";
 import { Flex } from "antd";
 
 const styles = {
@@ -41,7 +36,7 @@ const styles = {
   `,
 
   stepActive: css`
-    background: var(--accent);
+    background: var(--contrast-1);
   `,
 
   stepPlayhead: css`
@@ -54,30 +49,39 @@ const styles = {
     padding-right: 4px;
     border-right: 1px solid var(--accent-border);
   `,
+
+  stepDisabled: css`
+    opacity: 0.3;
+  `,
 };
 
 const GROUP_SIZE = 4;
+export const MINI_GRID_PAGE_SIZE = 32; // MiniGrid always shows this many steps, independent of StepGrid's own 16-wide page
+export const MINI_GRID_PAGE_COUNT = 2; // covers the full 64-step max in two halves
 
 interface MiniGridProps {
   patterns: Record<TrackId, boolean[]>;
-  currentStep: number; // page-relative (0-15), or -1 if the playhead isn't on viewedPage
-  viewedPage: number;
+  currentStep: number; // global (0..length-1)
+  length: number;
+  miniPage: number; // 0 or 1 — which 32-step half is shown, independent of StepGrid's page
   selectedTrack: TrackId;
   onSelectTrack: (id: TrackId) => void;
 }
 
-// Always shows one page's worth of steps per track — same 16-wide window
-// as StepGrid, following the same viewedPage — rather than stretching to
-// the full pattern length. See PageDots for the "which page is this"
-// indicator this pairs with.
+// Always shows a fixed 32-step window per track (half the max pattern),
+// paged independently of StepGrid via miniPage/PageDots — not tied to
+// StepGrid's own 16-wide page or auto-follow. Steps at or past the active
+// `length` render dimmed rather than being hidden, since their data (if
+// any) is still there, just outside what's currently playing.
 const MiniGrid = ({
   patterns,
   currentStep,
-  viewedPage,
+  length,
+  miniPage,
   selectedTrack,
   onSelectTrack,
 }: MiniGridProps) => {
-  const pageStart = viewedPage * STEP_COUNT;
+  const pageStart = miniPage * MINI_GRID_PAGE_SIZE;
 
   return (
     <Flex vertical className={styles.container}>
@@ -99,20 +103,23 @@ const MiniGrid = ({
             {TRACK_IDS.indexOf(trackId) + 1}
           </span>
           <Flex gap={2}>
-            {Array.from({ length: STEP_COUNT }, (_, stepIndex) => (
-              <div
-                key={stepIndex}
-                className={classNames(
-                  styles.step,
-                  patterns[trackId][pageStart + stepIndex] &&
-                    styles.stepActive,
-                  stepIndex === currentStep && styles.stepPlayhead,
-                  (stepIndex + 1) % GROUP_SIZE === 0 &&
-                    stepIndex !== STEP_COUNT - 1 &&
-                    styles.stepGroupEnd,
-                )}
-              />
-            ))}
+            {Array.from({ length: MINI_GRID_PAGE_SIZE }, (_, i) => {
+              const stepIndex = pageStart + i;
+              return (
+                <div
+                  key={stepIndex}
+                  className={classNames(
+                    styles.step,
+                    patterns[trackId][stepIndex] && styles.stepActive,
+                    stepIndex === currentStep && styles.stepPlayhead,
+                    stepIndex >= length && styles.stepDisabled,
+                    (i + 1) % GROUP_SIZE === 0 &&
+                      i !== MINI_GRID_PAGE_SIZE - 1 &&
+                      styles.stepGroupEnd,
+                  )}
+                />
+              );
+            })}
           </Flex>
         </Flex>
       ))}

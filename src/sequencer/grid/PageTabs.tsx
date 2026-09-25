@@ -4,12 +4,17 @@ import { STEP_COUNT, type PatternLength } from "./useStepSequencer";
 
 const styles = {
   segmented: css`
+    background: var(--bg);
     .ant-segmented-thumb,
     .ant-segmented-item-selected {
       background: var(--contrast-1) !important;
     }
     .ant-segmented-item-selected .ant-segmented-item-label {
       color: var(--bg) !important;
+    }
+
+    :not(.ant-segmented-item-selected) {
+      color: var(--accent);
     }
   `,
 };

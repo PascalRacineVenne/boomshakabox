@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { css } from "@linaria/core";
 import { Button, Collapse, Flex } from "antd";
 import TempoTransportPanel from "./transport/TempoTransportPanel";
 import MasterPanel from "../components/master/MasterPanel";
-import FilterPanel from "../components/filter/FilterPanel";
+
+import { BoomPurpleIcon } from "../icons/logos/BoomPurpleIcon";
 
 import KickPad from "../components/voices/kick/KickPad";
 import SnarePad from "../components/voices/snare/SnarePad";
@@ -22,12 +24,12 @@ import { useLowTomVoice } from "../components/voices/lowTom/useLowTomVoice";
 import StepGrid from "./grid/StepGrid";
 import VelocityRow from "./grid/VelocityRow";
 import VoiceScope from "./oscilloscope/VoiceScope";
-import MiniGrid from "./grid/MiniGrid";
+import MiniGrid, { MINI_GRID_PAGE_COUNT } from "./grid/MiniGrid";
 import LengthControl from "./grid/LengthControl";
 import PageTabs from "./grid/PageTabs";
 import PageDots from "./grid/PageDots";
 import PatternOverview from "./grid/PatternOverview";
-import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
+// import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
 import {
   useStepSequencer,
   TRACK_IDS,
@@ -93,9 +95,12 @@ const styles = {
       box-shadow: 1px 1px 4px var(--contrast-1) !important;
     }
   `,
+  sequencer: css`
+    padding: calc(var(--audioui-unit) / 4);
+  `,
 };
 
-const GAP = "calc(var(--audioui-unit) / 2)";
+const GAP = "calc(var(--audioui-unit) / 4)";
 
 const StepSequencer = () => {
   const kickVoice = useKickVoice();
@@ -151,16 +156,20 @@ const StepSequencer = () => {
       : -1;
   const showPager = length > STEP_COUNT;
 
+  // MiniGrid always shows a fixed 32-step window, paged independently of
+  // StepGrid's own 16-wide page/auto-follow — see MiniGrid.tsx.
+  const [miniPage, setMiniPage] = useState(0);
+
   return (
-    <Flex vertical align="center" gap={GAP}>
-      <Flex align="flex-start" gap={GAP}>
+    <Flex vertical align="center" gap={GAP} className={styles.sequencer}>
+      <Flex align="flex-start" justify="space-between" gap={GAP}>
+        <BoomPurpleIcon style={{ fontSize: 120 }} />
         <TempoTransportPanel
           isPlaying={transportPlayback.isPlaying}
           togglePlayPause={transportPlayback.togglePlayPause}
           stop={transportPlayback.stop}
         />
         <LengthControl length={length} onChange={setLength} />
-        <FilterPanel />
         <EffectsPanel />
         <MasterPanel />
       </Flex>
@@ -186,20 +195,19 @@ const StepSequencer = () => {
           ]}
         />
         <Flex vertical gap={4} align="center">
+          <PageDots
+            pageCount={MINI_GRID_PAGE_COUNT}
+            viewedPage={miniPage}
+            onSelectPage={setMiniPage}
+          />
           <MiniGrid
             patterns={patternsDisplay}
-            currentStep={pageRelativeStep}
-            viewedPage={viewedPage}
+            currentStep={currentStep}
+            length={length}
+            miniPage={miniPage}
             selectedTrack={selectedTrack}
             onSelectTrack={selectTrack}
           />
-          {showPager && (
-            <PageDots
-              length={length}
-              viewedPage={viewedPage}
-              onSelectPage={goToPage}
-            />
-          )}
         </Flex>
       </Flex>
       <Flex>
@@ -299,7 +307,7 @@ const StepSequencer = () => {
         </Flex>
       </Flex>
 
-      <VoiceParamsTable selectedTrack={selectedTrack} voices={voices} />
+      {/* <VoiceParamsTable selectedTrack={selectedTrack} voices={voices} /> */}
     </Flex>
   );
 };
