@@ -122,7 +122,7 @@ const styles = {
   `,
 };
 
-const GAP = "calc(var(--audioui-unit) / 4)";
+const GAP = "calc(var(--audioui-unit) / 8)";
 
 const StepSequencer = () => {
   const kickVoice = useKickVoice();
@@ -253,7 +253,7 @@ const StepSequencer = () => {
 
       <Flex vertical gap={4} className={styles.gridRow}>
         {showPager && (
-          <Flex vertical gap={4}>
+          <Flex gap={4}>
             <PageTabs
               length={length}
               viewedPage={viewedPage}
