@@ -1,4 +1,5 @@
-import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
+import { Knob, Slider } from "@cutoff/audio-ui-react";
+import TriggerButton from "../../shared/TriggerButton";
 import classNames from "classnames";
 import { Flex } from "antd";
 import {
@@ -138,14 +139,11 @@ const HiHatPad = ({
           </Flex>
         </Flex>
       </Flex>
-      <Button
+      <TriggerButton
         label={`HH${trackNumber}`}
-        value={pressed}
-        size="large"
-        onChange={(press) => {
-          setPressed(press.value);
-          if (press.value) trigger();
-        }}
+        pressed={pressed}
+        setPressed={setPressed}
+        trigger={trigger}
       />
     </Flex>
   );

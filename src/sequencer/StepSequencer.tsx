@@ -42,6 +42,7 @@ const styles = {
   scopeRow: css`
     width: 100%;
     padding: calc(var(--audioui-unit) / 8);
+    align-items: stretch !important;
   `,
   scopeCollapse: css`
     border: none;
@@ -93,22 +94,31 @@ const styles = {
       box-shadow: 1px 1px 4px var(--contrast-1) !important;
     }
   `,
+  icon: css`
+    align-self: center;
+    height: 70px;
+  `,
   oscillators: css`
     border: 1px solid var(--accent-border);
     border-radius: 8px;
     padding: calc(var(--audioui-unit) / 4);
+    align-items: stretch !important;
   `,
   sequencer: css`
     padding: calc(var(--audioui-unit) / 4);
   `,
 
   waveformTitle: css`
+    writing-mode: vertical-rl;
+    text-orientation: upright;
     color: var(--accent);
     font-size: 12px;
     border: 1px solid var(--accent-border);
     border-radius: 8px;
     padding: calc(var(--audioui-unit) / 8);
     margin-bottom: calc(var(--audioui-unit) / 4) !important;
+    align-self: stretch !important;
+    height: auto !important;
   `,
 };
 
@@ -169,7 +179,7 @@ const StepSequencer = () => {
   return (
     <Flex vertical align="center" gap={GAP} className={styles.sequencer}>
       <Flex align="flex-start" justify="space-between" gap={GAP}>
-        <BoomPurpleIcon style={{ fontSize: 100 }} />
+        <BoomPurpleIcon className={styles.icon} />
         <TempoTransportPanel
           isPlaying={transportPlayback.isPlaying}
           togglePlayPause={transportPlayback.togglePlayPause}
@@ -179,16 +189,11 @@ const StepSequencer = () => {
         <EffectsPanel />
         <MasterPanel />
       </Flex>
-      <Flex
-        align="flex-start"
-        justify="center"
-        gap={GAP}
-        className={styles.scopeRow}
-      >
-        <Flex vertical align="flex-start" className={styles.oscillators}>
+      <Flex justify="center" gap={GAP} className={styles.scopeRow}>
+        <Flex className={styles.oscillators} gap={GAP}>
           <Typography
             className={styles.waveformTitle}
-          >{`${TRACK_LABELS[selectedTrack]} — waveform`}</Typography>
+          >{`${TRACK_LABELS[selectedTrack]}—wave`}</Typography>
           <VoiceScope key={selectedTrack} voice={voices[selectedTrack]} />
         </Flex>
         <MiniGrid

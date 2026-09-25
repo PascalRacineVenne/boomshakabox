@@ -28,6 +28,7 @@ const styles = {
     color: var(--text);
     text-transform: uppercase;
     letter-spacing: 0.03em;
+    line-height: 1.7;
   `,
 
   labelSelected: css`
