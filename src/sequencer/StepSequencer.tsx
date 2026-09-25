@@ -41,7 +41,6 @@ import { useDrumMachineHotkeys } from "./useDrumMachineHotkeys";
 const styles = {
   scopeRow: css`
     width: 100%;
-    padding: calc(var(--audioui-unit) / 8);
     align-items: stretch !important;
   `,
   scopeCollapse: css`
@@ -174,7 +173,6 @@ const StepSequencer = () => {
     Math.floor(currentStep / STEP_COUNT) === viewedPage
       ? currentStep % STEP_COUNT
       : -1;
-  const showPager = length > STEP_COUNT;
 
   return (
     <Flex vertical align="center" gap={GAP} className={styles.sequencer}>
@@ -252,22 +250,21 @@ const StepSequencer = () => {
       </Flex>
 
       <Flex vertical gap={4} className={styles.gridRow}>
-        {showPager && (
-          <Flex gap={4}>
-            <PageTabs
-              length={length}
-              viewedPage={viewedPage}
-              onSelectPage={goToPage}
-            />
-            <PatternOverview
-              patterns={patternsDisplay}
-              currentStep={currentStep}
-              length={length}
-              viewedPage={viewedPage}
-              onSelectPage={goToPage}
-            />
-          </Flex>
-        )}
+        <Flex gap={4}>
+          <PageTabs
+            length={length}
+            viewedPage={viewedPage}
+            onSelectPage={goToPage}
+          />
+          <PatternOverview
+            patterns={patternsDisplay}
+            currentStep={currentStep}
+            length={length}
+            viewedPage={viewedPage}
+            onSelectPage={goToPage}
+          />
+        </Flex>
+
         <Flex align="center" gap={GAP}>
           <span className={styles.gridLabel}>
             {TRACK_LABELS[selectedTrack]}
