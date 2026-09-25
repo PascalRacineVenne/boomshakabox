@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { css } from "@linaria/core";
-import { Button, Collapse, Flex } from "antd";
+import { Button, Flex, Typography } from "antd";
 import TempoTransportPanel from "./transport/TempoTransportPanel";
 import MasterPanel from "../components/master/MasterPanel";
 
@@ -43,7 +43,7 @@ import { useDrumMachineHotkeys } from "./useDrumMachineHotkeys";
 const styles = {
   scopeRow: css`
     width: 100%;
-    padding: var(--audioui-unit);
+    padding: calc(var(--audioui-unit) / 8);
   `,
   scopeCollapse: css`
     border: none;
@@ -95,8 +95,22 @@ const styles = {
       box-shadow: 1px 1px 4px var(--contrast-1) !important;
     }
   `,
+  oscillators: css`
+    border: 1px solid var(--accent-border);
+    border-radius: 8px;
+    padding: calc(var(--audioui-unit) / 4);
+  `,
   sequencer: css`
     padding: calc(var(--audioui-unit) / 4);
+  `,
+
+  waveformTitle: css`
+    color: var(--accent);
+    font-size: 12px;
+    border: 1px solid var(--accent-border);
+    border-radius: 8px;
+    padding: calc(var(--audioui-unit) / 8);
+    margin-bottom: calc(var(--audioui-unit) / 4) !important;
   `,
 };
 
@@ -146,18 +160,12 @@ const StepSequencer = () => {
     selectTrack,
   );
 
-  // StepGrid always shows one page's worth of steps, indexed locally
-  // (0-15) — translate the sequencer's global playhead into that local
-  // frame, or -1 if the playhead is currently on a different page than
-  // the one being viewed (nothing on this page should show as "playing").
   const pageRelativeStep =
     Math.floor(currentStep / STEP_COUNT) === viewedPage
       ? currentStep % STEP_COUNT
       : -1;
   const showPager = length > STEP_COUNT;
 
-  // MiniGrid always shows a fixed 32-step window, paged independently of
-  // StepGrid's own 16-wide page/auto-follow — see MiniGrid.tsx.
   const [miniPage, setMiniPage] = useState(0);
 
   return (
@@ -179,22 +187,13 @@ const StepSequencer = () => {
         gap={GAP}
         className={styles.scopeRow}
       >
-        <Collapse
-          size="small"
-          className={styles.scopeCollapse}
-          defaultActiveKey={["scope"]}
-          destroyOnHidden
-          items={[
-            {
-              key: "scope",
-              label: `${TRACK_LABELS[selectedTrack]} — waveform`,
-              children: (
-                <VoiceScope key={selectedTrack} voice={voices[selectedTrack]} />
-              ),
-            },
-          ]}
-        />
-        <Flex vertical gap={4} align="center">
+        <Flex vertical align="flex-start" className={styles.oscillators}>
+          <Typography
+            className={styles.waveformTitle}
+          >{`${TRACK_LABELS[selectedTrack]} — waveform`}</Typography>
+          <VoiceScope key={selectedTrack} voice={voices[selectedTrack]} />
+        </Flex>
+        <Flex vertical gap={2} align="center">
           <PageDots
             pageCount={MINI_GRID_PAGE_COUNT}
             viewedPage={miniPage}
