@@ -95,7 +95,7 @@ const styles = {
   `,
   icon: css`
     align-self: center;
-    height: 70px;
+    height: 64px;
   `,
   oscillators: css`
     border: 1px solid var(--accent-border);
@@ -158,6 +158,7 @@ const StepSequencer = () => {
     goToPage,
     miniPage,
     goToMiniPage,
+    sequencerHits,
   } = useStepSequencer(voices);
 
   const transportPlayback = useTransportPlayback();
@@ -210,42 +211,49 @@ const StepSequencer = () => {
           trackNumber={1}
           selected={selectedTrack === "kick"}
           onSelect={() => selectTrack("kick")}
+          sequencerHit={sequencerHits.kick}
         />
         <SnarePad
           {...snareVoice}
           trackNumber={2}
           selected={selectedTrack === "snare"}
           onSelect={() => selectTrack("snare")}
+          sequencerHit={sequencerHits.snare}
         />
         <HiTomPad
           {...hiTomVoice}
           trackNumber={3}
           selected={selectedTrack === "hiTom"}
           onSelect={() => selectTrack("hiTom")}
+          sequencerHit={sequencerHits.hiTom}
         />
         <MidTomPad
           {...midTomVoice}
           trackNumber={4}
           selected={selectedTrack === "midTom"}
           onSelect={() => selectTrack("midTom")}
+          sequencerHit={sequencerHits.midTom}
         />
         <LowTomPad
           {...lowTomVoice}
           trackNumber={5}
           selected={selectedTrack === "lowTom"}
           onSelect={() => selectTrack("lowTom")}
+          sequencerHit={sequencerHits.lowTom}
         />
         <HiHatPad
           {...hiHatVoice}
           trackNumber={6}
           selected={selectedTrack === "hihat"}
           onSelect={() => selectTrack("hihat")}
+          sequencerHit={sequencerHits.hihat}
         />
         <HiHatOpenPad
           {...hiHatOpenVoice}
           trackNumber={7}
           selected={selectedTrack === "hihatOpen"}
           onSelect={() => selectTrack("hihatOpen")}
+          sequencerHit={sequencerHits.hihatOpen}
         />
       </Flex>
 

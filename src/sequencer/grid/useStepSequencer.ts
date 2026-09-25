@@ -34,13 +34,16 @@ type TriggerFn = (scheduledTime?: number, velocity?: number) => void;
 
 type Voices = Record<TrackId, { trigger: TriggerFn }>;
 
+const noSequencerHits = (): Record<TrackId, boolean> =>
+  Object.fromEntries(TRACK_IDS.map((id) => [id, false])) as Record<
+    TrackId,
+    boolean
+  >;
+
 const DEFAULT_VELOCITY = 80;
 const DEFAULT_LENGTH: PatternLength = 16;
+const SEQUENCER_HIT_FLASH_MS = 60;
 
-// Always allocate the full 64 steps, regardless of the active length, so
-// shrinking length (e.g. 64 -> 16) only hides/excludes steps 17-64 from
-// the grid and playback rather than deleting their programmed data —
-// growing back restores whatever was already there.
 const emptyPattern = (): boolean[] => Array(MAX_STEPS).fill(false);
 
 const initialPatterns = (): Record<TrackId, boolean[]> =>
@@ -69,15 +72,12 @@ export const useStepSequencer = (voices: Voices) => {
   const [selectedTrack, setSelectedTrack] = useState<TrackId>(TRACK_IDS[0]);
   const [currentStep, setCurrentStep] = useState(0); // global index, 0..length-1
 
-  // Pattern length is global (shared by every voice), not per-track.
   const [length, setLength] = useState<PatternLength>(DEFAULT_LENGTH);
   const lengthRef = useRef(length);
   useEffect(() => {
     lengthRef.current = length;
   }, [length]);
 
-  // Which page (0-3) the grid is currently showing, and whether it should
-  // keep jumping to follow the playhead automatically.
   const [viewedPage, setViewedPage] = useState(0);
   const [autoFollow, setAutoFollow] = useState(true);
   const autoFollowRef = useRef(autoFollow);
@@ -85,9 +85,6 @@ export const useStepSequencer = (voices: Voices) => {
     autoFollowRef.current = autoFollow;
   }, [autoFollow]);
 
-  // Same auto-follow/manual-override pattern, at MiniGrid's own coarser
-  // 32-step granularity — a separate page concept from viewedPage above,
-  // not derived from it.
   const [miniPage, setMiniPage] = useState(0);
   const [miniAutoFollow, setMiniAutoFollow] = useState(true);
   const miniAutoFollowRef = useRef(miniAutoFollow);
@@ -100,9 +97,23 @@ export const useStepSequencer = (voices: Voices) => {
     voicesRef.current = voices;
   });
 
+  const [sequencerHits, setSequencerHits] = useState(noSequencerHits);
+  const flashTimeoutsRef = useRef(
+    {} as Record<TrackId, ReturnType<typeof setTimeout> | undefined>,
+  );
+
+  const flashHit = (id: TrackId) => {
+    clearTimeout(flashTimeoutsRef.current[id]);
+    setSequencerHits((prev) => ({ ...prev, [id]: true }));
+    flashTimeoutsRef.current[id] = setTimeout(() => {
+      setSequencerHits((prev) => ({ ...prev, [id]: false }));
+    }, SEQUENCER_HIT_FLASH_MS);
+  };
+
   const stepCountRef = useRef(0);
 
   useEffect(() => {
+    const flashTimeouts = flashTimeoutsRef.current;
     const eventId = Tone.getTransport().scheduleRepeat((time) => {
       const step = stepCountRef.current % lengthRef.current;
       stepCountRef.current += 1;
@@ -115,6 +126,9 @@ export const useStepSequencer = (voices: Voices) => {
 
       Tone.getDraw().schedule(() => {
         setCurrentStep(step);
+        TRACK_IDS.forEach((id) => {
+          if (patternsRef.current[id][step]) flashHit(id);
+        });
         if (autoFollowRef.current) {
           setViewedPage(Math.floor(step / STEP_COUNT));
         }
@@ -127,6 +141,8 @@ export const useStepSequencer = (voices: Voices) => {
     const handleTransportStop = () => {
       stepCountRef.current = 0;
       setCurrentStep(0);
+      TRACK_IDS.forEach((id) => clearTimeout(flashTimeouts[id]));
+      setSequencerHits(noSequencerHits());
       if (autoFollowRef.current) setViewedPage(0);
       if (miniAutoFollowRef.current) setMiniPage(0);
     };
@@ -135,6 +151,7 @@ export const useStepSequencer = (voices: Voices) => {
     return () => {
       Tone.getTransport().clear(eventId);
       Tone.getTransport().off("stop", handleTransportStop);
+      TRACK_IDS.forEach((id) => clearTimeout(flashTimeouts[id]));
     };
   }, []);
 
@@ -168,23 +185,17 @@ export const useStepSequencer = (voices: Voices) => {
     setVelocitiesDisplay((prev) => ({ ...prev, [track]: defaultVelocities() }));
   };
 
-  // Shrinking length can leave viewedPage pointing past the new last page.
   const changeLength = (nextLength: PatternLength) => {
     setLength(nextLength);
     const maxPage = nextLength / STEP_COUNT - 1;
     setViewedPage((prev) => Math.min(prev, maxPage));
   };
 
-  // The one action behind both page tabs and the overview strip: view that
-  // page, and only keep auto-follow on if it's the page the playhead is
-  // actually on right now — clicking away from the live page is what turns
-  // auto-follow off, and clicking back onto it is what turns it back on.
   const goToPage = (page: number) => {
     setViewedPage(page);
     setAutoFollow(page === Math.floor(currentStep / STEP_COUNT));
   };
 
-  // Same rule as goToPage, at MiniGrid's own page granularity.
   const goToMiniPage = (page: number) => {
     setMiniPage(page);
     setMiniAutoFollow(page === Math.floor(currentStep / MINI_GRID_PAGE_SIZE));
@@ -216,5 +227,6 @@ export const useStepSequencer = (voices: Voices) => {
     autoFollow,
     miniPage,
     goToMiniPage,
+    sequencerHits,
   };
 };

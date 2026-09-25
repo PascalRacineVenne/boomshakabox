@@ -33,6 +33,7 @@ interface LowTomPadProps {
   trigger: (scheduledTime?: number) => void;
   selected?: boolean;
   onSelect?: () => void;
+  sequencerHit?: boolean;
 }
 const LowTomPad = ({
   trackNumber,
@@ -53,6 +54,7 @@ const LowTomPad = ({
   trigger,
   selected,
   onSelect,
+  sequencerHit,
 }: LowTomPadProps) => {
   return (
     <Flex
@@ -156,6 +158,7 @@ const LowTomPad = ({
         pressed={pressed}
         setPressed={setPressed}
         trigger={trigger}
+        sequencerHit={sequencerHit}
       />
     </Flex>
   );
