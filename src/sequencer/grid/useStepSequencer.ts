@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import * as Tone from "tone";
 
-export const STEP_COUNT = 16; // steps shown per page in the grid
-export const MAX_STEPS = 64; // patterns always allocate this many steps, independent of the active length
+export const STEP_COUNT = 16;
+export const MAX_STEPS = 64;
 export const PATTERN_LENGTH_OPTIONS = [16, 32, 48, 64] as const;
 export type PatternLength = (typeof PATTERN_LENGTH_OPTIONS)[number];
 
-export const MINI_GRID_PAGE_SIZE = 32; // MiniGrid always shows this many steps, independent of StepGrid's own 16-wide page
-export const MINI_GRID_PAGE_COUNT = 2; // covers the full 64-step max in two halves
+export const MINI_GRID_RANGE_SIZE = 32;
+export const MINI_GRID_RANGE_COUNT = 2;
 
 export const TRACK_IDS = [
   "kick",
@@ -78,14 +78,9 @@ export const useStepSequencer = (voices: Voices) => {
     lengthRef.current = length;
   }, [length]);
 
-  const [viewedPage, setViewedPage] = useState(0);
-  const [autoFollow, setAutoFollow] = useState(true);
-  const autoFollowRef = useRef(autoFollow);
-  useEffect(() => {
-    autoFollowRef.current = autoFollow;
-  }, [autoFollow]);
+  const [viewedRange, setViewedRange] = useState(0);
 
-  const [miniPage, setMiniPage] = useState(0);
+  const [miniRange, setMiniRange] = useState(0);
   const [miniAutoFollow, setMiniAutoFollow] = useState(true);
   const miniAutoFollowRef = useRef(miniAutoFollow);
   useEffect(() => {
@@ -129,11 +124,8 @@ export const useStepSequencer = (voices: Voices) => {
         TRACK_IDS.forEach((id) => {
           if (patternsRef.current[id][step]) flashHit(id);
         });
-        if (autoFollowRef.current) {
-          setViewedPage(Math.floor(step / STEP_COUNT));
-        }
         if (miniAutoFollowRef.current) {
-          setMiniPage(Math.floor(step / MINI_GRID_PAGE_SIZE));
+          setMiniRange(Math.floor(step / MINI_GRID_RANGE_SIZE));
         }
       }, time);
     }, "16n");
@@ -143,8 +135,7 @@ export const useStepSequencer = (voices: Voices) => {
       setCurrentStep(0);
       TRACK_IDS.forEach((id) => clearTimeout(flashTimeouts[id]));
       setSequencerHits(noSequencerHits());
-      if (autoFollowRef.current) setViewedPage(0);
-      if (miniAutoFollowRef.current) setMiniPage(0);
+      if (miniAutoFollowRef.current) setMiniRange(0);
     };
     Tone.getTransport().on("stop", handleTransportStop);
 
@@ -155,9 +146,9 @@ export const useStepSequencer = (voices: Voices) => {
     };
   }, []);
 
-  const setStep = (pageStepIndex: number, active: boolean) => {
+  const setStep = (rangeStepIndex: number, active: boolean) => {
     const track = selectedTrack;
-    const absoluteIndex = viewedPage * STEP_COUNT + pageStepIndex;
+    const absoluteIndex = viewedRange * STEP_COUNT + rangeStepIndex;
     const updated = patternsRef.current[track].slice();
     updated[absoluteIndex] = active;
     patternsRef.current[track] = updated;
@@ -165,9 +156,9 @@ export const useStepSequencer = (voices: Voices) => {
     setPatternsDisplay((prev) => ({ ...prev, [track]: updated }));
   };
 
-  const setVelocity = (pageStepIndex: number, velocity: number) => {
+  const setVelocity = (rangeStepIndex: number, velocity: number) => {
     const track = selectedTrack;
-    const absoluteIndex = viewedPage * STEP_COUNT + pageStepIndex;
+    const absoluteIndex = viewedRange * STEP_COUNT + rangeStepIndex;
     const updated = velocitiesRef.current[track].slice();
     updated[absoluteIndex] = velocity;
     velocitiesRef.current[track] = updated;
@@ -187,32 +178,27 @@ export const useStepSequencer = (voices: Voices) => {
 
   const changeLength = (nextLength: PatternLength) => {
     setLength(nextLength);
-    const maxPage = nextLength / STEP_COUNT - 1;
-    setViewedPage((prev) => Math.min(prev, maxPage));
+    const maxRange = nextLength / STEP_COUNT - 1;
+    setViewedRange((prev) => Math.min(prev, maxRange));
   };
 
-  const goToPage = (page: number) => {
-    setViewedPage(page);
-    setAutoFollow(page === Math.floor(currentStep / STEP_COUNT));
+  const goToMiniRange = (range: number) => {
+    setMiniRange(range);
+    setMiniAutoFollow(range === Math.floor(currentStep / MINI_GRID_RANGE_SIZE));
   };
 
-  const goToMiniPage = (page: number) => {
-    setMiniPage(page);
-    setMiniAutoFollow(page === Math.floor(currentStep / MINI_GRID_PAGE_SIZE));
-  };
-
-  const pageStart = viewedPage * STEP_COUNT;
+  const rangeStart = viewedRange * STEP_COUNT;
 
   return {
     patternsDisplay,
     activePattern: patternsDisplay[selectedTrack].slice(
-      pageStart,
-      pageStart + STEP_COUNT,
+      rangeStart,
+      rangeStart + STEP_COUNT,
     ),
     velocitiesDisplay,
     activeVelocities: velocitiesDisplay[selectedTrack].slice(
-      pageStart,
-      pageStart + STEP_COUNT,
+      rangeStart,
+      rangeStart + STEP_COUNT,
     ),
     selectedTrack,
     selectTrack: setSelectedTrack,
@@ -222,11 +208,10 @@ export const useStepSequencer = (voices: Voices) => {
     clearTrack,
     length,
     setLength: changeLength,
-    viewedPage,
-    goToPage,
-    autoFollow,
-    miniPage,
-    goToMiniPage,
+    viewedRange,
+    goToRange: setViewedRange,
+    miniRange,
+    goToMiniRange,
     sequencerHits,
   };
 };

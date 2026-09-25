@@ -3,8 +3,8 @@ import classNames from "classnames";
 import {
   TRACK_IDS,
   TRACK_LABELS,
-  MINI_GRID_PAGE_SIZE,
-  MINI_GRID_PAGE_COUNT,
+  MINI_GRID_RANGE_SIZE,
+  MINI_GRID_RANGE_COUNT,
   type TrackId,
 } from "./useStepSequencer";
 import { Flex } from "antd";
@@ -80,37 +80,37 @@ const GROUP_SIZE = 4;
 
 interface MiniGridProps {
   patterns: Record<TrackId, boolean[]>;
-  currentStep: number; // global (0..length-1)
+  currentStep: number;
   length: number;
-  miniPage: number; // 0 or 1 — which 32-step half is shown, independent of StepGrid's page
+  miniRange: number;
   selectedTrack: TrackId;
   onSelectTrack: (id: TrackId) => void;
-  onSelectPage?: (page: number) => void;
+  onSelectRange?: (range: number) => void;
 }
 
 const MiniGrid = ({
   patterns,
   currentStep,
   length,
-  miniPage,
+  miniRange,
   selectedTrack,
   onSelectTrack,
-  onSelectPage,
+  onSelectRange,
 }: MiniGridProps) => {
-  const pageStart = miniPage * MINI_GRID_PAGE_SIZE;
+  const rangeStart = miniRange * MINI_GRID_RANGE_SIZE;
 
   return (
     <Flex vertical align="center" gap={2} className={styles.container}>
-      {MINI_GRID_PAGE_COUNT > 1 && (
+      {MINI_GRID_RANGE_COUNT > 1 && (
         <Flex gap={4} className={styles.dots}>
-          {Array.from({ length: MINI_GRID_PAGE_COUNT }, (_, page) => (
+          {Array.from({ length: MINI_GRID_RANGE_COUNT }, (_, range) => (
             <div
-              key={page}
+              key={range}
               className={classNames(
                 styles.dot,
-                page === miniPage && styles.dotViewed,
+                range === miniRange && styles.dotViewed,
               )}
-              onClick={() => onSelectPage?.(page)}
+              onClick={() => onSelectRange?.(range)}
             />
           ))}
         </Flex>
@@ -134,8 +134,8 @@ const MiniGrid = ({
               {TRACK_IDS.indexOf(trackId) + 1}
             </span>
             <Flex gap={2}>
-              {Array.from({ length: MINI_GRID_PAGE_SIZE }, (_, i) => {
-                const stepIndex = pageStart + i;
+              {Array.from({ length: MINI_GRID_RANGE_SIZE }, (_, i) => {
+                const stepIndex = rangeStart + i;
                 return (
                   <div
                     key={stepIndex}
@@ -145,7 +145,7 @@ const MiniGrid = ({
                       stepIndex === currentStep && styles.stepPlayhead,
                       stepIndex >= length && styles.stepDisabled,
                       (i + 1) % GROUP_SIZE === 0 &&
-                        i !== MINI_GRID_PAGE_SIZE - 1 &&
+                        i !== MINI_GRID_RANGE_SIZE - 1 &&
                         styles.stepGroupEnd,
                     )}
                   />
