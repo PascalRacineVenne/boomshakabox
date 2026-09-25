@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { css } from "@linaria/core";
 import { Button, Flex, Typography } from "antd";
 import TempoTransportPanel from "./transport/TempoTransportPanel";
@@ -24,10 +23,9 @@ import { useLowTomVoice } from "../components/voices/lowTom/useLowTomVoice";
 import StepGrid from "./grid/StepGrid";
 import VelocityRow from "./grid/VelocityRow";
 import VoiceScope from "./oscilloscope/VoiceScope";
-import MiniGrid, { MINI_GRID_PAGE_COUNT } from "./grid/MiniGrid";
+import MiniGrid from "./grid/MiniGrid";
 import LengthControl from "./grid/LengthControl";
 import PageTabs from "./grid/PageTabs";
-import PageDots from "./grid/PageDots";
 import PatternOverview from "./grid/PatternOverview";
 // import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
 import {
@@ -149,6 +147,8 @@ const StepSequencer = () => {
     setLength,
     viewedPage,
     goToPage,
+    miniPage,
+    goToMiniPage,
   } = useStepSequencer(voices);
 
   const transportPlayback = useTransportPlayback();
@@ -165,8 +165,6 @@ const StepSequencer = () => {
       ? currentStep % STEP_COUNT
       : -1;
   const showPager = length > STEP_COUNT;
-
-  const [miniPage, setMiniPage] = useState(0);
 
   return (
     <Flex vertical align="center" gap={GAP} className={styles.sequencer}>
@@ -193,21 +191,15 @@ const StepSequencer = () => {
           >{`${TRACK_LABELS[selectedTrack]} — waveform`}</Typography>
           <VoiceScope key={selectedTrack} voice={voices[selectedTrack]} />
         </Flex>
-        <Flex vertical gap={2} align="center">
-          <PageDots
-            pageCount={MINI_GRID_PAGE_COUNT}
-            viewedPage={miniPage}
-            onSelectPage={setMiniPage}
-          />
-          <MiniGrid
-            patterns={patternsDisplay}
-            currentStep={currentStep}
-            length={length}
-            miniPage={miniPage}
-            selectedTrack={selectedTrack}
-            onSelectTrack={selectTrack}
-          />
-        </Flex>
+        <MiniGrid
+          patterns={patternsDisplay}
+          currentStep={currentStep}
+          length={length}
+          miniPage={miniPage}
+          selectedTrack={selectedTrack}
+          onSelectTrack={selectTrack}
+          onSelectPage={goToMiniPage}
+        />
       </Flex>
       <Flex>
         <KickPad

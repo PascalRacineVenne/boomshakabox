@@ -6,6 +6,9 @@ export const MAX_STEPS = 64; // patterns always allocate this many steps, indepe
 export const PATTERN_LENGTH_OPTIONS = [16, 32, 48, 64] as const;
 export type PatternLength = (typeof PATTERN_LENGTH_OPTIONS)[number];
 
+export const MINI_GRID_PAGE_SIZE = 32; // MiniGrid always shows this many steps, independent of StepGrid's own 16-wide page
+export const MINI_GRID_PAGE_COUNT = 2; // covers the full 64-step max in two halves
+
 export const TRACK_IDS = [
   "kick",
   "snare",
@@ -82,6 +85,16 @@ export const useStepSequencer = (voices: Voices) => {
     autoFollowRef.current = autoFollow;
   }, [autoFollow]);
 
+  // Same auto-follow/manual-override pattern, at MiniGrid's own coarser
+  // 32-step granularity — a separate page concept from viewedPage above,
+  // not derived from it.
+  const [miniPage, setMiniPage] = useState(0);
+  const [miniAutoFollow, setMiniAutoFollow] = useState(true);
+  const miniAutoFollowRef = useRef(miniAutoFollow);
+  useEffect(() => {
+    miniAutoFollowRef.current = miniAutoFollow;
+  }, [miniAutoFollow]);
+
   const voicesRef = useRef(voices);
   useEffect(() => {
     voicesRef.current = voices;
@@ -105,6 +118,9 @@ export const useStepSequencer = (voices: Voices) => {
         if (autoFollowRef.current) {
           setViewedPage(Math.floor(step / STEP_COUNT));
         }
+        if (miniAutoFollowRef.current) {
+          setMiniPage(Math.floor(step / MINI_GRID_PAGE_SIZE));
+        }
       }, time);
     }, "16n");
 
@@ -112,6 +128,7 @@ export const useStepSequencer = (voices: Voices) => {
       stepCountRef.current = 0;
       setCurrentStep(0);
       if (autoFollowRef.current) setViewedPage(0);
+      if (miniAutoFollowRef.current) setMiniPage(0);
     };
     Tone.getTransport().on("stop", handleTransportStop);
 
@@ -167,6 +184,12 @@ export const useStepSequencer = (voices: Voices) => {
     setAutoFollow(page === Math.floor(currentStep / STEP_COUNT));
   };
 
+  // Same rule as goToPage, at MiniGrid's own page granularity.
+  const goToMiniPage = (page: number) => {
+    setMiniPage(page);
+    setMiniAutoFollow(page === Math.floor(currentStep / MINI_GRID_PAGE_SIZE));
+  };
+
   const pageStart = viewedPage * STEP_COUNT;
 
   return {
@@ -191,5 +214,7 @@ export const useStepSequencer = (voices: Voices) => {
     viewedPage,
     goToPage,
     autoFollow,
+    miniPage,
+    goToMiniPage,
   };
 };
