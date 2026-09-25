@@ -1,8 +1,9 @@
 import { css } from "@linaria/core";
-import { Button, Collapse, Flex } from "antd";
+import { Button, Flex, Typography } from "antd";
 import TempoTransportPanel from "./transport/TempoTransportPanel";
 import MasterPanel from "../components/master/MasterPanel";
-import FilterPanel from "../components/filter/FilterPanel";
+
+import { BoomPurpleIcon } from "../icons/logos/BoomPurpleIcon";
 
 import KickPad from "../components/voices/kick/KickPad";
 import SnarePad from "../components/voices/snare/SnarePad";
@@ -23,8 +24,16 @@ import StepGrid from "./grid/StepGrid";
 import VelocityRow from "./grid/VelocityRow";
 import VoiceScope from "./oscilloscope/VoiceScope";
 import MiniGrid from "./grid/MiniGrid";
-import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
-import { useStepSequencer, TRACK_IDS, TRACK_LABELS } from "./grid/useStepSequencer";
+import LengthControl from "./grid/LengthControl";
+import PageTabs from "./grid/PageTabs";
+import PatternOverview from "./grid/PatternOverview";
+// import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
+import {
+  useStepSequencer,
+  TRACK_IDS,
+  TRACK_LABELS,
+  STEP_COUNT,
+} from "./grid/useStepSequencer";
 import EffectsPanel from "../components/effects/EffectsPanel";
 import { useTransportPlayback } from "./transport/useTransportPlayback";
 import { useDrumMachineHotkeys } from "./useDrumMachineHotkeys";
@@ -32,7 +41,7 @@ import { useDrumMachineHotkeys } from "./useDrumMachineHotkeys";
 const styles = {
   scopeRow: css`
     width: 100%;
-    padding: var(--audioui-unit);
+    align-items: stretch !important;
   `,
   scopeCollapse: css`
     border: none;
@@ -84,9 +93,35 @@ const styles = {
       box-shadow: 1px 1px 4px var(--contrast-1) !important;
     }
   `,
+  icon: css`
+    align-self: center;
+    height: 70px;
+  `,
+  oscillators: css`
+    border: 1px solid var(--accent-border);
+    border-radius: 8px;
+    padding: calc(var(--audioui-unit) / 4);
+    align-items: stretch !important;
+  `,
+  sequencer: css`
+    padding: calc(var(--audioui-unit) / 4);
+  `,
+
+  waveformTitle: css`
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    color: var(--accent);
+    font-size: 12px;
+    border: 1px solid var(--accent-border);
+    border-radius: 8px;
+    padding: calc(var(--audioui-unit) / 8);
+    margin-bottom: calc(var(--audioui-unit) / 4) !important;
+    align-self: stretch !important;
+    height: auto !important;
+  `,
 };
 
-const GAP = "calc(var(--audioui-unit) / 2)";
+const GAP = "calc(var(--audioui-unit) / 8)";
 
 const StepSequencer = () => {
   const kickVoice = useKickVoice();
@@ -117,6 +152,12 @@ const StepSequencer = () => {
     setStep,
     setVelocity,
     clearTrack,
+    length,
+    setLength,
+    viewedPage,
+    goToPage,
+    miniPage,
+    goToMiniPage,
   } = useStepSequencer(voices);
 
   const transportPlayback = useTransportPlayback();
@@ -128,44 +169,39 @@ const StepSequencer = () => {
     selectTrack,
   );
 
+  const pageRelativeStep =
+    Math.floor(currentStep / STEP_COUNT) === viewedPage
+      ? currentStep % STEP_COUNT
+      : -1;
+
   return (
-    <Flex vertical align="center" gap={GAP}>
-      <Flex align="flex-start" gap={GAP}>
+    <Flex vertical align="center" gap={GAP} className={styles.sequencer}>
+      <Flex align="flex-start" justify="space-between" gap={GAP}>
+        <BoomPurpleIcon className={styles.icon} />
         <TempoTransportPanel
           isPlaying={transportPlayback.isPlaying}
           togglePlayPause={transportPlayback.togglePlayPause}
           stop={transportPlayback.stop}
         />
-        <FilterPanel />
+        <LengthControl length={length} onChange={setLength} />
         <EffectsPanel />
         <MasterPanel />
       </Flex>
-      <Flex
-        align="flex-start"
-        justify="center"
-        gap={GAP}
-        className={styles.scopeRow}
-      >
-        <Collapse
-          size="small"
-          className={styles.scopeCollapse}
-          defaultActiveKey={["scope"]}
-          destroyOnHidden
-          items={[
-            {
-              key: "scope",
-              label: `${TRACK_LABELS[selectedTrack]} — waveform`,
-              children: (
-                <VoiceScope key={selectedTrack} voice={voices[selectedTrack]} />
-              ),
-            },
-          ]}
-        />
+      <Flex justify="center" gap={GAP} className={styles.scopeRow}>
+        <Flex className={styles.oscillators} gap={GAP}>
+          <Typography
+            className={styles.waveformTitle}
+          >{`${TRACK_LABELS[selectedTrack]}—wave`}</Typography>
+          <VoiceScope key={selectedTrack} voice={voices[selectedTrack]} />
+        </Flex>
         <MiniGrid
           patterns={patternsDisplay}
           currentStep={currentStep}
+          length={length}
+          miniPage={miniPage}
           selectedTrack={selectedTrack}
           onSelectTrack={selectTrack}
+          onSelectPage={goToMiniPage}
         />
       </Flex>
       <Flex>
@@ -214,14 +250,30 @@ const StepSequencer = () => {
       </Flex>
 
       <Flex vertical gap={4} className={styles.gridRow}>
+        <Flex gap={4}>
+          <PageTabs
+            length={length}
+            viewedPage={viewedPage}
+            onSelectPage={goToPage}
+          />
+          <PatternOverview
+            patterns={patternsDisplay}
+            currentStep={currentStep}
+            length={length}
+            viewedPage={viewedPage}
+            onSelectPage={goToPage}
+          />
+        </Flex>
+
         <Flex align="center" gap={GAP}>
           <span className={styles.gridLabel}>
             {TRACK_LABELS[selectedTrack]}
           </span>
           <StepGrid
             active={activePattern}
-            currentStep={currentStep}
+            currentStep={pageRelativeStep}
             onStepChange={setStep}
+            startNumber={viewedPage * STEP_COUNT + 1}
           />
         </Flex>
         <Flex gap={GAP} align="flex-start">
@@ -248,7 +300,7 @@ const StepSequencer = () => {
         </Flex>
       </Flex>
 
-      <VoiceParamsTable selectedTrack={selectedTrack} voices={voices} />
+      {/* <VoiceParamsTable selectedTrack={selectedTrack} voices={voices} /> */}
     </Flex>
   );
 };

@@ -9,8 +9,8 @@ const styles = {
     font-weight: 700 !important;
     line-height: 1 !important;
     color: var(--accent) !important;
-    height: auto !important;
-    border: 1px solid var(--accent) !important;
+    height: 100% !important;
+    border: 1px solid var(--accent-border) !important;
     border-radius: 8px !important;
 
     &.ant-input-number-focused {
@@ -19,7 +19,9 @@ const styles = {
   `,
 
   root: css`
+    align-self: stretch !important;
     padding-inline: 0;
+    height: auto !important;
     &.ant-input-number-focused {
       outline: none !important;
     }

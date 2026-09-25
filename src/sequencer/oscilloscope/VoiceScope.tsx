@@ -5,7 +5,7 @@ import WaveformDisplay from "./WaveformDisplay";
 import FullWaveformDisplay from "./FullWaveformDisplay";
 
 const FULL_RENDER_DEBOUNCE_MS = 200; // avoid re-rendering offline on every knob-drag tick
-const GAP = "calc(var(--audioui-unit) / 2)";
+const GAP = "calc(var(--audioui-unit) / 4)";
 
 interface VoiceScopeProps {
   voice: VoiceScopeSource;

@@ -5,17 +5,14 @@ import TransportControls from "./TransportControls";
 import MetronomeClick from "./MetronomeClick";
 
 const styles = {
+  // antd's Flex `align` prop doesn't accept "stretch" as a value (it's
+  // silently dropped — no class or style gets emitted for it), so this is
+  // set directly rather than via the `align` prop.
   grid: css`
-    padding: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
+    align-items: stretch !important;
+    padding: calc(var(--audioui-unit) / 4);
     border: 1px solid var(--accent-border);
     border-radius: 8px;
-  `,
-
-  title: css`
-    font-size: 11px;
-    color: var(--text);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
   `,
 };
 
@@ -34,7 +31,7 @@ const TempoTransportPanel = ({
 }: TempoTransportPanelProps) => {
   return (
     <Flex vertical justify="center">
-      <Flex align="center" gap={GAP} className={styles.grid}>
+      <Flex gap={GAP} className={styles.grid}>
         <TempoInput />
         <TransportControls
           isPlaying={isPlaying}
@@ -43,7 +40,6 @@ const TempoTransportPanel = ({
         />
         <MetronomeClick />
       </Flex>
-      <span className={styles.title}>Transport</span>
     </Flex>
   );
 };

@@ -1,4 +1,4 @@
-import { Button, Knob, Slider } from "@cutoff/audio-ui-react";
+import { Knob, Slider } from "@cutoff/audio-ui-react";
 import classNames from "classnames";
 import { Flex } from "antd";
 import {
@@ -10,6 +10,7 @@ import {
   VOLUME_MAX,
   VOLUME_MIN,
 } from "../../shared/ControlPanel";
+import TriggerButton from "../../shared/TriggerButton";
 import {
   KICK_CLICK_MAX,
   KICK_CLICK_MIN,
@@ -86,7 +87,7 @@ const KickPad = ({
       )}
       onMouseDown={onSelect}
     >
-      <Flex gap={4}>
+      <Flex>
         <Flex vertical align="center" gap={4}>
           <Knob
             variant="plainCap"
@@ -199,14 +200,11 @@ const KickPad = ({
           </Flex>
         </Flex>
       </Flex>
-      <Button
+      <TriggerButton
         label={`BD${trackNumber}`}
-        value={pressed}
-        size="large"
-        onChange={(press) => {
-          setPressed(press.value);
-          if (press.value) trigger();
-        }}
+        pressed={pressed}
+        setPressed={setPressed}
+        trigger={trigger}
       />
     </Flex>
   );

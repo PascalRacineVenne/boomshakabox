@@ -34,13 +34,6 @@ const styles = {
 
   slider: css`
     margin: 0 !important;
-
-    /* Velocity is inert for a step that isn't active, but the rail (the
-       full 0-100 range) stays at full visibility either way — it's the
-       one reference line every slider always needs, disabled or not.
-       Without this, a disabled slider is just a faint dot with nothing
-       to show it's even a slider. Only the track/handle (the CURRENT
-       value, which matters less when disabled) get greyed down. */
     &.ant-slider-disabled {
       .ant-slider-rail {
         background-color: var(--border) !important;
@@ -118,9 +111,7 @@ const VelocityRow = ({
                           width: STEP_WIDTH,
                         }}
                         value={velocities[stepIndex]}
-                        onChange={(value) =>
-                          onVelocityChange(stepIndex, value)
-                        }
+                        onChange={(value) => onVelocityChange(stepIndex, value)}
                         disabled={!active[stepIndex]}
                       />
                     );

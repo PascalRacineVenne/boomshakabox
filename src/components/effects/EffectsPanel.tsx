@@ -7,7 +7,7 @@ import { LABELED_SMALL_KNOB_HEIGHT_UNITS } from "../shared/ControlPanel";
 const styles = {
   grid: css`
     gap: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
-    padding: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
+    padding: calc(var(--audioui-unit) / 4);
     border: 1px solid var(--accent-border);
     border-radius: 8px;
   `,
@@ -68,9 +68,29 @@ const EffectsPanel = () => {
             label="Drive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
+          <Knob
+            variant="plainCap"
+            size="small"
+            min={0}
+            max={1}
+            value={drive}
+            // onChange={(rotation) => setVerb(rotation.value)}
+            label="Verb"
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
+          />
+          <Knob
+            variant="plainCap"
+            size="small"
+            min={0}
+            max={1}
+            value={drive}
+            // onChange={(rotation) => setDelay(rotation.value)}
+            label="Delay"
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
+          />
         </Space>
+        {/* <span className={styles.title}>Effects</span> */}
       </Flex>
-      <span className={styles.title}>Effects</span>
     </Flex>
   );
 };

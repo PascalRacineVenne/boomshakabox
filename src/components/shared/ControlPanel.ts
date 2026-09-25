@@ -14,7 +14,6 @@ export const formatPan = (value: number) => {
 
 export const controlPanelStyles = {
   panel: css`
-    gap: calc(var(--audioui-unit) / 4);
     padding: calc(var(--audioui-unit) / 4);
     border: 1px solid var(--accent-border);
     border-radius: 8px;
@@ -42,6 +41,28 @@ export const controlPanelStyles = {
   toggleButtonActive: css`
     border-color: var(--contrast-1);
     background: var(--contrast-1);
+    color: var(--bg);
+  `,
+
+  triggerWrap: css`
+    position: relative;
+    max-height: 48px;
+  `,
+
+  triggerLabel: css`
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-h);
+    pointer-events: none;
+    user-select: none;
+  `,
+
+  triggerLabelActive: css`
     color: var(--bg);
   `,
 };
