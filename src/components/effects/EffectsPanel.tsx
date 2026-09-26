@@ -7,7 +7,7 @@ import { LABELED_SMALL_KNOB_HEIGHT_UNITS } from "../shared/ControlPanel";
 const styles = {
   grid: css`
     gap: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
-    padding: calc(var(--audioui-unit) / 4);
+    padding: calc(var(--audioui-unit) / 8);
     border: 1px solid var(--accent-border);
     border-radius: 8px;
   `,

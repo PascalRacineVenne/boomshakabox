@@ -93,7 +93,7 @@ const styles = {
   oscillators: css`
     border: 1px solid var(--accent-border);
     border-radius: 8px;
-    padding: calc(var(--audioui-unit) / 4);
+    padding: calc(var(--audioui-unit) / 8);
     align-items: stretch !important;
     width: 100%;
   `,

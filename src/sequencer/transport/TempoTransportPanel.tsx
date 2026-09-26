@@ -8,7 +8,7 @@ import { BoomPurpleIcon } from "../../icons/logos/BoomPurpleIcon";
 const styles = {
   grid: css`
     align-items: stretch !important;
-    padding: calc(var(--audioui-unit) / 4);
+    padding: calc(var(--audioui-unit) / 8);
     border: 1px solid var(--accent-border);
     border-radius: 8px;
   `,

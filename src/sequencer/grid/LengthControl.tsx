@@ -5,7 +5,7 @@ import { PATTERN_LENGTH_OPTIONS, type PatternLength } from "./useStepSequencer";
 const styles = {
   panel: css`
     min-height: 50px;
-    padding: calc(var(--audioui-unit) / 4);
+    padding: calc(var(--audioui-unit) / 8);
     border: 1px solid var(--accent-border);
     border-radius: 8px;
     width: 100%;
