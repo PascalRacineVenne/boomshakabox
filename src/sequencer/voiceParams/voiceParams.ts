@@ -29,6 +29,19 @@ import {
   useSnareVoice,
 } from "../../components/voices/snare/useSnareVoice";
 import {
+  CLAP_DECAY_MAX,
+  CLAP_DECAY_MIN,
+  CLAP_FATNESS_MAX,
+  CLAP_FATNESS_MIN,
+  CLAP_PUNCH_MAX,
+  CLAP_PUNCH_MIN,
+  CLAP_SNAP_MAX,
+  CLAP_SNAP_MIN,
+  CLAP_TONE_MAX,
+  CLAP_TONE_MIN,
+  useClapVoice,
+} from "../../components/voices/clap/useClapVoice";
+import {
   HH_TONE_MAX,
   HH_TONE_MIN,
   useHiHatVoice,
@@ -61,6 +74,7 @@ import type { TrackId } from "../grid/useStepSequencer";
 export interface AllVoices {
   kick: ReturnType<typeof useKickVoice>;
   snare: ReturnType<typeof useSnareVoice>;
+  clap: ReturnType<typeof useClapVoice>;
   hihat: ReturnType<typeof useHiHatVoice>;
   hihatOpen: ReturnType<typeof useHiHatOpenVoice>;
   hiTom: ReturnType<typeof useHiTomVoice>;
@@ -347,6 +361,136 @@ const snareRows = (v: AllVoices["snare"]): VoiceParamRow[] => [
   masterEnvRow(),
 ];
 
+const clapRows = (v: AllVoices["clap"]): VoiceParamRow[] => [
+  {
+    key: "noise-source",
+    stage: "Noise",
+    detail: "white noise, feeds both the tail and burst paths",
+    parameter: "Type",
+    value: "white",
+    live: false,
+    control: "Fixed in code",
+  },
+  {
+    key: "bandpass-freq",
+    stage: "Filter",
+    detail: "bandpass, shared by tail and burst paths",
+    parameter: "Cutoff (Tone)",
+    value: `${v.tone} Hz`,
+    live: true,
+    control: `Tone knob (${CLAP_TONE_MIN}–${CLAP_TONE_MAX} Hz)`,
+  },
+  {
+    key: "bandpass-q",
+    stage: "Filter",
+    detail: "bandpass, shared by tail and burst paths",
+    parameter: "Q (Punch)",
+    value: `${v.punch}`,
+    live: true,
+    control: `Punch knob (${CLAP_PUNCH_MIN}–${CLAP_PUNCH_MAX})`,
+  },
+  {
+    key: "tail-vca-decay",
+    stage: "VCA (Tail path)",
+    detail: 'single exponential decay — the "room" ring-out',
+    parameter: "Decay",
+    value: `${v.decay.toFixed(2)}s`,
+    live: true,
+    control: `Decay knob (${CLAP_DECAY_MIN}–${CLAP_DECAY_MAX}s)`,
+  },
+  {
+    key: "burst-pulse-count",
+    stage: "VCA (Burst path)",
+    detail: "5 short pulses, chaotic timing/amplitude on the first two",
+    parameter: "Pulse Count",
+    value: "5",
+    live: false,
+    control: "Fixed in code",
+  },
+  {
+    key: "burst-spacing",
+    stage: "VCA (Burst path)",
+    detail: "5 short pulses, chaotic timing/amplitude on the first two",
+    parameter: "Pulse Spacing (Snap)",
+    value: `${v.snap}`,
+    live: true,
+    control: `Snap knob (${CLAP_SNAP_MIN}–${CLAP_SNAP_MAX}, higher = tighter)`,
+  },
+  {
+    key: "fold-amount",
+    stage: "Distortion",
+    detail: "Tone.Distortion (wavefold), 4x oversample — burst path only",
+    parameter: "Amount (Fatness)",
+    value: `${v.fatness}`,
+    live: true,
+    control: `Fatness knob (${CLAP_FATNESS_MIN}–${CLAP_FATNESS_MAX})`,
+  },
+  {
+    key: "lowpass",
+    stage: "Filter",
+    detail: "lowpass, post-sum of tail and burst paths",
+    parameter: "Cutoff",
+    value: "9000 Hz",
+    live: false,
+    control: "Fixed in code — not exposed",
+  },
+  {
+    key: "makeup",
+    stage: "Gain",
+    detail: "fixed makeup stage, post-lowpass",
+    parameter: "Gain",
+    value: "2.4x",
+    live: false,
+    control: "Fixed in code — not exposed",
+  },
+  {
+    key: "highpass",
+    stage: "Filter",
+    detail: "highpass, rumble control before the compressor",
+    parameter: "Cutoff",
+    value: "28 Hz",
+    live: false,
+    control: "Fixed in code — not exposed",
+  },
+  {
+    key: "compressor",
+    stage: "Compressor",
+    detail: "same settings as Kick's output stage",
+    parameter: "Threshold / Ratio",
+    value: "-16dB / 4:1",
+    live: false,
+    control: "Fixed in code — not exposed",
+  },
+  {
+    key: "limiter",
+    stage: "Limiter",
+    detail: "final ceiling before Volume/Pan",
+    parameter: "Threshold",
+    value: "-1dB",
+    live: false,
+    control: "Fixed in code — not exposed",
+  },
+  {
+    key: "vca-peak",
+    stage: "VCA (Volume)",
+    detail: "final Gain stage, post-Limiter",
+    parameter: "Peak Level",
+    value: v.muted ? "0% (muted)" : `${v.volume}%`,
+    live: true,
+    control: `Volume slider (${VOLUME_MIN}–${VOLUME_MAX}%)`,
+  },
+  {
+    key: "pan",
+    stage: "Pan",
+    detail: "stereo panner, shared by both paths",
+    parameter: "Position",
+    value: formatPan(v.pan),
+    live: true,
+    control: `Pan knob (${PANNING_L}–${PANNING_R})`,
+  },
+  masterEnvRow(),
+];
+
 const hihatRows = (v: AllVoices["hihat"]): VoiceParamRow[] => [
   {
     key: "osc-bank",
@@ -569,6 +713,8 @@ export const buildVoiceParamRows = (
       return kickRows(voices.kick);
     case "snare":
       return snareRows(voices.snare);
+    case "clap":
+      return clapRows(voices.clap);
     case "hihat":
       return hihatRows(voices.hihat);
     case "hihatOpen":

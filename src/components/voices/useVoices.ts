@@ -1,12 +1,13 @@
 import { useKickVoice } from "./kick/useKickVoice";
 import { useSnareVoice } from "./snare/useSnareVoice";
+import { useClapVoice } from "./clap/useClapVoice";
 import { useHiHatVoice } from "./hiHat/useHiHatVoice";
 import { useHiHatOpenVoice } from "./hiHatOpen/useHiHatOpenVoice";
 import { useHiTomVoice } from "./hiTom/useHiTomVoice";
 import { useMidTomVoice } from "./midTom/useMidTomVoice";
 import { useLowTomVoice } from "./lowTom/useLowTomVoice";
 
-// Composes all seven per-voice hooks into the single `voices` object
+// Composes all eight per-voice hooks into the single `voices` object
 // keyed by TrackId that the rest of the sequencer (useStepSequencer,
 // VoicePadRow, VoiceScope, VoiceParamsTable) expects. Returns each
 // hook's full result rather than the narrower Voices interface the
@@ -16,6 +17,7 @@ import { useLowTomVoice } from "./lowTom/useLowTomVoice";
 export const useVoices = () => {
   const kickVoice = useKickVoice();
   const snareVoice = useSnareVoice();
+  const clapVoice = useClapVoice();
   const hiHatVoice = useHiHatVoice();
   const hiHatOpenVoice = useHiHatOpenVoice();
   const hiTomVoice = useHiTomVoice();
@@ -25,6 +27,7 @@ export const useVoices = () => {
   return {
     kick: kickVoice,
     snare: snareVoice,
+    clap: clapVoice,
     hihat: hiHatVoice,
     hihatOpen: hiHatOpenVoice,
     hiTom: hiTomVoice,
