@@ -5,21 +5,8 @@ import MasterPanel from "../components/master/MasterPanel";
 
 import { BoomPurpleIcon } from "../icons/logos/BoomPurpleIcon";
 
-import KickPad from "../components/voices/kick/KickPad";
-import SnarePad from "../components/voices/snare/SnarePad";
-import HiHatPad from "../components/voices/hiHat/HiHatPad";
-import HiHatOpenPad from "../components/voices/hiHatOpen/HiHatOpenPad";
-import HiTomPad from "../components/voices/hiTom/HiTomPad";
-import MidTomPad from "../components/voices/midTom/MidTomPad";
-import LowTomPad from "../components/voices/lowTom/LowTomPad";
-
-import { useKickVoice } from "../components/voices/kick/useKickVoice";
-import { useSnareVoice } from "../components/voices/snare/useSnareVoice";
-import { useHiHatVoice } from "../components/voices/hiHat/useHiHatVoice";
-import { useHiHatOpenVoice } from "../components/voices/hiHatOpen/useHiHatOpenVoice";
-import { useHiTomVoice } from "../components/voices/hiTom/useHiTomVoice";
-import { useMidTomVoice } from "../components/voices/midTom/useMidTomVoice";
-import { useLowTomVoice } from "../components/voices/lowTom/useLowTomVoice";
+import { useVoices } from "../components/voices/useVoices";
+import VoicePadRow from "../components/voices/VoicePadRow";
 import StepGrid from "./grid/StepGrid";
 import VelocityRow from "./grid/VelocityRow";
 import VoiceScope from "./oscilloscope/VoiceScope";
@@ -132,23 +119,7 @@ const styles = {
 const GAP = "calc(var(--audioui-unit) / 8)";
 
 const StepSequencer = () => {
-  const kickVoice = useKickVoice();
-  const snareVoice = useSnareVoice();
-  const hiHatVoice = useHiHatVoice();
-  const hiHatOpenVoice = useHiHatOpenVoice();
-  const hiTomVoice = useHiTomVoice();
-  const midTomVoice = useMidTomVoice();
-  const lowTomVoice = useLowTomVoice();
-
-  const voices = {
-    kick: kickVoice,
-    snare: snareVoice,
-    hihat: hiHatVoice,
-    hihatOpen: hiHatOpenVoice,
-    hiTom: hiTomVoice,
-    midTom: midTomVoice,
-    lowTom: lowTomVoice,
-  };
+  const voices = useVoices();
 
   const {
     patternsDisplay,
@@ -213,57 +184,12 @@ const StepSequencer = () => {
           onSelectRange={goToMiniRange}
         />
       </Flex>
-      <Flex>
-        <KickPad
-          {...kickVoice}
-          trackNumber={1}
-          selected={selectedTrack === "kick"}
-          onSelect={() => selectTrack("kick")}
-          sequencerHit={sequencerHits.kick}
-        />
-        <SnarePad
-          {...snareVoice}
-          trackNumber={2}
-          selected={selectedTrack === "snare"}
-          onSelect={() => selectTrack("snare")}
-          sequencerHit={sequencerHits.snare}
-        />
-        <HiTomPad
-          {...hiTomVoice}
-          trackNumber={3}
-          selected={selectedTrack === "hiTom"}
-          onSelect={() => selectTrack("hiTom")}
-          sequencerHit={sequencerHits.hiTom}
-        />
-        <MidTomPad
-          {...midTomVoice}
-          trackNumber={4}
-          selected={selectedTrack === "midTom"}
-          onSelect={() => selectTrack("midTom")}
-          sequencerHit={sequencerHits.midTom}
-        />
-        <LowTomPad
-          {...lowTomVoice}
-          trackNumber={5}
-          selected={selectedTrack === "lowTom"}
-          onSelect={() => selectTrack("lowTom")}
-          sequencerHit={sequencerHits.lowTom}
-        />
-        <HiHatPad
-          {...hiHatVoice}
-          trackNumber={6}
-          selected={selectedTrack === "hihat"}
-          onSelect={() => selectTrack("hihat")}
-          sequencerHit={sequencerHits.hihat}
-        />
-        <HiHatOpenPad
-          {...hiHatOpenVoice}
-          trackNumber={7}
-          selected={selectedTrack === "hihatOpen"}
-          onSelect={() => selectTrack("hihatOpen")}
-          sequencerHit={sequencerHits.hihatOpen}
-        />
-      </Flex>
+      <VoicePadRow
+        voices={voices}
+        selectedTrack={selectedTrack}
+        onSelectTrack={selectTrack}
+        sequencerHits={sequencerHits}
+      />
 
       <Flex vertical gap={4} className={styles.gridRow}>
         <Flex gap={4}>
