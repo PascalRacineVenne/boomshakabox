@@ -5,9 +5,10 @@ import { PATTERN_LENGTH_OPTIONS, type PatternLength } from "./useStepSequencer";
 const styles = {
   panel: css`
     min-height: 50px;
-    padding: calc(var(--audioui-unit) / 4);
+    padding: calc(var(--audioui-unit) / 8);
     border: 1px solid var(--accent-border);
     border-radius: 8px;
+    width: 100%;
   `,
 
   title: css`
@@ -38,11 +39,7 @@ interface LengthControlProps {
   onChange: (length: PatternLength) => void;
 }
 
-// Pattern length is global (one value shared by every voice), so this
-// lives near the transport controls rather than inside any single voice's
-// panel — see useStepSequencer.ts for where the length state itself lives.
 const LengthControl = ({ length, onChange }: LengthControlProps) => (
-  // <Flex>
   <Flex
     vertical
     align="center"
@@ -61,7 +58,6 @@ const LengthControl = ({ length, onChange }: LengthControlProps) => (
     />
     <span className={styles.title}>Length</span>
   </Flex>
-  // </Flex>
 );
 
 export default LengthControl;
