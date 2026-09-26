@@ -31,7 +31,7 @@ flowchart TD
     HOTKEYS -->|play / stop| ENGINE
     GRID -->|toggle steps / velocity| PATTERNS
     PATTERNS -->|read each 16th note| ENGINE
-    ENGINE -->|trigger(time, velocity)| VOICES
+    ENGINE -->|trigger at time, with velocity| VOICES
     VOICES -->|each voice's own synthesis chain| MASTERFILTER
     MASTERFILTER --> EFFECTS --> DELAYVERB --> MASTERGAIN
     VOICES -.->|parallel tap| OSCOPE
