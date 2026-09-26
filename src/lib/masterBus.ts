@@ -18,10 +18,7 @@ const masterFilter = new Tone.Filter(12000, FILTER_MODE_OPTIONS.LOWPASS.value);
 masterFilter.connect(effectsBusInput);
 
 const masterGain = new Tone.Gain(0.75);
-// effectsBusOutput -> [delay -> reverb insert, see delayReverbInsert.ts]
-// -> masterGain: the insert sits right before the master bus, after the
-// existing Filter/Drive stages, per delayReverbInsert.ts's own routing
-// of effectsBusOutput as its input.
+// See DOCS/buses/master-bus.md for the full chain this sits in.
 delayReverbInsertOutput.connect(masterGain);
 
 const masterLimiter = new Tone.Limiter(-1).toDestination();

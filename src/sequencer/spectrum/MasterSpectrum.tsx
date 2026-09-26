@@ -33,11 +33,9 @@ const MasterSpectrum = () => {
     const ctx = canvas?.getContext("2d");
     if (!wrapper || !canvas || !ctx) return;
 
-    // The canvas is position:absolute inside `wrapper` (see
-    // spectrumCanvas.ts), so it can never influence wrapper's own size —
-    // safe to observe wrapper (not the canvas) for the row's
-    // flex-stretched height and resize the canvas's backing store to
-    // match, at devicePixelRatio for a crisp (non-blurry) render.
+    // Observes the wrapper, not the canvas — see README — and resizes
+    // the canvas's backing store to match, at devicePixelRatio for a
+    // crisp (non-blurry) render.
     let logicalWidth = SPECTRUM_CANVAS_WIDTH;
     let logicalHeight = SPECTRUM_CANVAS_INITIAL_HEIGHT;
 
@@ -114,8 +112,7 @@ const MasterSpectrum = () => {
         ctx.fillText(formatFreqTick(hz), freqToX(hz), bottom + 1);
       });
 
-      // The spectrum curve itself: filled area under a line, same visual
-      // language as VoiceScope (stroke color, fill at low opacity).
+      // The spectrum curve: filled area under a line — see README.
       const spectrum = getSpectrum();
       ctx.beginPath();
       for (let column = 0; column < SPECTRUM_COLUMN_COUNT; column++) {

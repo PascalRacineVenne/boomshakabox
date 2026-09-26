@@ -1,33 +1,15 @@
 import { css } from "@linaria/core";
 import { SCOPE_CANVAS_WIDTH, SCOPE_CANVAS_HEIGHT } from "../oscilloscope/scopeCanvas";
 
-// Width: StepSequencer's row lays this out on a CSS Grid, giving this
-// component's column `minmax(SPECTRUM_CANVAS_WIDTH, 1fr)` — never
-// smaller than a single scope canvas's width, but absorbing any
-// leftover space in the row (see .scopeRow in StepSequencer.tsx). Height
-// is matched to the row's stretched height (same as the waveform box)
-// via the wrapper, not the canvas itself. In both cases the wrapper just
-// needs to stretch to fill whatever cell the grid gives it — grid items
-// stretch to fill their cell by default in both axes, so no explicit
-// width/height/flex is needed here at all.
+// Sized by StepSequencer's CSS Grid row (.scopeRow) via the wrapper, not
+// the canvas — see this folder's README for why.
 export const SPECTRUM_CANVAS_WIDTH = SCOPE_CANVAS_WIDTH;
 // Only used for the very first paint before ResizeObserver reports the
 // wrapper's real (stretched/grown) size.
 export const SPECTRUM_CANVAS_INITIAL_HEIGHT = SCOPE_CANVAS_HEIGHT;
 
-// Three earlier attempts tried to size the canvas directly (via
-// ResizeObserver on the canvas, CSS stretch on the canvas, or flexbox
-// flex-grow/shrink tuning) and each caused a different failure: a
-// canvas's width/height attributes double as both its intrinsic size —
-// which a flex row's own auto-size calculation can depend on — and its
-// DPI backing-store resolution, so mutating them each resize fed back
-// into the very layout being measured; flexbox's flex-shrink/min-width
-// interactions then proved too easy to get subtly wrong by hand. The fix
-// is structural on two fronts: the canvas is `position: absolute` inside
-// this plain wrapper div (spectrumCanvasClass below), fully removed from
-// normal flow so it can never influence the wrapper's size; and the row
-// itself uses CSS Grid (not flexbox) so each column's sizing is explicit
-// and deterministic rather than negotiated.
+// See this folder's README for why the canvas is absolutely positioned
+// inside this plain wrapper rather than sized directly.
 export const spectrumWrapperClass = css`
   position: relative;
   overflow: hidden;
@@ -44,10 +26,7 @@ export const spectrumCanvasClass = css`
   height: 100%;
 `;
 
-// The native Web Audio AnalyserNode's own default dB range
-// (minDecibels/maxDecibels) — Tone.Analyser doesn't override these, so
-// this is the real range getFloatFrequencyData() can return, not a
-// guess.
+// AnalyserNode's own default dB range — see README.
 export const DB_MIN = -100;
 export const DB_MAX = -30;
 

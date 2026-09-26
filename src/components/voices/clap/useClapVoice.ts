@@ -30,18 +30,14 @@ const DEFAULTS_CLAP = {
   snap: 0.5,
 };
 
-// Burst envelope shape: 4-6 short noise pulses fired in quick succession.
-// Chose the middle of that range.
+// Burst shape (pulse count/attack/decay, jitter extent) is fixed — see
+// this folder's README. Only the pulse spacing (Snap knob, between these
+// two extremes) and Fat are user-facing.
 const BURST_PULSE_COUNT = 5;
 const BURST_PULSE_ATTACK = 0.001;
 const BURST_PULSE_DECAY = 0.012;
-// Snap knob scales the gap between pulses between these two extremes —
-// higher snap = tighter/closer together ("flam"), lower = looser/separated.
 const BURST_WIDE_INTERVAL = 0.022;
 const BURST_TIGHT_INTERVAL = 0.006;
-// Per the reference, the burst "starts off super chaotic, then trails
-// off to a more regular burst" — only the first couple of pulses get
-// randomized timing/amplitude; the rest land exactly on the regular grid.
 const BURST_JITTER_PULSES = 2;
 const BURST_JITTER_TIME_RATIO = 0.5;
 const BURST_JITTER_AMOUNT = 0.4;
