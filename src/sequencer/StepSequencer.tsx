@@ -3,9 +3,6 @@ import { Button, Flex, Typography, Collapse } from "antd";
 import TempoTransportPanel from "./transport/TempoTransportPanel";
 import MasterPanel from "../components/master/MasterPanel";
 
-import { BoomPurpleIcon } from "../icons/logos/BoomPurpleIcon";
-
-import { useVoices } from "../components/voices/useVoices";
 import VoicePadRow from "../components/voices/VoicePadRow";
 import StepGrid from "./grid/StepGrid";
 import VelocityRow from "./grid/VelocityRow";
@@ -13,7 +10,9 @@ import VoiceScope from "./oscilloscope/VoiceScope";
 import MiniGrid from "./grid/MiniGrid";
 import LengthControl from "./grid/LengthControl";
 import RangeTabs from "./grid/RangeTabs";
-// import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
+import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
+
+import { useVoices } from "../components/voices/useVoices";
 import {
   useStepSequencer,
   TRACK_IDS,
@@ -23,9 +22,11 @@ import {
 import EffectsPanel from "../components/effects/EffectsPanel";
 import { useTransportPlayback } from "./transport/useTransportPlayback";
 import { useDrumMachineHotkeys } from "./useDrumMachineHotkeys";
-import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
 
 const styles = {
+  topRow: css`
+    width: 100%;
+  `,
   scopeRow: css`
     width: 100%;
     align-items: stretch !important;
@@ -63,14 +64,15 @@ const styles = {
     border: 1px solid var(--accent-border);
     border-radius: 8px;
     padding: calc(var(--audioui-unit) / 4) calc(var(--audioui-unit) / 2);
+    margin-top: calc(var(--audioui-unit) / 8);
   `,
   gridLabel: css`
     font-size: 14px;
     color: var(--text);
-    width: 48px;
+    width: 72px;
   `,
   clearButtonWrap: css`
-    width: 48px;
+    width: 72px;
     font-size: 10px;
     color: var(--text);
   `,
@@ -88,15 +90,12 @@ const styles = {
       box-shadow: 1px 1px 4px var(--contrast-1) !important;
     }
   `,
-  icon: css`
-    align-self: center;
-    height: 64px;
-  `,
   oscillators: css`
     border: 1px solid var(--accent-border);
     border-radius: 8px;
     padding: calc(var(--audioui-unit) / 4);
     align-items: stretch !important;
+    width: 100%;
   `,
   sequencer: css`
     padding: calc(var(--audioui-unit) / 4);
@@ -110,7 +109,6 @@ const styles = {
     border: 1px solid var(--accent-border);
     border-radius: 8px;
     padding: calc(var(--audioui-unit) / 8);
-    margin-bottom: calc(var(--audioui-unit) / 4) !important;
     align-self: stretch !important;
     height: auto !important;
   `,
@@ -156,8 +154,12 @@ const StepSequencer = () => {
 
   return (
     <Flex vertical align="center" gap={GAP} className={styles.sequencer}>
-      <Flex align="flex-start" justify="space-between" gap={GAP}>
-        <BoomPurpleIcon className={styles.icon} />
+      <Flex
+        align="flex-start"
+        justify="space-between"
+        gap={GAP}
+        className={styles.topRow}
+      >
         <TempoTransportPanel
           isPlaying={transportPlayback.isPlaying}
           togglePlayPause={transportPlayback.togglePlayPause}
@@ -184,54 +186,56 @@ const StepSequencer = () => {
           onSelectRange={goToMiniRange}
         />
       </Flex>
-      <VoicePadRow
-        voices={voices}
-        selectedTrack={selectedTrack}
-        onSelectTrack={selectTrack}
-        sequencerHits={sequencerHits}
-      />
-
-      <Flex vertical gap={4} className={styles.gridRow}>
-        <Flex gap={4}>
-          <RangeTabs
-            length={length}
-            viewedRange={viewedRange}
-            onSelectRange={goToRange}
-          />
-        </Flex>
-
-        <Flex align="center" gap={GAP}>
-          <span className={styles.gridLabel}>
-            {TRACK_LABELS[selectedTrack]}
-          </span>
-          <StepGrid
-            active={activePattern}
-            currentStep={rangeRelativeStep}
-            onStepChange={setStep}
-            startNumber={viewedRange * STEP_COUNT + 1}
-          />
-        </Flex>
-        <Flex gap={GAP} align="flex-start">
-          <Flex
-            vertical
-            align="center"
-            gap={2}
-            className={styles.clearButtonWrap}
-          >
-            <Button
-              type="text"
-              size="small"
-              className={styles.clearButton}
-              title={`Clear ${TRACK_LABELS[selectedTrack]}'s steps`}
-              onClick={clearTrack}
+      <Flex vertical>
+        <VoicePadRow
+          voices={voices}
+          selectedTrack={selectedTrack}
+          onSelectTrack={selectTrack}
+          sequencerHits={sequencerHits}
+        />
+        {/* ---- STEPS SECTION ---- */}
+        <Flex vertical gap={4} className={styles.gridRow}>
+          <Flex gap={4}>
+            <RangeTabs
+              length={length}
+              viewedRange={viewedRange}
+              onSelectRange={goToRange}
             />
-            CLEAR
           </Flex>
-          <VelocityRow
-            active={activePattern}
-            velocities={activeVelocities}
-            onVelocityChange={setVelocity}
-          />
+
+          <Flex align="center" gap={GAP}>
+            <span className={styles.gridLabel}>
+              {TRACK_LABELS[selectedTrack]}
+            </span>
+            <StepGrid
+              active={activePattern}
+              currentStep={rangeRelativeStep}
+              onStepChange={setStep}
+              startNumber={viewedRange * STEP_COUNT + 1}
+            />
+          </Flex>
+          <Flex gap={GAP} align="flex-start">
+            <Flex
+              vertical
+              align="center"
+              gap={2}
+              className={styles.clearButtonWrap}
+            >
+              <Button
+                type="text"
+                size="small"
+                className={styles.clearButton}
+                title={`Clear ${TRACK_LABELS[selectedTrack]}'s steps`}
+                onClick={clearTrack}
+              />
+              CLEAR
+            </Flex>
+            <VelocityRow
+              active={activePattern}
+              velocities={activeVelocities}
+              onVelocityChange={setVelocity}
+            />
+          </Flex>
         </Flex>
       </Flex>
       <Collapse
