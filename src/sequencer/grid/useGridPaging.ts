@@ -3,7 +3,7 @@ import {
   STEP_COUNT,
   type PatternLength,
   type TrackId,
-} from "./useStepSequencer";
+} from "../sequencerConstants";
 
 const DEFAULT_LENGTH: PatternLength = 16;
 

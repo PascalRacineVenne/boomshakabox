@@ -6,7 +6,7 @@ import {
   type VoiceParamRow,
   buildVoiceParamRows,
 } from "./voiceParams";
-import { TRACK_LABELS, type TrackId } from "../grid/useStepSequencer";
+import { TRACK_LABELS, type TrackId } from "../sequencerConstants";
 
 const styles = {
   table: css`

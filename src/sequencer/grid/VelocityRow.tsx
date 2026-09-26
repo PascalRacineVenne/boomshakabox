@@ -1,6 +1,6 @@
 import { css } from "@linaria/core";
 import { Collapse, Flex, Slider } from "antd";
-import { STEP_COUNT } from "./useStepSequencer";
+import { STEP_COUNT } from "../sequencerConstants";
 
 const GROUP_SIZE = 4;
 const GAP = 4;

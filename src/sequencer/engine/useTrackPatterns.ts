@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { MAX_STEPS, TRACK_IDS, type TrackId } from "../grid/useStepSequencer";
+import { MAX_STEPS, TRACK_IDS, type TrackId } from "../sequencerConstants";
 
 const DEFAULT_VELOCITY = 80;
 

@@ -1,7 +1,7 @@
 import { css } from "@linaria/core";
 import classNames from "classnames";
 import { Button } from "@cutoff/audio-ui-react";
-import { STEP_COUNT } from "./useStepSequencer";
+import { STEP_COUNT } from "../sequencerConstants";
 import { Flex } from "antd";
 
 const GROUP_SIZE = 4;

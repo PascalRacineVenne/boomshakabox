@@ -6,7 +6,7 @@ import {
   MINI_GRID_RANGE_SIZE,
   MINI_GRID_RANGE_COUNT,
   type TrackId,
-} from "./useStepSequencer";
+} from "../sequencerConstants";
 import { Flex } from "antd";
 
 const styles = {
