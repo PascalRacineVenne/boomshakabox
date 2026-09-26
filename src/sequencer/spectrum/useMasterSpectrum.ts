@@ -87,7 +87,10 @@ export const useMasterSpectrum = () => {
         held[column] =
           value > held[column]
             ? value
-            : Math.max(SPECTRUM_FLOOR_DB, held[column] - PEAK_DECAY_DB_PER_FRAME);
+            : Math.max(
+                SPECTRUM_FLOOR_DB,
+                held[column] - PEAK_DECAY_DB_PER_FRAME,
+              );
       }
     }
 

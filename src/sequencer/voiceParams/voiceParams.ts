@@ -71,7 +71,7 @@ import {
   useLowTomVoice,
 } from "../../components/voices/lowTom/useLowTomVoice";
 
-import type { TrackId } from "../grid/useStepSequencer";
+import type { TrackId } from "../sequencerConstants";
 
 export interface AllVoices {
   kick: ReturnType<typeof useKickVoice>;

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { TrackId } from "../grid/useStepSequencer";
+import type { TrackId } from "../sequencerConstants";
 
 const SEQUENCER_HIT_FLASH_MS = 60;
 

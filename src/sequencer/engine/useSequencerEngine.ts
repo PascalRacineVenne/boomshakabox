@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 import * as Tone from "tone";
-import type { PatternLength, TrackId } from "../grid/useStepSequencer";
+import type { PatternLength, TrackId } from "../sequencerConstants";
 
 type TriggerFn = (scheduledTime?: number, velocity?: number) => void;
 

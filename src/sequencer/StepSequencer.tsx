@@ -15,12 +15,8 @@ import RangeTabs from "./grid/RangeTabs";
 import VoiceParamsTable from "./voiceParams/VoiceParamsTable";
 
 import { useVoices } from "../components/voices/useVoices";
-import {
-  useStepSequencer,
-  TRACK_IDS,
-  TRACK_LABELS,
-  STEP_COUNT,
-} from "./grid/useStepSequencer";
+import { useStepSequencer } from "./grid/useStepSequencer";
+import { TRACK_IDS, TRACK_LABELS, STEP_COUNT } from "./sequencerConstants";
 import EffectsPanel from "../components/effects/EffectsPanel";
 import { useTransportPlayback } from "./transport/useTransportPlayback";
 import { useDrumMachineHotkeys } from "./useDrumMachineHotkeys";

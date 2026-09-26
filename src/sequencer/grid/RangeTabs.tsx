@@ -1,6 +1,6 @@
 import { css } from "@linaria/core";
 import { Segmented } from "antd";
-import { STEP_COUNT, type PatternLength } from "./useStepSequencer";
+import { STEP_COUNT, type PatternLength } from "../sequencerConstants";
 
 const styles = {
   segmented: css`

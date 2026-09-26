@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MINI_GRID_RANGE_SIZE } from "./useStepSequencer";
+import { MINI_GRID_RANGE_SIZE } from "../sequencerConstants";
 
 export const useMiniGridFollow = (currentStep: number) => {
   const [manualRange, setManualRange] = useState(0);

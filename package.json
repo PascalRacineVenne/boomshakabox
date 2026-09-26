@@ -7,8 +7,12 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "format": "prettier --check --cache '{src,test}/**/*.{js,jsx,ts,tsx}'",
     "preview": "vite preview",
-    "test": "jest"
+    "test": "jest",
+    "fix:eslint": "eslint . --fix",
+    "fix:prettier": "prettier --write --cache '{src,test}/**/*.{js,jsx,ts,tsx}'",
+    "fix": "npm run fix:eslint && npm run fix:prettier"
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.4",
@@ -44,6 +48,7 @@
     "globals": "^17.11.0",
     "jest": "^30.5.1",
     "jest-environment-jsdom": "^30.5.1",
+    "prettier": "^3.9.9",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.67.0",
     "vite": "^8.2.2",

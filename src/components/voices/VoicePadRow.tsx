@@ -7,7 +7,7 @@ import HiHatOpenPad from "./hiHatOpen/HiHatOpenPad";
 import HiTomPad from "./hiTom/HiTomPad";
 import MidTomPad from "./midTom/MidTomPad";
 import LowTomPad from "./lowTom/LowTomPad";
-import { TRACK_IDS, type TrackId } from "../../sequencer/grid/useStepSequencer";
+import { TRACK_IDS, type TrackId } from "../../sequencer/sequencerConstants";
 import type { AllVoices } from "../../sequencer/voiceParams/voiceParams";
 
 interface VoicePadRowProps {
