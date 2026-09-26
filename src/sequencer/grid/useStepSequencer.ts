@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import * as Tone from "tone";
+import { useTrackPatterns } from "../engine/useTrackPatterns";
+import { useSequencerEngine, type Voices } from "../engine/useSequencerEngine";
 
 export const STEP_COUNT = 16;
 export const MAX_STEPS = 64;
@@ -30,53 +31,29 @@ export const TRACK_LABELS: Record<TrackId, string> = {
   hihatOpen: "OH",
 };
 
-type TriggerFn = (scheduledTime?: number, velocity?: number) => void;
-
-type Voices = Record<TrackId, { trigger: TriggerFn }>;
-
 const noSequencerHits = (): Record<TrackId, boolean> =>
   Object.fromEntries(TRACK_IDS.map((id) => [id, false])) as Record<
     TrackId,
     boolean
   >;
 
-const DEFAULT_VELOCITY = 80;
 const DEFAULT_LENGTH: PatternLength = 16;
 const SEQUENCER_HIT_FLASH_MS = 60;
 
-const emptyPattern = (): boolean[] => Array(MAX_STEPS).fill(false);
-
-const initialPatterns = (): Record<TrackId, boolean[]> =>
-  Object.fromEntries(TRACK_IDS.map((id) => [id, emptyPattern()])) as Record<
-    TrackId,
-    boolean[]
-  >;
-
-const defaultVelocities = (): number[] =>
-  Array(MAX_STEPS).fill(DEFAULT_VELOCITY);
-
-const initialVelocities = (): Record<TrackId, number[]> =>
-  Object.fromEntries(
-    TRACK_IDS.map((id) => [id, defaultVelocities()]),
-  ) as Record<TrackId, number[]>;
-
 export const useStepSequencer = (voices: Voices) => {
-  const patternsRef = useRef<Record<TrackId, boolean[]>>(initialPatterns());
-  const [patternsDisplay, setPatternsDisplay] =
-    useState<Record<TrackId, boolean[]>>(initialPatterns);
-
-  const velocitiesRef = useRef<Record<TrackId, number[]>>(initialVelocities());
-  const [velocitiesDisplay, setVelocitiesDisplay] =
-    useState<Record<TrackId, number[]>>(initialVelocities);
-
-  const [selectedTrack, setSelectedTrack] = useState<TrackId>(TRACK_IDS[0]);
-  const [currentStep, setCurrentStep] = useState(0); // global index, 0..length-1
+  const {
+    patternsRef,
+    patternsDisplay,
+    velocitiesRef,
+    velocitiesDisplay,
+    selectedTrack,
+    selectTrack,
+    setStep: setAbsoluteStep,
+    setVelocity: setAbsoluteVelocity,
+    clearTrack,
+  } = useTrackPatterns();
 
   const [length, setLength] = useState<PatternLength>(DEFAULT_LENGTH);
-  const lengthRef = useRef(length);
-  useEffect(() => {
-    lengthRef.current = length;
-  }, [length]);
 
   const [viewedRange, setViewedRange] = useState(0);
 
@@ -86,11 +63,6 @@ export const useStepSequencer = (voices: Voices) => {
   useEffect(() => {
     miniAutoFollowRef.current = miniAutoFollow;
   }, [miniAutoFollow]);
-
-  const voicesRef = useRef(voices);
-  useEffect(() => {
-    voicesRef.current = voices;
-  });
 
   const [sequencerHits, setSequencerHits] = useState(noSequencerHits);
   const flashTimeoutsRef = useRef(
@@ -105,75 +77,39 @@ export const useStepSequencer = (voices: Voices) => {
     }, SEQUENCER_HIT_FLASH_MS);
   };
 
-  const stepCountRef = useRef(0);
-
   useEffect(() => {
     const flashTimeouts = flashTimeoutsRef.current;
-    const eventId = Tone.getTransport().scheduleRepeat((time) => {
-      const step = stepCountRef.current % lengthRef.current;
-      stepCountRef.current += 1;
-
-      TRACK_IDS.forEach((id) => {
-        if (patternsRef.current[id][step]) {
-          voicesRef.current[id].trigger(time, velocitiesRef.current[id][step]);
-        }
-      });
-
-      Tone.getDraw().schedule(() => {
-        setCurrentStep(step);
-        TRACK_IDS.forEach((id) => {
-          if (patternsRef.current[id][step]) flashHit(id);
-        });
-        if (miniAutoFollowRef.current) {
-          setMiniRange(Math.floor(step / MINI_GRID_RANGE_SIZE));
-        }
-      }, time);
-    }, "16n");
-
-    const handleTransportStop = () => {
-      stepCountRef.current = 0;
-      setCurrentStep(0);
-      TRACK_IDS.forEach((id) => clearTimeout(flashTimeouts[id]));
-      setSequencerHits(noSequencerHits());
-      if (miniAutoFollowRef.current) setMiniRange(0);
-    };
-    Tone.getTransport().on("stop", handleTransportStop);
-
     return () => {
-      Tone.getTransport().clear(eventId);
-      Tone.getTransport().off("stop", handleTransportStop);
       TRACK_IDS.forEach((id) => clearTimeout(flashTimeouts[id]));
     };
   }, []);
 
-  const setStep = (rangeStepIndex: number, active: boolean) => {
-    const track = selectedTrack;
-    const absoluteIndex = viewedRange * STEP_COUNT + rangeStepIndex;
-    const updated = patternsRef.current[track].slice();
-    updated[absoluteIndex] = active;
-    patternsRef.current[track] = updated;
+  const { currentStep } = useSequencerEngine({
+    trackIds: TRACK_IDS,
+    voices,
+    patternsRef,
+    velocitiesRef,
+    length,
+    onStepHit: (step, hitTrackIds) => {
+      hitTrackIds.forEach((id) => flashHit(id));
+      if (miniAutoFollowRef.current) {
+        setMiniRange(Math.floor(step / MINI_GRID_RANGE_SIZE));
+      }
+    },
+    onStop: () => {
+      const flashTimeouts = flashTimeoutsRef.current;
+      TRACK_IDS.forEach((id) => clearTimeout(flashTimeouts[id]));
+      setSequencerHits(noSequencerHits());
+      if (miniAutoFollowRef.current) setMiniRange(0);
+    },
+  });
 
-    setPatternsDisplay((prev) => ({ ...prev, [track]: updated }));
+  const setStep = (rangeStepIndex: number, active: boolean) => {
+    setAbsoluteStep(viewedRange * STEP_COUNT + rangeStepIndex, active);
   };
 
   const setVelocity = (rangeStepIndex: number, velocity: number) => {
-    const track = selectedTrack;
-    const absoluteIndex = viewedRange * STEP_COUNT + rangeStepIndex;
-    const updated = velocitiesRef.current[track].slice();
-    updated[absoluteIndex] = velocity;
-    velocitiesRef.current[track] = updated;
-
-    setVelocitiesDisplay((prev) => ({ ...prev, [track]: updated }));
-  };
-
-  const clearTrack = () => {
-    const track = selectedTrack;
-
-    patternsRef.current[track] = emptyPattern();
-    setPatternsDisplay((prev) => ({ ...prev, [track]: emptyPattern() }));
-
-    velocitiesRef.current[track] = defaultVelocities();
-    setVelocitiesDisplay((prev) => ({ ...prev, [track]: defaultVelocities() }));
+    setAbsoluteVelocity(viewedRange * STEP_COUNT + rangeStepIndex, velocity);
   };
 
   const changeLength = (nextLength: PatternLength) => {
@@ -201,7 +137,7 @@ export const useStepSequencer = (voices: Voices) => {
       rangeStart + STEP_COUNT,
     ),
     selectedTrack,
-    selectTrack: setSelectedTrack,
+    selectTrack,
     currentStep,
     setStep,
     setVelocity,
