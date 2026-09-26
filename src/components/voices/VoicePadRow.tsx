@@ -1,6 +1,7 @@
 import { Flex } from "antd";
 import KickPad from "./kick/KickPad";
 import SnarePad from "./snare/SnarePad";
+import ClapPad from "./clap/ClapPad";
 import HiHatPad from "./hiHat/HiHatPad";
 import HiHatOpenPad from "./hiHatOpen/HiHatOpenPad";
 import HiTomPad from "./hiTom/HiTomPad";
@@ -52,6 +53,17 @@ const VoicePadRow = ({
             <SnarePad
               key={id}
               {...voices.snare}
+              trackNumber={trackNumber}
+              selected={selected}
+              onSelect={onSelect}
+              sequencerHit={sequencerHit}
+            />
+          );
+        case "clap":
+          return (
+            <ClapPad
+              key={id}
+              {...voices.clap}
               trackNumber={trackNumber}
               selected={selected}
               onSelect={onSelect}

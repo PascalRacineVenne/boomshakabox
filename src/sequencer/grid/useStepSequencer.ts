@@ -15,6 +15,7 @@ export const MINI_GRID_RANGE_COUNT = 2;
 export const TRACK_IDS = [
   "kick",
   "snare",
+  "clap",
   "hiTom",
   "midTom",
   "lowTom",
@@ -26,6 +27,7 @@ export type TrackId = (typeof TRACK_IDS)[number];
 export const TRACK_LABELS: Record<TrackId, string> = {
   kick: "BD",
   snare: "SN",
+  clap: "CP",
   hiTom: "HT",
   midTom: "MT",
   lowTom: "LT",
