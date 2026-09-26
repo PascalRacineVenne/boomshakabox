@@ -7,6 +7,8 @@ import VoicePadRow from "../components/voices/VoicePadRow";
 import StepGrid from "./grid/StepGrid";
 import VelocityRow from "./grid/VelocityRow";
 import VoiceScope from "./oscilloscope/VoiceScope";
+import MasterSpectrum from "./spectrum/MasterSpectrum";
+import { SPECTRUM_CANVAS_WIDTH } from "./spectrum/spectrumCanvas";
 import MiniGrid from "./grid/MiniGrid";
 import LengthControl from "./grid/LengthControl";
 import RangeTabs from "./grid/RangeTabs";
@@ -23,13 +25,21 @@ import EffectsPanel from "../components/effects/EffectsPanel";
 import { useTransportPlayback } from "./transport/useTransportPlayback";
 import { useDrumMachineHotkeys } from "./useDrumMachineHotkeys";
 
+const GAP = "calc(var(--audioui-unit) / 8)";
+
 const styles = {
   topRow: css`
     width: 100%;
   `,
   scopeRow: css`
+    display: grid;
+    grid-template-columns: auto auto auto minmax(
+        ${SPECTRUM_CANVAS_WIDTH}px,
+        1fr
+      );
+    align-items: stretch;
+    gap: ${GAP};
     width: 100%;
-    align-items: stretch !important;
   `,
   scopeCollapse: css`
     border: 1px solid var(--accent-border) !important;
@@ -95,7 +105,6 @@ const styles = {
     border-radius: 8px;
     padding: calc(var(--audioui-unit) / 8);
     align-items: stretch !important;
-    width: 100%;
   `,
   sequencer: css`
     padding: calc(var(--audioui-unit) / 4);
@@ -113,8 +122,6 @@ const styles = {
     height: auto !important;
   `,
 };
-
-const GAP = "calc(var(--audioui-unit) / 8)";
 
 const StepSequencer = () => {
   const voices = useVoices();
@@ -169,7 +176,7 @@ const StepSequencer = () => {
         <EffectsPanel />
         <MasterPanel />
       </Flex>
-      <Flex justify="center" gap={GAP} className={styles.scopeRow}>
+      <div className={styles.scopeRow}>
         <Flex className={styles.oscillators} gap={GAP}>
           <Typography
             className={styles.waveformTitle}
@@ -185,7 +192,9 @@ const StepSequencer = () => {
           onSelectTrack={selectTrack}
           onSelectRange={goToMiniRange}
         />
-      </Flex>
+        <Typography className={styles.waveformTitle}>SPECTRUM</Typography>
+        <MasterSpectrum />
+      </div>
       <Flex vertical>
         <VoicePadRow
           voices={voices}
