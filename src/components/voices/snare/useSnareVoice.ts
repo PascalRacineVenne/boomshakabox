@@ -11,9 +11,8 @@ import {
 } from "../../../lib/voiceScope";
 import { computeLevel } from "../../../lib/voiceLevel";
 
-// Ratio between the two tone-voice VCOs in the original fixed-frequency
-// recipe (330/180) — preserved when the "Tone" knob shifts the base
-// frequency, so the interval between them stays the same as you tune it.
+// Preserves the two VCOs' original fixed-frequency interval (330/180) as
+// the Tone knob shifts the base frequency — see this folder's README.
 const TONE_VOICE_RATIO = 330 / 180;
 
 export const SNARE_TONE_MIN = 100;

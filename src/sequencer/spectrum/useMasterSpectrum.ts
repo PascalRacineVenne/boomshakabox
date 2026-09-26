@@ -11,9 +11,7 @@ export const SPECTRUM_COLUMN_COUNT = 72;
 export const SPECTRUM_MIN_FREQ = 20;
 export const SPECTRUM_MAX_FREQ = 20000;
 
-// Matches the native Web Audio AnalyserNode's own default minDecibels —
-// Tone.Analyser doesn't override it, so this is the real floor of what
-// getFloatFrequencyData() can return.
+// AnalyserNode's own default minDecibels floor — see README.
 const SPECTRUM_FLOOR_DB = -100;
 
 // How fast a held peak decays back down, in dB per animation frame.
@@ -31,11 +29,8 @@ interface BinRange {
   end: number;
 }
 
-// Precomputed once per (fftSize, sampleRate): each column's window of
-// linear FFT bins to average, spanning the log-frequency gap between its
-// neighbors — narrow at the low end (where columns are close together in
-// frequency), wide at the high end (where many linear bins fall within
-// one log-spaced column).
+// Precomputed once per (fftSize, sampleRate) — see README for why each
+// column's bin window is narrow at the low end and wide at the high end.
 const buildColumnBinRanges = (
   fftSize: number,
   sampleRate: number,
@@ -61,12 +56,8 @@ const buildColumnBinRanges = (
   return ranges;
 };
 
-// Reads the shared master analyser, downsamples it to SPECTRUM_COLUMN_COUNT
-// log-spaced columns, and applies peak-hold-with-slow-decay per column.
 // Returns a stable accessor (not React state) — the caller's own rAF loop
-// calls it each frame, mirroring how WaveformDisplay reads waveformRef
-// directly inside its draw loop rather than routing 60fps data through
-// component state/re-renders.
+// calls it each frame rather than routing 60fps data through re-renders.
 export const useMasterSpectrum = () => {
   const heldRef = useRef<Float32Array>(
     new Float32Array(SPECTRUM_COLUMN_COUNT).fill(SPECTRUM_FLOOR_DB),
