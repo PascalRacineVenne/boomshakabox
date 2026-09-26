@@ -22,6 +22,8 @@ import {
   useKickVoice,
 } from "../../components/voices/kick/useKickVoice";
 import {
+  SNARE_DECAY_MAX,
+  SNARE_DECAY_MIN,
   SNARE_SNAPPY_MAX,
   SNARE_SNAPPY_MIN,
   SNARE_TONE_MAX,
@@ -309,9 +311,9 @@ const snareRows = (v: AllVoices["snare"]): VoiceParamRow[] => [
     stage: "VCA (Tone voice)",
     detail: "exponential decay",
     parameter: "Decay",
-    value: "0.2s",
-    live: false,
-    control: "Fixed in code — not exposed",
+    value: `${v.decay.toFixed(2)}s`,
+    live: true,
+    control: `Decay knob (${SNARE_DECAY_MIN}–${SNARE_DECAY_MAX}s)`,
   },
   {
     key: "noise-filter",
@@ -336,9 +338,9 @@ const snareRows = (v: AllVoices["snare"]): VoiceParamRow[] => [
     stage: "VCA (Snap voice)",
     detail: "exponential decay",
     parameter: "Decay",
-    value: "0.2s",
-    live: false,
-    control: "Fixed in code — not exposed, same as Tone voice's decay",
+    value: `${v.decay.toFixed(2)}s`,
+    live: true,
+    control: `Decay knob (${SNARE_DECAY_MIN}–${SNARE_DECAY_MAX}s) — same value as Tone voice's decay`,
   },
   {
     key: "vca-peak",

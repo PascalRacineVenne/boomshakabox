@@ -99,6 +99,7 @@ const ClapPad = ({
             value={tone}
             onChange={(rotation) => setTone(rotation.value)}
             label="Tone"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <Knob
@@ -109,6 +110,7 @@ const ClapPad = ({
             value={decay}
             onChange={(rotation) => setDecay(rotation.value)}
             label="Decay"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <Knob
@@ -119,6 +121,7 @@ const ClapPad = ({
             value={fatness}
             onChange={(rotation) => setFatness(rotation.value)}
             label="Fat"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
         </Flex>
@@ -131,6 +134,7 @@ const ClapPad = ({
             value={punch}
             onChange={(rotation) => setPunch(rotation.value)}
             label="Punch"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <Knob
@@ -141,6 +145,7 @@ const ClapPad = ({
             value={snap}
             onChange={(rotation) => setSnap(rotation.value)}
             label="Snap"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
         </Flex>

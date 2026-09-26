@@ -91,7 +91,7 @@ const VelocityRow = ({
       items={[
         {
           key: "velocity",
-          label: "Velocity",
+          label: "VELOCITY",
           children: (
             <Flex gap={GAP}>
               {Array.from({ length: groupCount }, (_, groupIndex) => (
