@@ -5,7 +5,10 @@ import {
   triggerMasterFilterEnvelope,
 } from "../../../lib/masterBus";
 import { startAudioContext } from "../../../lib/startAudioContext";
-import { renderOfflineWaveform, useScopeWaveform } from "../../../lib/voiceScope";
+import {
+  renderOfflineWaveform,
+  useScopeWaveform,
+} from "../../../lib/voiceScope";
 import { computeLevel } from "../../../lib/voiceLevel";
 
 // Ratio between the two tone-voice VCOs in the original fixed-frequency
@@ -18,7 +21,7 @@ export const SNARE_TONE_MAX = 300;
 export const SNARE_SNAPPY_MIN = 0;
 export const SNARE_SNAPPY_MAX = 1;
 export const SNARE_DECAY_MIN = 0.05;
-export const SNARE_DECAY_MAX = 3;
+export const SNARE_DECAY_MAX = 2;
 
 interface SnareChainParams {
   tone: number;
@@ -107,7 +110,11 @@ export const useSnareVoice = () => {
   const renderFullWaveform = useCallback(() => {
     const level = computeLevel(muted, volume);
     return renderOfflineWaveform(decay + 0.05, (now, destination) =>
-      buildAndTriggerSnare({ tone, snappy, decay, level, pan }, now, destination),
+      buildAndTriggerSnare(
+        { tone, snappy, decay, level, pan },
+        now,
+        destination,
+      ),
     );
   }, [tone, snappy, decay, volume, pan, muted]);
 

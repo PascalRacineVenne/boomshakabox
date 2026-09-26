@@ -1,6 +1,7 @@
 import { Knob } from "@cutoff/audio-ui-react";
 import { css } from "@linaria/core";
 import { useEffectsBus } from "./useEffectsBus";
+import { useDelayReverbBus } from "./useDelayReverbBus";
 import { Flex, Space } from "antd";
 import { LABELED_SMALL_KNOB_HEIGHT_UNITS } from "../shared/ControlPanel";
 
@@ -33,6 +34,17 @@ const EffectsPanel = () => {
     drive,
     setDrive,
   } = useEffectsBus();
+
+  const {
+    delayTimeIndex,
+    setDelayTimeIndex,
+    maxDelayTimeIndex,
+    delayTimeLabels,
+    delayFeedback,
+    setDelayFeedback,
+    verbLength,
+    setVerbLength,
+  } = useDelayReverbBus();
 
   return (
     <Flex vertical align="center" gap={2}>
@@ -72,10 +84,13 @@ const EffectsPanel = () => {
             variant="plainCap"
             size="small"
             min={0}
-            max={1}
-            value={0}
-            // onChange={(rotation) => setVerb(rotation.value)}
-            label="Verb"
+            max={maxDelayTimeIndex}
+            step={1}
+            value={delayTimeIndex}
+            onChange={(rotation) => setDelayTimeIndex(rotation.value)}
+            label="Rate"
+            valueAsLabel="interactive"
+            valueFormatter={(value) => delayTimeLabels[value]}
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <Knob
@@ -83,9 +98,21 @@ const EffectsPanel = () => {
             size="small"
             min={0}
             max={1}
-            value={0}
-            // onChange={(rotation) => setDelay(rotation.value)}
-            label="Delay"
+            value={delayFeedback}
+            onChange={(rotation) => setDelayFeedback(rotation.value)}
+            label="Time"
+            valueAsLabel="interactive"
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
+          />
+          <Knob
+            variant="plainCap"
+            size="small"
+            min={0}
+            max={1}
+            value={verbLength}
+            onChange={(rotation) => setVerbLength(rotation.value)}
+            label="Verb"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
         </Space>
