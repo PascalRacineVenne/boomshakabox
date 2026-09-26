@@ -6,13 +6,16 @@ import {
   triggerMasterFilterEnvelope,
 } from "../../../lib/masterBus";
 import { distortionMakeupGain } from "../../../lib/distortionMakeupGain";
-import { renderOfflineWaveform, useScopeWaveform } from "../../../lib/voiceScope";
+import {
+  renderOfflineWaveform,
+  useScopeWaveform,
+} from "../../../lib/voiceScope";
 import { computeLevel } from "../../../lib/voiceLevel";
 
 export const TONE_MIN = 80;
 export const TONE_MAX = 100;
 export const DECAY_MIN = 0.08;
-export const DECAY_MAX = 0.6;
+export const DECAY_MAX = 3;
 
 const PITCH_DROP_RATIO = 1.15;
 const FILTER_Q = 3;

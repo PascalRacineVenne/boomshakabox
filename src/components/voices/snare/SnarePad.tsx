@@ -13,6 +13,8 @@ import {
 } from "../../shared/ControlPanel";
 import KnobSlot from "../../shared/KnobSlot";
 import {
+  SNARE_DECAY_MAX,
+  SNARE_DECAY_MIN,
   SNARE_SNAPPY_MAX,
   SNARE_SNAPPY_MIN,
   SNARE_TONE_MAX,
@@ -25,6 +27,8 @@ interface SnarePadProps {
   setTone: (value: number) => void;
   snappy: number;
   setSnappy: (value: number) => void;
+  decay: number;
+  setDecay: (value: number) => void;
   volume: number;
   setVolume: (value: number) => void;
   pan: number;
@@ -47,6 +51,8 @@ const SnarePad = ({
   setTone,
   snappy,
   setSnappy,
+  decay,
+  setDecay,
   volume,
   setVolume,
   pan,
@@ -82,9 +88,20 @@ const SnarePad = ({
             value={tone}
             onChange={(rotation) => setTone(rotation.value)}
             label="Tone"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
-          <KnobSlot />
+          <Knob
+            variant="plainCap"
+            min={SNARE_DECAY_MIN}
+            max={SNARE_DECAY_MAX}
+            size="small"
+            value={decay}
+            onChange={(rotation) => setDecay(rotation.value)}
+            label="Decay"
+            valueAsLabel="interactive"
+            labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
+          />
           <KnobSlot />
         </Flex>
         <Flex vertical align="center" gap={4}>
@@ -96,6 +113,7 @@ const SnarePad = ({
             value={snappy}
             onChange={(rotation) => setSnappy(rotation.value)}
             label="Snap"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <KnobSlot />

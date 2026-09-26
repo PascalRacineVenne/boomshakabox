@@ -73,6 +73,7 @@ const HiHatPad = ({
             value={tone}
             onChange={(rotation) => setTone(rotation.value)}
             label="Tone"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <KnobSlot />

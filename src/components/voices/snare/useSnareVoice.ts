@@ -13,22 +13,23 @@ import { computeLevel } from "../../../lib/voiceLevel";
 // frequency, so the interval between them stays the same as you tune it.
 const TONE_VOICE_RATIO = 330 / 180;
 
-const DURATION = 0.2;
-
 export const SNARE_TONE_MIN = 100;
 export const SNARE_TONE_MAX = 300;
 export const SNARE_SNAPPY_MIN = 0;
 export const SNARE_SNAPPY_MAX = 1;
+export const SNARE_DECAY_MIN = 0.05;
+export const SNARE_DECAY_MAX = 3;
 
 interface SnareChainParams {
   tone: number;
   snappy: number;
+  decay: number;
   level: number;
   pan: number;
 }
 
 const buildAndTriggerSnare = (
-  { tone, snappy, level, pan }: SnareChainParams,
+  { tone, snappy, decay, level, pan }: SnareChainParams,
   now: number,
   destination: Tone.ToneAudioNode,
   waveform?: Tone.Waveform | null,
@@ -38,12 +39,12 @@ const buildAndTriggerSnare = (
 
   const toneGain = new Tone.Gain(1).connect(panner);
   toneGain.gain.setValueAtTime(0.7 * level, now);
-  toneGain.gain.exponentialRampToValueAtTime(0.001, now + DURATION);
+  toneGain.gain.exponentialRampToValueAtTime(0.001, now + decay);
 
   const oscillators = [tone, tone * TONE_VOICE_RATIO].map((freq) => {
     const osc = new Tone.Oscillator(freq, "triangle").connect(toneGain);
     osc.start(now);
-    osc.stop(now + DURATION);
+    osc.stop(now + decay);
     return osc;
   });
 
@@ -51,15 +52,15 @@ const buildAndTriggerSnare = (
   const noiseFilter = new Tone.Filter(1000, "highpass");
   const noiseGain = new Tone.Gain(1).connect(panner);
   noiseGain.gain.setValueAtTime(snappy * level, now);
-  noiseGain.gain.exponentialRampToValueAtTime(0.001, now + DURATION);
+  noiseGain.gain.exponentialRampToValueAtTime(0.001, now + decay);
 
   const noise = new Tone.Noise("white").connect(noiseFilter);
   noiseFilter.connect(noiseGain);
   noise.start(now);
-  noise.stop(now + DURATION);
+  noise.stop(now + decay);
 
   return {
-    duration: DURATION,
+    duration: decay,
     dispose: () => {
       oscillators.forEach((osc) => osc.dispose());
       toneGain.dispose();
@@ -74,6 +75,7 @@ const buildAndTriggerSnare = (
 export const useSnareVoice = () => {
   const [tone, setTone] = useState(180);
   const [snappy, setSnappy] = useState(1);
+  const [decay, setDecay] = useState(0.2);
   const [volume, setVolume] = useState(75);
   const [pan, setPan] = useState(0);
   const [muted, setMuted] = useState(false);
@@ -93,7 +95,7 @@ export const useSnareVoice = () => {
     triggerMasterFilterEnvelope(now);
 
     const { duration, dispose } = buildAndTriggerSnare(
-      { tone, snappy, level, pan },
+      { tone, snappy, decay, level, pan },
       now,
       masterBusInput,
       waveformRef.current,
@@ -104,16 +106,18 @@ export const useSnareVoice = () => {
 
   const renderFullWaveform = useCallback(() => {
     const level = computeLevel(muted, volume);
-    return renderOfflineWaveform(DURATION + 0.05, (now, destination) =>
-      buildAndTriggerSnare({ tone, snappy, level, pan }, now, destination),
+    return renderOfflineWaveform(decay + 0.05, (now, destination) =>
+      buildAndTriggerSnare({ tone, snappy, decay, level, pan }, now, destination),
     );
-  }, [tone, snappy, volume, pan, muted]);
+  }, [tone, snappy, decay, volume, pan, muted]);
 
   return {
     tone,
     setTone,
     snappy,
     setSnappy,
+    decay,
+    setDecay,
     volume,
     setVolume,
     pan,

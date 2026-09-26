@@ -5,7 +5,10 @@ import {
   triggerMasterFilterEnvelope,
 } from "../../../lib/masterBus";
 import { startAudioContext } from "../../../lib/startAudioContext";
-import { renderOfflineWaveform, useScopeWaveform } from "../../../lib/voiceScope";
+import {
+  renderOfflineWaveform,
+  useScopeWaveform,
+} from "../../../lib/voiceScope";
 import { computeLevel } from "../../../lib/voiceLevel";
 
 export const KICK_PITCH_MIN = 34;
@@ -13,7 +16,7 @@ export const KICK_PITCH_MAX = 72;
 export const KICK_PUNCH_MIN = 2;
 export const KICK_PUNCH_MAX = 9;
 export const KICK_LENGTH_MIN = 0.12;
-export const KICK_LENGTH_MAX = 2;
+export const KICK_LENGTH_MAX = 3;
 export const KICK_CLICK_MIN = 0;
 export const KICK_CLICK_MAX = 1;
 export const KICK_FATNESS_MIN = 0;

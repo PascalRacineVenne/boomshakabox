@@ -76,6 +76,7 @@ const HiHatOpenPad = ({
             value={tone}
             onChange={(rotation) => setTone(rotation.value)}
             label="Tone"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <KnobSlot />
@@ -90,6 +91,7 @@ const HiHatOpenPad = ({
             value={decay}
             onChange={(rotation) => setDecay(rotation.value)}
             label="Decay"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <KnobSlot />

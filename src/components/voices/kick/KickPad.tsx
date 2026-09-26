@@ -99,6 +99,7 @@ const KickPad = ({
             value={pitch}
             onChange={(rotation) => setPitch(rotation.value)}
             label="Pitch"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <Knob
@@ -109,6 +110,7 @@ const KickPad = ({
             value={length}
             onChange={(rotation) => setLength(rotation.value)}
             label="Decay"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <Knob
@@ -119,6 +121,7 @@ const KickPad = ({
             value={fatness}
             onChange={(rotation) => setFatness(rotation.value)}
             label="Fat"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
         </Flex>
@@ -131,6 +134,7 @@ const KickPad = ({
             value={punch}
             onChange={(rotation) => setPunch(rotation.value)}
             label="Punch"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
           <Knob
@@ -141,6 +145,7 @@ const KickPad = ({
             value={click}
             onChange={(rotation) => setClick(rotation.value)}
             label="Click"
+            valueAsLabel="interactive"
             labelHeightUnits={LABELED_SMALL_KNOB_HEIGHT_UNITS}
           />
         </Flex>
