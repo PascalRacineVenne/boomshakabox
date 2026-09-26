@@ -1,5 +1,6 @@
 import * as Tone from "tone";
-import { effectsBusInput, effectsBusOutput } from "./effectsBus";
+import { effectsBusInput } from "./effectsBus";
+import { delayReverbInsertOutput } from "./delayReverbInsert";
 
 export const FILTER_MODE_OPTIONS = {
   LOWPASS: { value: "lowpass", label: "LP" },
@@ -17,7 +18,11 @@ const masterFilter = new Tone.Filter(12000, FILTER_MODE_OPTIONS.LOWPASS.value);
 masterFilter.connect(effectsBusInput);
 
 const masterGain = new Tone.Gain(0.75);
-effectsBusOutput.connect(masterGain);
+// effectsBusOutput -> [delay -> reverb insert, see delayReverbInsert.ts]
+// -> masterGain: the insert sits right before the master bus, after the
+// existing Filter/Drive stages, per delayReverbInsert.ts's own routing
+// of effectsBusOutput as its input.
+delayReverbInsertOutput.connect(masterGain);
 
 const masterLimiter = new Tone.Limiter(-1).toDestination();
 masterGain.connect(masterLimiter);
