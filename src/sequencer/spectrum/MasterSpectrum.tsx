@@ -19,8 +19,7 @@ import {
   getPlotBounds,
 } from "./spectrumCanvas";
 
-const formatFreqTick = (hz: number) =>
-  hz >= 1000 ? `${hz / 1000}K` : `${hz}`;
+const formatFreqTick = (hz: number) => (hz >= 1000 ? `${hz / 1000}K` : `${hz}`);
 
 const MasterSpectrum = () => {
   const wrapperRef = useRef<HTMLDivElement | null>(null);
@@ -53,7 +52,9 @@ const MasterSpectrum = () => {
     resizeObserver.observe(wrapper);
 
     const strokeColor = resolveScopeStrokeColor(canvas);
-    const textColor = getComputedStyle(canvas).getPropertyValue("--text").trim();
+    const textColor = getComputedStyle(canvas)
+      .getPropertyValue("--text")
+      .trim();
 
     let frameId: number;
 

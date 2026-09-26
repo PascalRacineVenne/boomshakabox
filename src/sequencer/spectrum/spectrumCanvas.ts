@@ -1,5 +1,8 @@
 import { css } from "@linaria/core";
-import { SCOPE_CANVAS_WIDTH, SCOPE_CANVAS_HEIGHT } from "../oscilloscope/scopeCanvas";
+import {
+  SCOPE_CANVAS_WIDTH,
+  SCOPE_CANVAS_HEIGHT,
+} from "../oscilloscope/scopeCanvas";
 
 // Sized by StepSequencer's CSS Grid row (.scopeRow) via the wrapper, not
 // the canvas — see this folder's README for why.

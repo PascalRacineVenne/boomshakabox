@@ -1,6 +1,11 @@
 import { act, renderHook } from "@testing-library/react";
 import { useGridPaging } from "./useGridPaging";
-import { MAX_STEPS, STEP_COUNT, TRACK_IDS, type TrackId } from "../sequencerConstants";
+import {
+  MAX_STEPS,
+  STEP_COUNT,
+  TRACK_IDS,
+  type TrackId,
+} from "../sequencerConstants";
 
 const DEFAULT_VELOCITY = 80;
 
@@ -169,8 +174,22 @@ describe("useGridPaging", () => {
     // Then
     expect(result.current.rangeStart).toBe(48);
     expect(result.current.activePattern).toEqual([
-      true, false, true, false, false, false, false, false,
-      false, false, false, false, false, false, false, true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
     ]);
     expect(result.current.activeVelocities[15]).toBe(99);
   });

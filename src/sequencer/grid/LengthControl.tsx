@@ -1,6 +1,9 @@
 import { css } from "@linaria/core";
 import { Flex, Segmented } from "antd";
-import { PATTERN_LENGTH_OPTIONS, type PatternLength } from "../sequencerConstants";
+import {
+  PATTERN_LENGTH_OPTIONS,
+  type PatternLength,
+} from "../sequencerConstants";
 
 const styles = {
   panel: css`

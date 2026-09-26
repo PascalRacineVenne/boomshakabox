@@ -6,7 +6,10 @@ import {
   triggerMasterFilterEnvelope,
 } from "../../../lib/masterBus";
 import { startAudioContext } from "../../../lib/startAudioContext";
-import { renderOfflineWaveform, useScopeWaveform } from "../../../lib/voiceScope";
+import {
+  renderOfflineWaveform,
+  useScopeWaveform,
+} from "../../../lib/voiceScope";
 import { computeLevel } from "../../../lib/voiceLevel";
 
 interface HiHatOpenChainParams {
