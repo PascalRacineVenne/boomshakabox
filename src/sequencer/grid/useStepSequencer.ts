@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
 import { useTrackPatterns } from "../engine/useTrackPatterns";
 import { useSequencerEngine, type Voices } from "../engine/useSequencerEngine";
+import { useSequencerHitFlash } from "../engine/useSequencerHitFlash";
+import { useGridPaging } from "./useGridPaging";
+import { useMiniGridFollow } from "./useMiniGridFollow";
 
 export const STEP_COUNT = 16;
 export const MAX_STEPS = 64;
@@ -31,15 +33,6 @@ export const TRACK_LABELS: Record<TrackId, string> = {
   hihatOpen: "OH",
 };
 
-const noSequencerHits = (): Record<TrackId, boolean> =>
-  Object.fromEntries(TRACK_IDS.map((id) => [id, false])) as Record<
-    TrackId,
-    boolean
-  >;
-
-const DEFAULT_LENGTH: PatternLength = 16;
-const SEQUENCER_HIT_FLASH_MS = 60;
-
 export const useStepSequencer = (voices: Voices) => {
   const {
     patternsRef,
@@ -53,36 +46,17 @@ export const useStepSequencer = (voices: Voices) => {
     clearTrack,
   } = useTrackPatterns();
 
-  const [length, setLength] = useState<PatternLength>(DEFAULT_LENGTH);
+  const {
+    length,
+    setLength,
+    viewedRange,
+    goToRange,
+    rangeStart,
+    activePattern,
+    activeVelocities,
+  } = useGridPaging({ patternsDisplay, velocitiesDisplay, selectedTrack });
 
-  const [viewedRange, setViewedRange] = useState(0);
-
-  const [miniRange, setMiniRange] = useState(0);
-  const [miniAutoFollow, setMiniAutoFollow] = useState(true);
-  const miniAutoFollowRef = useRef(miniAutoFollow);
-  useEffect(() => {
-    miniAutoFollowRef.current = miniAutoFollow;
-  }, [miniAutoFollow]);
-
-  const [sequencerHits, setSequencerHits] = useState(noSequencerHits);
-  const flashTimeoutsRef = useRef(
-    {} as Record<TrackId, ReturnType<typeof setTimeout> | undefined>,
-  );
-
-  const flashHit = (id: TrackId) => {
-    clearTimeout(flashTimeoutsRef.current[id]);
-    setSequencerHits((prev) => ({ ...prev, [id]: true }));
-    flashTimeoutsRef.current[id] = setTimeout(() => {
-      setSequencerHits((prev) => ({ ...prev, [id]: false }));
-    }, SEQUENCER_HIT_FLASH_MS);
-  };
-
-  useEffect(() => {
-    const flashTimeouts = flashTimeoutsRef.current;
-    return () => {
-      TRACK_IDS.forEach((id) => clearTimeout(flashTimeouts[id]));
-    };
-  }, []);
+  const hitFlash = useSequencerHitFlash(TRACK_IDS);
 
   const { currentStep } = useSequencerEngine({
     trackIds: TRACK_IDS,
@@ -90,52 +64,30 @@ export const useStepSequencer = (voices: Voices) => {
     patternsRef,
     velocitiesRef,
     length,
-    onStepHit: (step, hitTrackIds) => {
-      hitTrackIds.forEach((id) => flashHit(id));
-      if (miniAutoFollowRef.current) {
-        setMiniRange(Math.floor(step / MINI_GRID_RANGE_SIZE));
-      }
+    onStepHit: (_step, hitTrackIds) => {
+      hitFlash.reportHit(hitTrackIds);
     },
     onStop: () => {
-      const flashTimeouts = flashTimeoutsRef.current;
-      TRACK_IDS.forEach((id) => clearTimeout(flashTimeouts[id]));
-      setSequencerHits(noSequencerHits());
-      if (miniAutoFollowRef.current) setMiniRange(0);
+      hitFlash.reset();
+      miniGridFollow.reset();
     },
   });
 
+  const miniGridFollow = useMiniGridFollow(currentStep);
+
   const setStep = (rangeStepIndex: number, active: boolean) => {
-    setAbsoluteStep(viewedRange * STEP_COUNT + rangeStepIndex, active);
+    setAbsoluteStep(rangeStart + rangeStepIndex, active);
   };
 
   const setVelocity = (rangeStepIndex: number, velocity: number) => {
-    setAbsoluteVelocity(viewedRange * STEP_COUNT + rangeStepIndex, velocity);
+    setAbsoluteVelocity(rangeStart + rangeStepIndex, velocity);
   };
-
-  const changeLength = (nextLength: PatternLength) => {
-    setLength(nextLength);
-    const maxRange = nextLength / STEP_COUNT - 1;
-    setViewedRange((prev) => Math.min(prev, maxRange));
-  };
-
-  const goToMiniRange = (range: number) => {
-    setMiniRange(range);
-    setMiniAutoFollow(range === Math.floor(currentStep / MINI_GRID_RANGE_SIZE));
-  };
-
-  const rangeStart = viewedRange * STEP_COUNT;
 
   return {
     patternsDisplay,
-    activePattern: patternsDisplay[selectedTrack].slice(
-      rangeStart,
-      rangeStart + STEP_COUNT,
-    ),
+    activePattern,
     velocitiesDisplay,
-    activeVelocities: velocitiesDisplay[selectedTrack].slice(
-      rangeStart,
-      rangeStart + STEP_COUNT,
-    ),
+    activeVelocities,
     selectedTrack,
     selectTrack,
     currentStep,
@@ -143,11 +95,11 @@ export const useStepSequencer = (voices: Voices) => {
     setVelocity,
     clearTrack,
     length,
-    setLength: changeLength,
+    setLength,
     viewedRange,
-    goToRange: setViewedRange,
-    miniRange,
-    goToMiniRange,
-    sequencerHits,
+    goToRange,
+    miniRange: miniGridFollow.miniRange,
+    goToMiniRange: miniGridFollow.goToMiniRange,
+    sequencerHits: hitFlash.sequencerHits,
   };
 };
