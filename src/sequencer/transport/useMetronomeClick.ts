@@ -3,7 +3,7 @@ import * as Tone from "tone";
 import { clamp } from "../../lib/clamp";
 
 const CLICK_TONE = 1000;
-const DEFAULT_VOLUME = 50;
+const DEFAULT_VOLUME = 10;
 const DEFAULT_MUTED = true;
 
 export const useMetronomeClick = () => {

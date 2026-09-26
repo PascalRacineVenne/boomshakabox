@@ -9,9 +9,8 @@ import { effectsBusOutput } from "./effectsBus";
 //
 // Hand-built tape-style ping-pong delay (not Tone.PingPongDelay, so the
 // cross-feed/darkening/grit character is tunable) followed by a
-// Tone.Freeverb (not Tone.Reverb — Freeverb's roomSize is a plain
-// Signal that can be ramped live; Tone.Reverb needs an async .generate()
-// on every change and would glitch under a knob).
+// Tone.Reverb (chosen after A/B/C listening against Freeverb and
+// JCReverb — Tone.Reverb won).
 
 // --- fixed, non-user-facing tone-shaping constants ---
 const DELAY_INPUT_HIGHPASS_HZ = 250; // strips low end before it can enter the repeats
@@ -22,7 +21,15 @@ const DELAY_LFO_DEPTH_SEC = 0.003; // wow/flutter depth, +/- 3ms
 const DELAY_WET_LEVEL = 0.28; // ~25-30% wet — kit stays mostly dry/punchy
 const REVERB_INPUT_HIGHPASS_HZ = 300; // strips low end before the reverb tail
 const REVERB_WET_LEVEL = 0.18; // ~15-20% wet
-const REVERB_DAMPENING_HZ = 3000; // mid-range default, tuned by ear
+// Tone.Reverb has no roomSize Signal — its only control is `decay` (in
+// seconds), a plain setter that triggers an async offline IR render.
+// Verb Length (0-1) maps onto this range instead of straight into a Signal.
+const TONE_REVERB_MIN_DECAY_SEC = 0.3;
+const TONE_REVERB_MAX_DECAY_SEC = 4;
+// Regenerating the IR on every knob tick would fire an offline render per
+// tick while dragging; debouncing to only the last value after a short
+// pause keeps that to one render per knob gesture instead.
+const TONE_REVERB_DECAY_DEBOUNCE_MS = 120;
 
 // --- quantized delay-time divisions, exposed to the UI ---
 // Ordered by actual resulting duration (not by note-name grouping), so
@@ -144,9 +151,9 @@ delayWetGain.connect(preReverbSum);
 // The reverb's highpass/processing is a SIDE-CHAIN off preReverbSum, not
 // something preReverbSum itself passes through — otherwise the entire
 // kit (not just the reverb tail) would lose its low end, since
-// Freeverb's own internal wet/dry mix would be blending its OWN input
+// Tone.Reverb's own internal wet/dry mix would be blending its OWN input
 // (the already-highpassed signal) back in as its "dry" portion. Instead:
-// freeverb runs fully wet (its internal mix disabled), and only ITS
+// toneReverb runs fully wet (its internal mix disabled), and only ITS
 // output — the processed tail — gets summed back onto the untouched
 // full-bandwidth preReverbSum signal below.
 const reverbInputHighpass = new Tone.Filter(
@@ -155,19 +162,28 @@ const reverbInputHighpass = new Tone.Filter(
 );
 preReverbSum.connect(reverbInputHighpass);
 
-const freeverb = new Tone.Freeverb({
-  roomSize: DEFAULT_VERB_LENGTH,
-  dampening: REVERB_DAMPENING_HZ,
-});
-freeverb.wet.value = 1;
-reverbInputHighpass.connect(freeverb);
+// Tone.Reverb: a convolution reverb from an offline-rendered decaying
+// noise burst. Its only control (`decay`, in seconds) is a plain setter
+// that kicks off an async re-render each time it's set — see
+// setVerbLength below, which debounces that.
+const toneReverb = new Tone.Reverb(TONE_REVERB_MIN_DECAY_SEC);
+toneReverb.wet.value = 1;
+reverbInputHighpass.connect(toneReverb);
+
+// Convolving with a generated noise-burst IR reads quieter than an
+// algorithmic reverb's sustained feedback at a matched decay length, so
+// this makeup gain brings the tail up to a comparable presence.
+// Starting guess from the A/B/C pass; retune by ear if needed.
+const TONE_REVERB_PRESENCE_TRIM = 2.5;
+const toneReverbPresenceTrim = new Tone.Gain(TONE_REVERB_PRESENCE_TRIM);
+toneReverb.connect(toneReverbPresenceTrim);
 
 // Verb Length doubles as the reverb's overall presence (see
 // setVerbLength below), same as Feedback does for the delay: at
 // minimum, this goes to 0 too, so there's no reverb tail audible at all
 // rather than a short-but-still-there one.
 const reverbWetGain = new Tone.Gain(REVERB_WET_LEVEL * DEFAULT_VERB_LENGTH);
-freeverb.connect(reverbWetGain);
+toneReverbPresenceTrim.connect(reverbWetGain);
 
 const insertOutputSum = new Tone.Gain(1);
 preReverbSum.connect(insertOutputSum); // full-bandwidth, untouched
@@ -216,9 +232,17 @@ export const setDelayFeedback = (value: number) => {
   dryGain.gain.rampTo(1 - DELAY_WET_LEVEL * curved, 0.02);
 };
 
+let toneReverbDecayTimeout: ReturnType<typeof setTimeout> | null = null;
+
 export const setVerbLength = (value: number) => {
-  freeverb.roomSize.rampTo(value, 0.02);
   reverbWetGain.gain.rampTo(REVERB_WET_LEVEL * value, 0.02);
+
+  if (toneReverbDecayTimeout !== null) clearTimeout(toneReverbDecayTimeout);
+  toneReverbDecayTimeout = setTimeout(() => {
+    toneReverb.decay =
+      TONE_REVERB_MIN_DECAY_SEC +
+      (TONE_REVERB_MAX_DECAY_SEC - TONE_REVERB_MIN_DECAY_SEC) * value;
+  }, TONE_REVERB_DECAY_DEBOUNCE_MS);
 };
 
 applyDelayTimeDivision(DEFAULT_DELAY_TIME_INDEX);
